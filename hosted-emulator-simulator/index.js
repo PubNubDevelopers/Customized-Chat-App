@@ -20,23 +20,24 @@ function createSimulators() {
     }
   }
   if (configurationFromQueryParams === "") {
-    console.log('Failed to detect configuration in URL query params.  Could not load simulator');
-    document.getElementById('ios-device').innerHTML = "Failed to detect identifier in query params.  Could not load simulator"
+    console.log('Failed to detect configuration in URL query params.  Could not load simulator / emulator');
+    document.getElementById('ios-device').innerHTML = "Failed to detect identifier in query params.  Could not load iOS simulator"
+    document.getElementById('android-device').innerHTML = "Failed to detect identifier in query params.  Could not load Android emulator"
     return;
   }
   else {
     console.log(configurationFromQueryParams)
-    var simulatorWidth = " width='400px'";
+    var simulatorWidth = " width='404px'";
     //var simulatorHeight = " height='698px'";
-    var simulatorHeight = " height='800px'";
+    var simulatorHeight = " height='852px'";
 
     //  Android
-//    var device_android = "pixel7"
-//    var appId_android = "b_i6euwhlucx5s6vrvn4gx4ryjg4";
-//    var otherParams_android = "&scale=auto&screenOnly=false&osVersion=13.0&centered=both&grantPermissions=true"
-//    var encodedJson_android = encodeURIComponent(JSON.stringify({identifier: clientIdentifier}))
-//    var iFrameSource_android = "<iframe src='https://appetize.io/embed/" + appId_android + "?device=" + device_android + otherParams_android + "&params=" + encodedJson_android + "'" + simulatorHeight + "></iframe>";
-//    document.getElementById('android-device').innerHTML = iFrameSource_android
+    var device_android = "pixel8pro"
+    var appId_android = "b_4wiugox33t37rwxhnw25qi24mq";
+    var otherParams_android = "&scale=auto&screenOnly=false&osVersion=14.0&centered=both&grantPermissions=true"
+    var encodedJson_android = encodeURIComponent(JSON.stringify({configuration: configurationFromQueryParams}))
+    var iFrameSource_android = "<iframe src='https://appetize.io/embed/" + appId_android + "?device=" + device_android + otherParams_android + "&params=" + encodedJson_android + "'" + simulatorWidth + simulatorHeight + "></iframe>";
+    document.getElementById('android-device').innerHTML = iFrameSource_android
 
     //  iOS
     var device_ios = "iphone16promax"
