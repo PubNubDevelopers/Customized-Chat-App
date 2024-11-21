@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
+import { buildConfig } from './configuration'
+
 export default function Home () {
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -11,7 +13,9 @@ export default function Home () {
   const [configTypingIndicator, setConfigTypingIndicator] = useState(false)
 
   useEffect(() => {
-    setEncodedConfiguration(searchParams.get('configuration'))
+    const encodedConfiguration = searchParams.get('configuration')
+    if (!encodedConfiguration) return
+    setEncodedConfiguration(encodedConfiguration)
   }, [searchParams, router])
 
   useEffect(() => {
@@ -76,7 +80,8 @@ export default function Home () {
             Read our docs
           </a>
         </div>
-        <div className=''>Value of Typing Indicator {configTypingIndicator ? "Enabled" : "Disabled"}</div>
+        <div className=''>Value of Typing Indicator (Runtime) {configTypingIndicator ? "Enabled" : "Disabled"}</div>
+        <div className=''>Value of Typing Indicator (Build) {buildConfig.typing_indicator ? "Enabled" : "Disabled"}</div>
       </main>
       <footer className='row-start-3 flex gap-6 flex-wrap items-center justify-center'>
         <a
