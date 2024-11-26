@@ -450,73 +450,7 @@ export default function MessageList ({
             showUserMessage={showUserMessage}
           />
 
-<Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
 
-<Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
-
-<Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
-
-<Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
 
         {/*
         {messages.map((message, index) => {

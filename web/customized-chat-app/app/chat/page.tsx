@@ -26,7 +26,9 @@ import {
 } from '../types'
 import { getAuthKey } from "../getAuthKey"
 
-export default function Page () {
+export default function Page (
+  embeddedDemo = false
+) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [userId, setUserId] = useState<String | null>('')
@@ -95,8 +97,6 @@ export default function Page () {
     useState<ThreadChannel | null>(null)
   const [activeThreadMessage, setActiveThreadMessage] =
     useState<pnMessage | null>(null)
-
-  const dccHeaderShown = true
 
   async function emojiSelected (data) {
     if (emojiPickerTargetsInput) {
@@ -1037,7 +1037,7 @@ export default function Page () {
       />*/}
 
         
-      <Header
+      {!embeddedDemo && <Header
         setRoomSelectorVisible={setRoomSelectorVisible}
         setProfileScreenVisible={setProfileScreenVisible}
         showNotificationBadge={true}
@@ -1046,7 +1046,7 @@ export default function Page () {
         setCreatingNewMessage={setCreatingNewMessage}
         showUserMessage={showUserMessage}
         guidedDemo={guidedDemo}
-      />
+      />}
       <UserMessage
         userMsgShown={userMsgShown}
         title={userMsg.title}
@@ -1111,12 +1111,12 @@ export default function Page () {
           }}
           currentUserProfileUrl={profileUrl}
           showUserMessage={showUserMessage}
+          embeddedDemo={embeddedDemo}
         />
         <div className='relative w-full bg-white'>
-          {/* todo: mt-64px to account for the header */}
           <div
             id='chats-main'
-            className={`flex flex-col grow w-full max-h-screen py-0 ${dccHeaderShown ? 'mt-[64px]' : ''} bg-white`}
+            className={`flex flex-col grow w-full max-h-screen py-0 ${!embeddedDemo ? 'mt-[64px]' : ''} bg-white`}
           >
             {creatingNewMessage ? (
               <NewMessageGroup
