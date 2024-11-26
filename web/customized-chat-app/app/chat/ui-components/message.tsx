@@ -25,13 +25,15 @@ export default function Message ({
   message,
   currentUserId,
   isOnline = -1,
-  showUserMessage = (a, b, c, d) => {}
+  showUserMessage = (a, b, c, d) => {},
+  embeddedDemo = false,
+  forceShowActions = false,
+  configuration = null
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
-  const [actionsShown, setActionsShown] = useState(false)
+  const [actionsShown, setActionsShown] = useState(forceShowActions)
   const [emojiPickerShown, setEmojiPickerShown] = useState(false)
 
-  
   let messageHovered = false
 
   const handleMessageMouseEnter = e => {
@@ -40,7 +42,9 @@ export default function Message ({
   }
   const handleMessageMouseLeave = e => {
     messageHovered = false
-    setActionsShown(false)
+    if (!forceShowActions) {
+      setActionsShown(false)
+    }
     setEmojiPickerShown(false)
   }
 
@@ -49,7 +53,7 @@ export default function Message ({
   }
 
   function handleMessageActionsLeave () {
-    if (!messageHovered) {
+    if (!messageHovered && !forceShowActions) {
       setActionsShown(false)
     }
   }
@@ -207,6 +211,7 @@ export default function Message ({
               <Avatar
                 present={isOnline}
                 avatarUrl={avatarUrl ? avatarUrl : '/avatars/placeholder.png'}
+                configuration={configuration}
               />
             )}
           </div>
@@ -308,7 +313,7 @@ export default function Message ({
                     .getMessageElements()
                     .map((msgPart, index) => renderMessagePart(msgPart, index))}
                     */}
-                    <span>{message.content.text}</span>
+                <span>{message.content.text}</span>
                 {message.actions && message.actions.edited && (
                   <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
                 )}
@@ -354,30 +359,14 @@ export default function Message ({
                     ))
                 : ''}*/}
 
-<MessageReaction
-                        emoji={"🤕"}
-                        messageTimetoken={"0123456789"}
-                        count={3}
-                        reactionClicked={() => {}}
-                      />
+              {embeddedDemo && configuration?.get('message_reactions').state == true &&(
                 <MessageReaction
-                        emoji={"🤕"}
-                        messageTimetoken={"0123456789"}
-                        count={3}
-                        reactionClicked={() => {}}
-                      />
-                <MessageReaction
-                        emoji={"🤕"}
-                        messageTimetoken={"0123456789"}
-                        count={3}
-                        reactionClicked={() => {}}
-                      />
-                <MessageReaction
-                        emoji={"🤕"}
-                        messageTimetoken={"0123456789"}
-                        count={3}
-                        reactionClicked={() => {}}
-                      />
+                  emoji={'🤕'}
+                  messageTimetoken={'0123456789'}
+                  count={3}
+                  reactionClicked={() => {}}
+                />
+              )}
             </div>
             {!inThread && message.hasThread && (
               <div
@@ -415,60 +404,92 @@ export default function Message ({
                 isPinned={pinned}
                 messageActionsEnter={() => handleMessageActionsEnter()}
                 messageActionsLeave={() => handleMessageActionsLeave()}
-                emojiClick={(emoji) => console.log(emoji + " is clicked")}
-                replyInThreadClick={() =>
-                    console.log('reply')
-                  //messageActionHandler(
-                  //  MessageActionsTypes.REPLY_IN_THREAD,
-                  //  message
-                  //)
+                emojiClick={
+                  configuration?.get('message_reactions').state == true
+                    ? emoji => console.log(emoji + ' is clicked')
+                    : null
                 }
-                quoteMessageClick={() =>
-                  console.log('quote')
-                    //messageActionHandler(MessageActionsTypes.QUOTE, message)
+                replyInThreadClick={
+                  configuration?.get('message_threads').state == true
+                    ? () => {
+                        console.log('reply')
+                        messageActionHandler(
+                          MessageActionsTypes.REPLY_IN_THREAD,
+                          message
+                        )
+                      }
+                    : null
                 }
-                pinMessageClick={() => {
-                  console.log('pin')
-                  //  messageActionHandler(MessageActionsTypes.PIN, message)
-                }}
-                forwardMessageClick={() => console.log('forward')}
-                editMessageClick={() => console.log('edit')}
-                deleteMessageClick={() => console.log('delete')}
-                reportMessageClick={() => console.log('report')}
-                  />
+                quoteMessageClick={
+                  configuration?.get('message_quote').state == true
+                    ? () => {
+                        console.log('quote')
+                        messageActionHandler(MessageActionsTypes.QUOTE, message)
+                      }
+                    : null
+                }
+                pinMessageClick={
+                  configuration?.get('message_pin').state == true
+                    ? () => {
+                        console.log('pin')
+                        messageActionHandler(MessageActionsTypes.PIN, message)
+                      }
+                    : null
+                }
+                forwardMessageClick={configuration?.get('message_forward').state == true ? () => console.log('forward') : null}
+                editMessageClick={configuration?.get('message_editing').state == true ? () => console.log('edit') : null}
+                deleteMessageClick={configuration?.get('message_deletion_soft').state == true ? () => console.log('delete') : null}
+                reportMessageClick={configuration?.get('message_report').state == true ? () => console.log('report') : null}
+              />
             )}
           </div>
           {/* actions go here for sent */}
           {!received && !inThread && !inPinned && (
             <MessageActions
-            received={received}
-            actionsShown={actionsShown}
-            emojiPickerShown={emojiPickerShown}
-            setEmojiPickerShown={setEmojiPickerShown}
-            isPinned={pinned}
-            messageActionsEnter={() => handleMessageActionsEnter()}
-            messageActionsLeave={() => handleMessageActionsLeave()}
-            emojiClick={(emoji) => {setEmojiPickerShown(false);console.log(emoji + " is clicked")}}
-            replyInThreadClick={() =>
-                console.log('reply')
-              //messageActionHandler(
-              //  MessageActionsTypes.REPLY_IN_THREAD,
-              //  message
-              //)
-            }
-            quoteMessageClick={() =>
-              console.log('quote')
-              //  messageActionHandler(MessageActionsTypes.QUOTE, message)
-            }
-            pinMessageClick={() => {
-              console.log('pin')
-              //  messageActionHandler(MessageActionsTypes.PIN, message)
-            }}
-            forwardMessageClick={() => console.log('forward')}
-            editMessageClick={() => console.log('edit')}
-            deleteMessageClick={() => console.log('delete')}
-            reportMessageClick={() => console.log('report')}
-        />
+              received={received}
+              actionsShown={actionsShown}
+              emojiPickerShown={emojiPickerShown}
+              setEmojiPickerShown={setEmojiPickerShown}
+              isPinned={pinned}
+              messageActionsEnter={() => handleMessageActionsEnter()}
+              messageActionsLeave={() => handleMessageActionsLeave()}
+              emojiClick={
+                configuration?.get('message_reactions').state == true
+                  ? emoji => console.log(emoji + ' is clicked')
+                  : null
+              }
+              replyInThreadClick={
+                configuration?.get('message_threads').state == true
+                  ? () => {
+                      console.log('reply')
+                      messageActionHandler(
+                        MessageActionsTypes.REPLY_IN_THREAD,
+                        message
+                      )
+                    }
+                  : null
+              }
+              quoteMessageClick={
+                configuration?.get('message_quote').state == true
+                  ? () => {
+                      console.log('quote')
+                      messageActionHandler(MessageActionsTypes.QUOTE, message)
+                    }
+                  : null
+              }
+              pinMessageClick={
+                configuration?.get('message_pin').state == true
+                  ? () => {
+                      console.log('pin')
+                      messageActionHandler(MessageActionsTypes.PIN, message)
+                    }
+                  : null
+              }
+              forwardMessageClick={configuration?.get('message_forward').state == true ? () => console.log('forward') : null}
+              editMessageClick={configuration?.get('message_editing').state == true ? () => console.log('edit') : null}
+              deleteMessageClick={configuration?.get('message_deletion_soft').state == true ? () => console.log('delete') : null}
+              reportMessageClick={configuration?.get('message_report').state == true ? () => console.log('report') : null}
+            />
           )}
         </div>
       </div>

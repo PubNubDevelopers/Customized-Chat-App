@@ -29,7 +29,9 @@ export default function MessageList ({
   activeChannelPinnedMessage,
   setActiveChannelPinnedMessage,
   setShowThread,
-  showUserMessage
+  showUserMessage,
+  embeddedDemo = false,
+  configuration = null
 }) {
   const MAX_AVATARS_SHOWN = 9
   const [messages, setMessages] = useState<pnMessage[]>([])
@@ -38,9 +40,20 @@ export default function MessageList ({
   const [pinnedMessageTimetoken, setPinnedMessageTimetoken] = useState('') //  Keep track of if someone else has updated the pinned message
   const messageListRef = useRef<HTMLDivElement>(null)
   const [loadingMessage, setLoadingMessage] = useState('')
-  let dummyMessage1 = {"timetoken": 13518916319742640, "content": {"text": "This is a message"}}
-  let dummyMessage2 = {"timetoken": 13518916319742641, "content": {"text": "This is another message"}}
-  let dummyMessage3 = {"timetoken": 13518916319742642, "content": {"text": "This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long "}}
+  let dummyMessage1 = {
+    timetoken: 13518916319742640,
+    content: { text: 'This is a message' }
+  }
+  let dummyMessage2 = {
+    timetoken: 13518916319742641,
+    content: { text: 'This is another message' }
+  }
+  let dummyMessage3 = {
+    timetoken: 13518916319742642,
+    content: {
+      text: 'This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long '
+    }
+  }
 
   function uniqueById (items) {
     const set = new Set()
@@ -202,8 +215,8 @@ export default function MessageList ({
         <div
           className={`${roboto.className} text-base font-medium flex flex-row grow justify-center items-center gap-3`}
         >
-            Header (Temp)
-                        {/*
+          Header (Temp)
+          {/*
 
           {activeChannel.type == 'public' && (
             <div className='flex flex-row justify-center items-center gap-3'>
@@ -382,75 +395,83 @@ export default function MessageList ({
         )}
           */}
 
+        {embeddedDemo && (<div><Message
+          received={true}
+          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
+          isOnline={false}
+          readReceipts={null}
+          quotedMessageSender={null}
+          showReadIndicator={true}
+          sender={'Test User1'}
+          pinned={false}
+          messageActionHandler={(action, vars) =>
+            messageActionHandler(action, vars)
+          }
+          message={dummyMessage1}
+          currentUserId={'testuser001'}
+          showUserMessage={showUserMessage}
+          embeddedDemo={embeddedDemo}
+          forceShowActions={true}
+          configuration={configuration}
+        />
+
         <Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
+          received={false}
+          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
+          isOnline={false}
+          readReceipts={null}
+          quotedMessageSender={null}
+          showReadIndicator={true}
+          sender={'Test User 2'}
+          pinned={false}
+          messageActionHandler={(action, vars) =>
+            messageActionHandler(action, vars)
+          }
+          message={dummyMessage2}
+          currentUserId={'testuser002'}
+          showUserMessage={showUserMessage}
+          embeddedDemo={embeddedDemo}
+          configuration={configuration}
+        />
 
-<Message
-            received={false}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
-            isOnline={false}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User 2"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage2}
-            currentUserId={"testuser002"}
-            showUserMessage={showUserMessage}
-          />
+        <Message
+          received={true}
+          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
+          isOnline={true}
+          readReceipts={null}
+          quotedMessageSender={null}
+          showReadIndicator={true}
+          sender={'Test User1'}
+          pinned={false}
+          messageActionHandler={(action, vars) =>
+            messageActionHandler(action, vars)
+          }
+          message={dummyMessage1}
+          currentUserId={'testuser001'}
+          showUserMessage={showUserMessage}
+          embeddedDemo={embeddedDemo}
+          configuration={configuration}
+        />
 
-<Message
-            received={true}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
-            isOnline={true}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User1"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage1}
-            currentUserId={"testuser001"}
-            showUserMessage={showUserMessage}
-          />
-
-<Message
-            received={false}
-            avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
-            isOnline={true}
-            readReceipts={null}
-            quotedMessageSender={null}
-            showReadIndicator={true}
-            sender={"Test User 2"}
-            pinned={false}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={dummyMessage3}
-            currentUserId={"testuser002"}
-            showUserMessage={showUserMessage}
-          />
-
-
+        <Message
+          received={false}
+          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
+          isOnline={true}
+          readReceipts={null}
+          quotedMessageSender={null}
+          showReadIndicator={true}
+          sender={'Test User 2'}
+          pinned={false}
+          messageActionHandler={(action, vars) =>
+            messageActionHandler(action, vars)
+          }
+          message={dummyMessage3}
+          currentUserId={'testuser002'}
+          showUserMessage={showUserMessage}
+          embeddedDemo={embeddedDemo}
+          forceShowActions={true}
+          configuration={configuration}
+        /></div>)}
 
         {/*
         {messages.map((message, index) => {

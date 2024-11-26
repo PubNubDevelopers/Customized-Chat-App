@@ -8,7 +8,8 @@ export default function Avatar ({
   height = 32,
   editIcon = false,
   editActionHandler = () => {},
-  border = false
+  border = false,
+  configuration = null
 }) {
   return (
     <div className='relative'>
@@ -20,7 +21,7 @@ export default function Avatar ({
         height={height}
       />
       {/* Presence Indicator */}
-      {present != -1 &&
+      {(configuration == null || configuration?.get('user_presence')?.state == true) && present != -1 &&
         bubblePrecedent === '' &&
         (present > 0 ? (
           <div className='w-[12px] h-[12px] rounded-full border-2 border-white bg-success absolute left-[22px] top-[20px]'></div>

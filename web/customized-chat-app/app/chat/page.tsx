@@ -24,11 +24,9 @@ import {
   UnreadMessagesOnChannel,
   PresenceIcon
 } from '../types'
-import { getAuthKey } from "../getAuthKey"
+import { getAuthKey } from '../getAuthKey'
 
-export default function Page (
-  embeddedDemo = false
-) {
+export default function Page ({ embeddedDemo = false, configuration = null }) {
   const searchParams = useSearchParams()
   const router = useRouter()
   const [userId, setUserId] = useState<String | null>('')
@@ -322,12 +320,12 @@ export default function Page (
         userId: userId,
         typingTimeout: 5000,
         storeUserActivityTimestamps: true,
-        storeUserActivityInterval: 300000, /* 5 minutes */
-        authKey: accessManagerToken,
+        storeUserActivityInterval: 300000 /* 5 minutes */,
+        authKey: accessManagerToken
       })
       setChat(localChat)
       setCurrentUser(localChat.currentUser)
-      
+
       if (!localChat.currentUser.profileUrl) {
         const randomProfileUrl = Math.floor(
           Math.random() * testData.avatars.length
@@ -339,7 +337,9 @@ export default function Page (
         setName('' + userId)
         setProfileUrl(testData.avatars[randomProfileUrl])
       } else {
-        if (localChat.currentUser.name) {setName(localChat.currentUser.name)}
+        if (localChat.currentUser.name) {
+          setName(localChat.currentUser.name)
+        }
         setProfileUrl(localChat.currentUser.profileUrl)
       }
 
@@ -355,9 +355,10 @@ export default function Page (
             if (channelsResponse.channels.length > 0) {
               setLoadMessage('Creating Memberships')
               //  Join each of the public channels
-              const currentMemberships = await localChat.currentUser.getMemberships({
-                filter: "channel.type == 'public'"
-              })
+              const currentMemberships =
+                await localChat.currentUser.getMemberships({
+                  filter: "channel.type == 'public'"
+                })
 
               //  Test to see if we are already a member of the public channels, and if not, join them.
               const publicMembership =
@@ -368,7 +369,9 @@ export default function Page (
                 membership => membership.channel.id == 'public-work'
               )
               if (!publicMembership) {
-                const publicChannel = await localChat.getChannel('public-general')
+                const publicChannel = await localChat.getChannel(
+                  'public-general'
+                )
                 publicChannel?.join(message => {
                   //  We have a message listener elsewhere for consistency with private and direct chats
                 })
@@ -752,11 +755,11 @@ export default function Page (
             setQuotedMessageSender(user.name)
           }
         })
-//        actionCompleted({
-//          action: 'Quote a Message',
-//          blockDuplicateCalls: false,
-//          debug: false
-//        })
+        //        actionCompleted({
+        //          action: 'Quote a Message',
+        //          blockDuplicateCalls: false,
+        //          debug: false
+        //        })
         break
       case MessageActionsTypes.PIN:
         if (activeChannel) {
@@ -780,11 +783,11 @@ export default function Page (
               'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/pinned',
               ToastType.CHECK
             )
-//            actionCompleted({
-//              action: 'Pin a Message',
-//              blockDuplicateCalls: false,
-//              debug: false
-//            })
+            //            actionCompleted({
+            //              action: 'Pin a Message',
+            //              blockDuplicateCalls: false,
+            //              debug: false
+            //            })
           }
         }
         break
@@ -804,14 +807,11 @@ export default function Page (
 
   function logout () {
     const identifier = searchParams.get('identifier')
-    if (identifier)
-      {
-        router.replace(`/?identifier=${identifier}`)
-      }
-      else
-      {
-        router.replace(`/`)
-      }
+    if (identifier) {
+      router.replace(`/?identifier=${identifier}`)
+    } else {
+      router.replace(`/`)
+    }
   }
 
   function showUserMessage (
@@ -1036,17 +1036,18 @@ export default function Page (
         setChangeNameModalVisible={setChangeUserNameModalVisible}
       />*/}
 
-        
-      {!embeddedDemo && <Header
-        setRoomSelectorVisible={setRoomSelectorVisible}
-        setProfileScreenVisible={setProfileScreenVisible}
-        showNotificationBadge={true}
-        showMentionsBadge={false}
-        creatingNewMessage={creatingNewMessage}
-        setCreatingNewMessage={setCreatingNewMessage}
-        showUserMessage={showUserMessage}
-        guidedDemo={guidedDemo}
-      />}
+      {!embeddedDemo && (
+        <Header
+          setRoomSelectorVisible={setRoomSelectorVisible}
+          setProfileScreenVisible={setProfileScreenVisible}
+          showNotificationBadge={true}
+          showMentionsBadge={false}
+          creatingNewMessage={creatingNewMessage}
+          setCreatingNewMessage={setCreatingNewMessage}
+          showUserMessage={showUserMessage}
+          guidedDemo={guidedDemo}
+        />
+      )}
       <UserMessage
         userMsgShown={userMsgShown}
         title={userMsg.title}
@@ -1116,7 +1117,9 @@ export default function Page (
         <div className='relative w-full bg-white'>
           <div
             id='chats-main'
-            className={`flex flex-col grow w-full max-h-screen py-0 ${!embeddedDemo ? 'mt-[64px]' : ''} bg-white`}
+            className={`flex flex-col grow w-full max-h-screen py-0 ${
+              !embeddedDemo ? 'mt-[64px]' : ''
+            } bg-white`}
           >
             {creatingNewMessage ? (
               <NewMessageGroup
@@ -1203,6 +1206,8 @@ export default function Page (
                 setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
                 setShowThread={setShowThread}
                 showUserMessage={showUserMessage}
+                embeddedDemo={embeddedDemo}
+                configuration={configuration}
               />
             )}
             {!quotedMessage &&
@@ -1228,6 +1233,21 @@ export default function Page (
                   }
                 />
               )}
+            {
+              configuration?.get('typing_indicator').state == true && (<TypingIndicator
+                typers={['darryn']}
+                users={[
+                  {
+                    id: 'darryn',
+                    profileUrl: '/avatars/m/01.jpg',
+                    active: true,
+                    name: 'Darryn Campbell'
+                  }
+                ]}
+                embeddedDemo={embeddedDemo}
+                configuration={configuration}
+              />)
+            }
             <div
               className={`${
                 creatingNewMessage && 'hidden'
