@@ -16,7 +16,7 @@ export default function ToolTip ({ className, tip, messageActionsTip = true }) {
           {tip}
         </div>
         <Image
-          src='/icons/caret.svg'
+          src='/icons/chat-assets/caret.svg'
           alt='Caret'
           className='p-0 rotate-180'
           width={12}

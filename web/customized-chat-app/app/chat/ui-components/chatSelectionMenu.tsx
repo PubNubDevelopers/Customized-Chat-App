@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import ChatMenuHeader from './chatMenuHeader'
 import ChatMenuItem from './chatMenuItem'
-import { ChatHeaderActionIcon, PresenceIcon, ToastType, useBreakpoints, useMediaQuery } from '@/app/types'
+import { ChatHeaderActionIcon, PresenceIcon, ToastType, useBreakpoints, useMediaQuery } from '../../types'
 
 export default function ChatSelectionMenu ({
   chatSelectionMenuMinimized,
@@ -56,7 +56,7 @@ export default function ChatSelectionMenu ({
           onClick={e => {setChatSelectionMenuMinimized(!chatSelectionMenuMinimized);setShowThread(false)}}
         >
           <Image
-            src='/icons/close-rooms.svg'
+            src='/icons/chat-assets/close-rooms.svg'
             alt='Expand Chats'
             className='p-1 mb-7 rotate-180'
             width={36}
@@ -77,7 +77,7 @@ export default function ChatSelectionMenu ({
             }}
           />
           <Image
-            src='/icons/search.svg'
+            src='/icons/chat-assets/search.svg'
             alt='Search Icon'
             className='absolute left-6 top-1/2 h-[20px] w-[20px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900'
             width={20}

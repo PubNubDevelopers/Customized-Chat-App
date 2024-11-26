@@ -1,5 +1,5 @@
 import Avatar from './avatar'
-import { PresenceIcon } from '@/app/types'
+import { PresenceIcon } from '../../types'
 
 export default function TypingIndicator ({ typers, users }) {
   return (

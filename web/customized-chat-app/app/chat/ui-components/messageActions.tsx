@@ -65,7 +65,7 @@ export default function MessageActions ({
             toolTipText='React to message'
             toolTipVisible={emoteToolTip}
             setToolTipVisible={setEmoteToolTip}
-            iconUrl='/icons/smile.svg'
+            iconUrl='/icons/chat-assets/smile.svg'
             iconAlt='Smile'
           ></MessageAction>
         )}
@@ -77,7 +77,7 @@ export default function MessageActions ({
             toolTipText='Quote Message'
             toolTipVisible={quoteToolTip}
             setToolTipVisible={setQuoteToolTip}
-            iconUrl='/icons/quote.svg'
+            iconUrl='/icons/chat-assets/quote.svg'
             iconAlt='Quote'
           ></MessageAction>
         )}
@@ -89,7 +89,7 @@ export default function MessageActions ({
             toolTipText={`${isPinned ? 'Unpin message' : 'Pin message'}`}
             toolTipVisible={pinToolTip}
             setToolTipVisible={setPinToolTip}
-            iconUrl='/icons/pin.svg'
+            iconUrl='/icons/chat-assets/pin.svg'
             iconAlt='Pin'
           ></MessageAction>
         )}
@@ -101,7 +101,7 @@ export default function MessageActions ({
             toolTipText='Reply in thread'
             toolTipVisible={replyToolTip}
             setToolTipVisible={setReplyToolTip}
-            iconUrl='/icons/reply.svg'
+            iconUrl='/icons/chat-assets/reply.svg'
             iconAlt='Reply'
           ></MessageAction>
         )}
@@ -113,7 +113,7 @@ export default function MessageActions ({
             toolTipText='Forward Message'
             toolTipVisible={forwardToolTip}
             setToolTipVisible={setForwardToolTip}
-            iconUrl='/icons/forward.svg'
+            iconUrl='/icons/chat-assets/forward.svg'
             iconAlt='Reply'
           ></MessageAction>
         )}
@@ -125,7 +125,7 @@ export default function MessageActions ({
             toolTipText='Edit Message'
             toolTipVisible={editToolTip}
             setToolTipVisible={setEditToolTip}
-            iconUrl='/icons/edit.svg'
+            iconUrl='/icons/chat-assets/edit.svg'
             iconAlt='Edit'
           ></MessageAction>
         )}
@@ -137,7 +137,7 @@ export default function MessageActions ({
             toolTipText='Delete Message'
             toolTipVisible={deleteToolTip}
             setToolTipVisible={setDeleteToolTip}
-            iconUrl='/icons/delete.svg'
+            iconUrl='/icons/chat-assets/delete.svg'
             iconAlt='Delete'
           ></MessageAction>
         )}
@@ -149,7 +149,7 @@ export default function MessageActions ({
             toolTipText='Report Message'
             toolTipVisible={reportToolTip}
             setToolTipVisible={setReportToolTip}
-            iconUrl='/icons/report.svg'
+            iconUrl='/icons/chat-assets/report.svg'
             iconAlt='Report'
           ></MessageAction>
         )}

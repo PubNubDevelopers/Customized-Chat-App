@@ -5,7 +5,7 @@ import { MessageDraft, User, Channel } from '@pubnub/chat'
 import QuotedMessage from './quotedMessage'
 import MentionSuggestions from './mentionSuggestions'
 import { useState, useEffect, useRef } from 'react'
-import { ToastType } from '@/app/types'
+import { ToastType } from '../../types'
 
 export default function MessageInput ({
   activeChannel,
@@ -227,7 +227,7 @@ export default function MessageInput ({
             onClick={e => handleSend(e)}
           >
             <Image
-              src='/icons/send.svg'
+              src='/icons/chat-assets/send.svg'
               alt='Send'
               className='m-3 cursor-pointer'
               width={24}
@@ -244,7 +244,7 @@ export default function MessageInput ({
             }}
           >
             <Image
-              src='/icons/smile.svg'
+              src='/icons/chat-assets/smile.svg'
               alt='Smile'
               className='m-3 cursor-pointer'
               width={24}
@@ -265,7 +265,7 @@ export default function MessageInput ({
               <UnreadIndicator count={1}/>
             </div>)}
             <Image
-              src='/icons/attachment.svg'
+              src='/icons/chat-assets/attachment.svg'
               alt='Attachment'
               className='m-3 cursor-pointer'
               width={24}
@@ -280,7 +280,7 @@ export default function MessageInput ({
             onClick={e => handleSend(e)}
           >
             <Image
-              src='/icons/plus.svg'
+              src='/icons/chat-assets/plus.svg'
               alt='Plus'
               className='m-3'
               width={14}

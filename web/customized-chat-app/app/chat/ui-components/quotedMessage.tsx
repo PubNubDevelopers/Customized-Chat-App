@@ -31,7 +31,7 @@ export default function QuotedMessage ({
       {displayedWithMesageInput && setQuotedMessage && (
         <div className=' cursor-pointer' onClick={() => setQuotedMessage(null)}>
           <Image
-            src='/icons/close.svg'
+            src='/icons/chat-assets/close.svg'
             alt='Close'
             className='m-3'
             width={20}

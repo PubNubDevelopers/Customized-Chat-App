@@ -14,7 +14,7 @@ import UserMessage from './ui-components/userMessage'
 import ProfileScreen from './ui-components/profileScreen'
 import TypingIndicator from './ui-components/typingIndicator'
 import ChatSettingsScreen from './ui-components/chatSettingsScreen'
-import searchImg from '@/public/icons/search.svg'
+import searchImg from '@/public/icons/chat-assets/search.svg'
 import {
   ChatNameModals,
   MessageActionsTypes,
@@ -23,8 +23,8 @@ import {
   ChatEventTypes,
   UnreadMessagesOnChannel,
   PresenceIcon
-} from '@/app/types'
-import { getAuthKey } from "@/app/getAuthKey"
+} from '../types'
+import { getAuthKey } from "../getAuthKey"
 
 export default function Page () {
   const searchParams = useSearchParams()
@@ -849,7 +849,7 @@ export default function Page () {
           </div>
           <div className='flex mb-5 animate-spin'>
             <Image
-              src='/icons/loading.png'
+              src='/icons/chat-assets/loading.png'
               alt='Chat Icon'
               className=''
               width={50}

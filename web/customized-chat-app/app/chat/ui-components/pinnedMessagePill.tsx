@@ -8,7 +8,7 @@ export default function PinnedMessagePill ({}) {
     >
       <div className='text-xs font-normal text-sky-900'>Pinned message</div>
       <Image
-        src='/icons/pin.svg'
+        src='/icons/chat-assets/pin.svg'
         alt='Remove'
         className='ml-1'
         width={12}

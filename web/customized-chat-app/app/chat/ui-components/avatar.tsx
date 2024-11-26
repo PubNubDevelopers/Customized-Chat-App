@@ -38,7 +38,7 @@ export default function Avatar ({
         >
           <div onClick={e => editActionHandler()}>
             <Image
-              src={'/icons/edit.svg'}
+              src={'/icons/chat-assets/edit.svg'}
               alt='Edit'
               className='rounded-full white p-1'
               width={40}

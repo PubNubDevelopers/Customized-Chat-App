@@ -3,7 +3,7 @@ import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
 import { Membership, User } from '@pubnub/chat'
 import { useState, useEffect } from 'react'
-import { ToastType } from '@/app/types'
+import { ToastType } from '../../types'
 
 export default function ChatSettingsScreen ({
   chatSettingsScreenVisible,
@@ -46,7 +46,7 @@ export default function ChatSettingsScreen ({
           onClick={e => setChatSettingsScreenVisible(false)}
         >
           <Image
-            src='/icons/close-rooms.svg'
+            src='/icons/chat-assets/close-rooms.svg'
             alt='Close Rooms'
             className='p-3'
             width={36}
@@ -169,7 +169,7 @@ export default function ChatSettingsScreen ({
               onClick={e => buttonAction()}
             >
               <Image
-                src='/icons/logout.svg'
+                src='/icons/chat-assets/logout.svg'
                 alt='Leave Conversation'
                 className='p-2'
                 width={36}
@@ -186,7 +186,7 @@ export default function ChatSettingsScreen ({
                 onClick={e => buttonAction()}
               >
                 <Image
-                  src='/icons/logout.svg'
+                  src='/icons/chat-assets/logout.svg'
                   alt='Logout'
                   className='p-3'
                   width={36}

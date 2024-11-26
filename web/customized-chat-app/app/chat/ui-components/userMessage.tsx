@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { ToastType } from '@/app/types'
+import { ToastType } from '../../types'
 
 export default function UserMessage ({
   userMsgShown,
@@ -23,7 +23,7 @@ export default function UserMessage ({
       <div className='flex place-self-start min-w-[24px]'>
         {type === ToastType.INFO && (
           <Image
-            src='/icons/toast_info.svg'
+            src='/icons/chat-assets/toast_info.svg'
             alt='Info'
             className=''
             width={24}
@@ -33,7 +33,7 @@ export default function UserMessage ({
         )}
         {type === ToastType.CHECK && (
           <Image
-            src='/icons/toast_check.svg'
+            src='/icons/chat-assets/toast_check.svg'
             alt='Check'
             className=''
             width={24}
@@ -43,7 +43,7 @@ export default function UserMessage ({
         )}
         {type === ToastType.ERROR && (
           <Image
-            src='/icons/toast_error.svg'
+            src='/icons/chat-assets/toast_error.svg'
             alt='Error'
             className=''
             width={24}
@@ -65,7 +65,7 @@ export default function UserMessage ({
               Learn More...
             </a>
             <Image
-              src='/icons/arrow_forward.svg'
+              src='/icons/chat-assets/arrow_forward.svg'
               alt='Info'
               width={16}
               height={16}
@@ -78,7 +78,7 @@ export default function UserMessage ({
         onClick={() => closeToastAction()}
       >
         <Image
-          src='/icons/close.svg'
+          src='/icons/chat-assets/close.svg'
           alt='Error'
           className='m-3'
           width={24}

@@ -6,7 +6,7 @@ import MessageActions from './messageActions'
 import PinnedMessagePill from './pinnedMessagePill'
 import QuotedMessage from './quotedMessage'
 import MessageReaction from './messageReaction'
-import { MessageActionsTypes, PresenceIcon, ToastType } from '@/app/types'
+import { MessageActionsTypes, PresenceIcon, ToastType } from '../../types'
 import ToolTip from './toolTip'
 import { Channel, TimetokenUtils, MixedTextTypedElement } from '@pubnub/chat'
 
@@ -275,7 +275,7 @@ export default function Message ({
                     />
                   </div>
                   <Image
-                    src='/icons/close.svg'
+                    src='/icons/chat-assets/close.svg'
                     alt='Close'
                     className=''
                     width={20}
@@ -327,8 +327,8 @@ export default function Message ({
               <Image
                 src={`${
                   determineReadStatus(message.timetoken, readReceipts)
-                    ? '/icons/read.svg'
-                    : '/icons/sent.svg'
+                    ? '/icons/chat-assets/read.svg'
+                    : '/icons/chat-assets/sent.svg'
                 }`}
                 alt='Read'
                 className='absolute right-[10px] bottom-[14px]'

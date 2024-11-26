@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { roboto } from '@/app/fonts'
-import { ToastType } from '@/app/types'
+import { ToastType } from '../../types'
 
 export default function Header ({
   setRoomSelectorVisible,
@@ -51,7 +51,7 @@ export default function Header ({
           onClick={() => setCreatingNewMessage(true)}
         >
           <Image
-            src='/icons/new_message.svg'
+            src='/icons/chat-assets/new_message.svg'
             alt='New Message icon'
             className='flex self-center mr-3'
             width={15}
@@ -73,7 +73,7 @@ export default function Header ({
         >
           <div className='relative min-w-12'>
             <Image
-              src='/icons/notifications_none.svg'
+              src='/icons/chat-assets/notifications_none.svg'
               alt='Notifications'
               className='flex self-center m-3'
               width={24}
@@ -97,7 +97,7 @@ export default function Header ({
         >
           <div className='relative min-w-12'>
             <Image
-              src='/icons/alternate_email.svg'
+              src='/icons/chat-assets/alternate_email.svg'
               alt='Mentions'
               className='flex self-center m-3'
               width={24}
@@ -114,7 +114,7 @@ export default function Header ({
           onClick={e => setProfileScreenVisible(true)}
         >
           <Image
-            src='/icons/person_outline.svg'
+            src='/icons/chat-assets/person_outline.svg'
             alt='My Profile'
             className='flex self-center m-3'
             width={24}

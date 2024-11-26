@@ -88,7 +88,7 @@ export default function MessageListThread ({
               onClick={e => {setShowThread(false);setChatSelectionMenuMinimized(false)}}
             >
               <Image
-                src='/icons/close.svg'
+                src='/icons/chat-assets/close.svg'
                 alt='Close Thread'
                 className=''
                 width={24}

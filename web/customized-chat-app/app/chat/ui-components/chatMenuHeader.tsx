@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import { roboto } from '@/app/fonts'
 import { useState } from 'react'
-import { ChatHeaderActionIcon } from '@/app/types'
+import { ChatHeaderActionIcon } from '../../types'
 
 export default function ChatMenuHeader ({
   text,
@@ -19,7 +19,7 @@ export default function ChatMenuHeader ({
             onClick={() => expandCollapse()}
           >
             <Image
-              src='/icons/expand-more.svg'
+              src='/icons/chat-assets/expand-more.svg'
               alt='Expand'
               className={`${expanded ? '' : 'rotate-180'} w-3 h-[7px]`}
               width={12}
@@ -41,7 +41,7 @@ export default function ChatMenuHeader ({
           {actionIcon === ChatHeaderActionIcon.ADD && (
             <div className='cursor-pointer' onClick={() => action(true)}>
               <Image
-                src='/icons/add.svg'
+                src='/icons/chat-assets/add.svg'
                 alt='Add'
                 className='m-3'
                 width={14}

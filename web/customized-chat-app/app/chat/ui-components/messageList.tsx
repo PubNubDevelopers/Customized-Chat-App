@@ -3,7 +3,7 @@ import Avatar from './avatar'
 import Message from './message'
 import UnreadIndicator from './unreadIndicator'
 import Image from 'next/image'
-import { PresenceIcon } from '@/app/types'
+import { PresenceIcon } from '../../types'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 //import {
@@ -179,7 +179,7 @@ export default function MessageList ({
         </div>
         <div className='flex mb-5 animate-spin'>
           <Image
-            src='/icons/loading.png'
+            src='/icons/chat-assets/loading.png'
             alt='Chat Icon'
             className=''
             width={50}
@@ -282,7 +282,7 @@ export default function MessageList ({
               }}
             >
               <Image
-                src='/icons/pin.svg'
+                src='/icons/chat-assets/pin.svg'
                 alt='Pin'
                 className=''
                 width={24}
@@ -296,7 +296,7 @@ export default function MessageList ({
             onClick={() => setChatSettingsScreenVisible(true)}
           >
             <Image
-              src='/icons/settings.svg'
+              src='/icons/chat-assets/settings.svg'
               alt='Settings'
               className=''
               width={24}
