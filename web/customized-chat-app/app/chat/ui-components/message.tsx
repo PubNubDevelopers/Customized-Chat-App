@@ -26,7 +26,7 @@ export default function Message ({
   currentUserId,
   isOnline = -1,
   showUserMessage = (a, b, c, d) => {},
-  embeddedDemo = false,
+  embeddedDemoConfig = null,
   forceShowActions = false,
   appConfiguration = null
 }) {
@@ -359,7 +359,7 @@ export default function Message ({
                     ))
                 : ''}*/}
 
-              {embeddedDemo && appConfiguration?.message_reactions == true &&(
+              {embeddedDemoConfig != null && appConfiguration?.message_reactions == true &&(
                 <MessageReaction
                   emoji={'🤕'}
                   messageTimetoken={'0123456789'}

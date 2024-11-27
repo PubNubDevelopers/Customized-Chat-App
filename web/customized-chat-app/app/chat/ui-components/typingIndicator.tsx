@@ -1,7 +1,7 @@
 import Avatar from './avatar'
 import { PresenceIcon } from '../../types'
 
-export default function TypingIndicator ({ typers, users, embeddedDemo = false, configuration = null }) {
+export default function TypingIndicator ({ typers, users, embeddedDemoConfig = null, configuration = null }) {
   return (
     users &&
     typers && (
@@ -12,7 +12,7 @@ export default function TypingIndicator ({ typers, users, embeddedDemo = false, 
               <Avatar
                 key={index}
                 present={
-                  embeddedDemo ? PresenceIcon.ONLINE : users[users.findIndex(user => user.id == typer)]?.active
+                  embeddedDemoConfig != null ? PresenceIcon.ONLINE : users[users.findIndex(user => user.id == typer)]?.active
                     ? PresenceIcon.ONLINE
                     : PresenceIcon.OFFLINE
                 }

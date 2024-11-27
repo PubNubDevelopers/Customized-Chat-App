@@ -30,7 +30,7 @@ export default function MessageList ({
   setActiveChannelPinnedMessage,
   setShowThread,
   showUserMessage,
-  embeddedDemo = false,
+  embeddedDemoConfig = null,
   appConfiguration = null
 }) {
   const MAX_AVATARS_SHOWN = 9
@@ -40,20 +40,6 @@ export default function MessageList ({
   const [pinnedMessageTimetoken, setPinnedMessageTimetoken] = useState('') //  Keep track of if someone else has updated the pinned message
   const messageListRef = useRef<HTMLDivElement>(null)
   const [loadingMessage, setLoadingMessage] = useState('')
-  let dummyMessage1 = {
-    timetoken: 13518916319742640,
-    content: { text: 'This is a message' }
-  }
-  let dummyMessage2 = {
-    timetoken: 13518916319742641,
-    content: { text: 'This is another message' }
-  }
-  let dummyMessage3 = {
-    timetoken: 13518916319742642,
-    content: {
-      text: 'This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long This is another message but it is very long '
-    }
-  }
 
   function uniqueById (items) {
     const set = new Set()
@@ -176,34 +162,32 @@ export default function MessageList ({
   }, [messages])
 
   {
-    /*
-  if (!activeChannel)
-    return (
-      <div className='flex flex-col max-h-screen h-screen justify-center items-center w-full'>
-        <div className='max-w-96 max-h-96 '>
-          <Image
-            src='/chat-logo.svg'
-            alt='Chat Icon'
-            className=''
-            width={200}
-            height={200}
-            priority
-          />
+    if (!activeChannel && embeddedDemoConfig == null)
+      return (
+        <div className='flex flex-col max-h-screen h-screen justify-center items-center w-full'>
+          <div className='max-w-96 max-h-96 '>
+            <Image
+              src='/chat-logo.svg'
+              alt='Chat Icon'
+              className=''
+              width={200}
+              height={200}
+              priority
+            />
+          </div>
+          <div className='flex mb-5 animate-spin'>
+            <Image
+              src='/icons/chat-assets/loading.png'
+              alt='Chat Icon'
+              className=''
+              width={50}
+              height={50}
+              priority
+            />
+          </div>
+          <div className='text-2xl'>Loading...</div>
         </div>
-        <div className='flex mb-5 animate-spin'>
-          <Image
-            src='/icons/chat-assets/loading.png'
-            alt='Chat Icon'
-            className=''
-            width={50}
-            height={50}
-            priority
-          />
-        </div>
-        <div className='text-2xl'>Loading...</div>
-      </div>
-
-    )*/
+      )
   }
 
   return (
@@ -215,10 +199,12 @@ export default function MessageList ({
         <div
           className={`${roboto.className} text-base font-medium flex flex-row grow justify-center items-center gap-3`}
         >
-          Header (Temp)
-          {/*
-
-          {activeChannel.type == 'public' && (
+          {embeddedDemoConfig != null && (
+            <div className='flex flex-row justify-center items-center gap-3'>
+              1:1 between {embeddedDemoConfig.users[0].name} and {embeddedDemoConfig.users[1].name}
+            </div>
+          )}
+          {activeChannel?.type == 'public' && (
             <div className='flex flex-row justify-center items-center gap-3'>
               <Avatar
                 present={PresenceIcon.NOT_SHOWN}
@@ -228,7 +214,7 @@ export default function MessageList ({
               {activeChannel.type == 'public' && <div>(Public)</div>}
             </div>
           )}
-          {activeChannel.type == 'direct' && (
+          {activeChannel?.type == 'direct' && (
             <div className='flex flex-row justify-center items-center gap-3'>
               <div className='flex flex-row -space-x-2.0'>
                 {groupUsers?.map((member, index) => (
@@ -250,7 +236,7 @@ export default function MessageList ({
               )}
             </div>
           )}
-          {activeChannel.type == 'group' && (
+          {activeChannel?.type == 'group' && (
             <div className='flex flex-row justify-center items-center gap-3'>
               <div className='flex flex-row -space-x-2.0'>
                 {groupUsers?.map(
@@ -271,8 +257,6 @@ export default function MessageList ({
               {activeChannel.name} (Private Group)
             </div>
           )}
-
-          */}
         </div>
 
         <div className='flex flex-row'>
@@ -329,23 +313,22 @@ export default function MessageList ({
         }`}
         ref={messageListRef}
       >
-        {/*
-        {messages && messages.length == 0 && (
-          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
-            <Image
-              src='/chat-logo.svg'
-              alt='Chat Icon'
-              className=''
-              width={100}
-              height={100}
-              priority
-            />
-            {loadingMessage}
-          </div>
-        )}
-          */}
+        {messages &&
+          messages.length == 0 &&
+          embeddedDemoConfig == null && (
+            <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
+              <Image
+                src='/chat-logo.svg'
+                alt='Chat Icon'
+                className=''
+                width={100}
+                height={100}
+                priority
+              />
+              {loadingMessage}
+            </div>
+          )}
         {/* Show the pinned message first if there is one */}
-        {/*
         {activeChannelPinnedMessage && !activeChannelPinnedMessage.deleted && (
           <Message
             key={activeChannelPinnedMessage.timetoken}
@@ -393,88 +376,36 @@ export default function MessageList ({
             showUserMessage={showUserMessage}
           />
         )}
-          */}
 
-        {embeddedDemo && (<div><Message
-          received={true}
-          avatarUrl={'/avatars/f/01.jpg'}
-          isOnline={false}
-          readReceipts={null}
-          quotedMessageSender={null}
-          showReadIndicator={true}
-          sender={'Test User1'}
-          pinned={false}
-          messageActionHandler={(action, vars) =>
-            messageActionHandler(action, vars)
-          }
-          message={dummyMessage1}
-          currentUserId={'testuser001'}
-          showUserMessage={showUserMessage}
-          embeddedDemo={embeddedDemo}
-          forceShowActions={true}
-          appConfiguration={appConfiguration}
-        />
-
-        <Message
-          received={false}
-          avatarUrl={'/avatars/f/02.jpg'}
-          isOnline={false}
-          readReceipts={null}
-          quotedMessageSender={null}
-          showReadIndicator={true}
-          sender={'Test User 2'}
-          pinned={false}
-          messageActionHandler={(action, vars) =>
-            messageActionHandler(action, vars)
-          }
-          message={dummyMessage2}
-          currentUserId={'testuser002'}
-          showUserMessage={showUserMessage}
-          embeddedDemo={embeddedDemo}
-          appConfiguration={appConfiguration}
-        />
-
-        <Message
-          received={true}
-          avatarUrl={'/avatars/f/01.jpg'}
-          isOnline={true}
-          readReceipts={null}
-          quotedMessageSender={null}
-          showReadIndicator={true}
-          sender={'Test User1'}
-          pinned={false}
-          messageActionHandler={(action, vars) =>
-            messageActionHandler(action, vars)
-          }
-          message={dummyMessage1}
-          currentUserId={'testuser001'}
-          showUserMessage={showUserMessage}
-          embeddedDemo={embeddedDemo}
-          appConfiguration={appConfiguration}
-        />
-
-        <Message
-          received={false}
-          avatarUrl={'/avatars/f/02.jpg'}
-          isOnline={true}
-          readReceipts={null}
-          quotedMessageSender={null}
-          showReadIndicator={true}
-          sender={'Test User 2'}
-          pinned={false}
-          messageActionHandler={(action, vars) =>
-            messageActionHandler(action, vars)
-          }
-          message={dummyMessage3}
-          currentUserId={'testuser002'}
-          showUserMessage={showUserMessage}
-          embeddedDemo={embeddedDemo}
-          forceShowActions={true}
-          appConfiguration={appConfiguration}
-        /></div>)}
-
-        {/*
-        {messages.map((message, index) => {
+        {
+          embeddedDemoConfig?.testMessages?.map((message, index) => {
+            return (
+                <Message
+                  key={index}
+                  received={message.received}
+                  avatarUrl={message.avatarUrl}
+                  isOnline={message.isOnline}
+                  readReceipts={null}
+                  quotedMessageSender={null}
+                  showReadIndicator={message.showReadIndicator}
+                  sender={message.sender}
+                  pinned={message.pinned}
+                  messageActionHandler={(action, vars) =>
+                    messageActionHandler(action, vars)
+                  }
+                  message={message.message}
+                  currentUserId={message.currentUserId}
+                  showUserMessage={showUserMessage}
+                  embeddedDemoConfig={embeddedDemoConfig}
+                  forceShowActions={message.forceShowActions}
+                  appConfiguration={appConfiguration}    
+                />
+              
+            )
+          })
+        }
+       
+       {messages.map((message, index) => {
           return (
             !message.deleted && (
               <Message
@@ -518,7 +449,6 @@ export default function MessageList ({
             )
           )
         })}
-          */}
       </div>
     </div>
   )
