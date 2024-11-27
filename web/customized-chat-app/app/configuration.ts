@@ -1,1 +1,3 @@
-export const buildConfig = {"publishKey":"pub-c-49cfd6ac-79c7-4304-99d3-ddcc3780d972","subscribeKey":"sub-c-71575204-63b2-4375-a1a9-e5a9869ba786","public_channels":true,"group_chat":true,"message_history":true,"message_reactions":true,"message_read_receipts":true,"message_threads":true,"typing_indicator":true,"user_presence":true,"message_quote":true,"message_pin":true,"message_forward":false,"message_unread_count":false,"message_editing":false,"message_deletion_soft":false,"mention_user":false,"channel_references":false,"view_user_profiles":true,"edit_user_details":false,"edit_channel_details":false,"message_search":false,"message_voice_note":false,"message_send_file":false,"message_show_url_preview":false,"message_report":false,"handle_banned":true,"support_push":false,"message_encryption":false,"send_receive_messages":true}
+export const buildConfig = {
+    
+}
