@@ -1,7 +1,7 @@
 import Avatar from './avatar'
 import { PresenceIcon } from '../../types'
 
-export default function TypingIndicator ({ typers, users, embeddedDemoConfig = null, configuration = null }) {
+export default function TypingIndicator ({ typers, users, embeddedDemoConfig = null, appConfiguration = null }) {
   return (
     users &&
     typers && (
@@ -20,7 +20,7 @@ export default function TypingIndicator ({ typers, users, embeddedDemoConfig = n
                 avatarUrl={
                   users[users.findIndex(user => user.id == typer)]?.profileUrl
                 }
-                configuration={configuration}
+                appConfiguration={appConfiguration}
               />
             ))}
           </div>

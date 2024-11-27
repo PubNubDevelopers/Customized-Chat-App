@@ -108,11 +108,6 @@ export default function Page ({
       //  Selected emoji is intended for a message reaction
       const message = await activeChannel?.getMessage(showEmojiMessageTimetoken)
       message?.toggleReaction(data.native)
-      actionCompleted({
-        action: 'React to a message (Emoji)',
-        blockDuplicateCalls: false,
-        debug: false
-      })
     }
     setShowEmojiPicker(false)
   }
@@ -307,9 +302,14 @@ export default function Page ({
       //  Test runtime config: configuration=eyJwdWJsaXNoS2V5IjoicHViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4Iiwic3Vic2NyaWJlS2V5Ijoic3ViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4IiwicHVibGljX2NoYW5uZWxzIjp0cnVlLCJncm91cF9jaGF0Ijp0cnVlLCJtZXNzYWdlX2hpc3RvcnkiOnRydWUsIm1lc3NhZ2VfcmVhY3Rpb25zIjp0cnVlLCJtZXNzYWdlX3JlYWRfcmVjZWlwdHMiOnRydWUsIm1lc3NhZ2VfdGhyZWFkcyI6dHJ1ZSwidHlwaW5nX2luZGljYXRvciI6dHJ1ZSwidXNlcl9wcmVzZW5jZSI6dHJ1ZSwibWVzc2FnZV9xdW90ZSI6dHJ1ZSwibWVzc2FnZV9waW4iOnRydWUsIm1lc3NhZ2VfZm9yd2FyZCI6ZmFsc2UsIm1lc3NhZ2VfdW5yZWFkX2NvdW50IjpmYWxzZSwibWVzc2FnZV9lZGl0aW5nIjpmYWxzZSwibWVzc2FnZV9kZWxldGlvbl9zb2Z0IjpmYWxzZSwibWVudGlvbl91c2VyIjpmYWxzZSwiY2hhbm5lbF9yZWZlcmVuY2VzIjpmYWxzZSwidmlld191c2VyX3Byb2ZpbGVzIjp0cnVlLCJlZGl0X3VzZXJfZGV0YWlscyI6ZmFsc2UsImVkaXRfY2hhbm5lbF9kZXRhaWxzIjpmYWxzZSwibWVzc2FnZV9zZWFyY2giOmZhbHNlLCJtZXNzYWdlX3ZvaWNlX25vdGUiOmZhbHNlLCJtZXNzYWdlX3NlbmRfZmlsZSI6ZmFsc2UsIm1lc3NhZ2Vfc2hvd191cmxfcHJldmlldyI6ZmFsc2UsIm1lc3NhZ2VfcmVwb3J0IjpmYWxzZSwiaGFuZGxlX2Jhbm5lZCI6dHJ1ZSwic3VwcG9ydF9wdXNoIjpmYWxzZSwibWVzc2FnZV9lbmNyeXB0aW9uIjpmYWxzZSwic2VuZF9yZWNlaXZlX21lc3NhZ2VzIjp0cnVlfQ==
       console.log('Found runtime config')
       //  Runtime config is base64 encoded JSON object
-      const jsonConfig = JSON.parse(atob(searchParamsConfig))
-      console.log(jsonConfig)
-      setAppConfiguration(jsonConfig)
+      try {
+        const jsonConfig = JSON.parse(atob(searchParamsConfig))
+        console.log(jsonConfig)
+        setAppConfiguration(jsonConfig)
+      }
+      catch {
+        console.error("Provided Runtime configuration was in an unexpected format: continuing without configuration")
+      }
     } else if (buildConfig != null && buildConfig['publishKey'] != null) {
       console.log('Found build time config')
       //  Build time config is JSON object
@@ -326,21 +326,34 @@ export default function Page ({
   }
 
   useEffect(() => {
-    console.log('Configuration passed to this component has updated')
-    console.log(configuration)
+    //  Configuration passed to this component has been updated
     setAppConfiguration(configuration)
   }, [configuration])
 
+  useEffect(() => {
+    //  Page loaded
+    determineConfiguration()
+  }, [searchParams, router])
+
+  useEffect(() => {
+    //  Configuration is available, initialize PubNub
+    if (!appConfiguration) return
+    if (embeddedDemoConfig != null) return //  Do not initialize PubNub if we are within the embedded demo
+    console.log('Configuration is available, initializing PubNub')
+    //  todo
+  }, [appConfiguration])
+
   /* Initialization logic */
+  /*
   useEffect(() => {
     async function init () {
-      determineConfiguration()
 
       setUserId(searchParams.get('userId'))
       if (userId == null || userId === '') {
         setLoadMessage('Retrieving User ID')
         return
       }
+
       if (!process.env.NEXT_PUBLIC_PUBNUB_PUBLISH_KEY) {
         setLoadMessage('No Publish Key Found')
         return
@@ -362,7 +375,7 @@ export default function Page ({
         userId: userId,
         typingTimeout: 5000,
         storeUserActivityTimestamps: true,
-        storeUserActivityInterval: 300000 /* 5 minutes */,
+        storeUserActivityInterval: 300000 ,
         authKey: accessManagerToken
       })
       setChat(localChat)
@@ -436,15 +449,11 @@ export default function Page ({
         updateChannelMembershipsForGroups(localChat)
       }, 500)
 
-      actionCompleted({
-        action: 'Login',
-        blockDuplicateCalls: false,
-        debug: false
-      })
     }
     if (chat) return
     init()
   }, [userId, chat, searchParams, router])
+  */
 
   useEffect(() => {
     //  Connect to the direct chats whenever they change so we can keep a track of unread messages
@@ -784,11 +793,6 @@ export default function Page ({
           setActiveThreadChannel(await data.getThread())
         }
         setActiveThreadMessage(data)
-        //actionCompleted({
-        //  action: "Open a Message's Thread",
-        //  blockDuplicateCalls: false,
-        //  debug: false
-        //})
         break
       case MessageActionsTypes.QUOTE:
         setQuotedMessage(data)
@@ -797,11 +801,6 @@ export default function Page ({
             setQuotedMessageSender(user.name)
           }
         })
-        //        actionCompleted({
-        //          action: 'Quote a Message',
-        //          blockDuplicateCalls: false,
-        //          debug: false
-        //        })
         break
       case MessageActionsTypes.PIN:
         if (activeChannel) {
@@ -825,11 +824,6 @@ export default function Page ({
               'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/pinned',
               ToastType.CHECK
             )
-            //            actionCompleted({
-            //              action: 'Pin a Message',
-            //              blockDuplicateCalls: false,
-            //              debug: false
-            //            })
           }
         }
         break
@@ -848,9 +842,9 @@ export default function Page ({
   }
 
   function logout () {
-    const identifier = searchParams.get('identifier')
-    if (identifier) {
-      router.replace(`/?identifier=${identifier}`)
+    const configuration = searchParams.get('configuration')
+    if (configuration) {
+      router.replace(`/?configuration=${configuration}`)
     } else {
       router.replace(`/`)
     }
@@ -979,11 +973,6 @@ export default function Page ({
               'You have left this group, please select a different channel or create a new group / DM',
               'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details'
             )
-            actionCompleted({
-              action: 'Leave a Private Group',
-              blockDuplicateCalls: false,
-              debug: false
-            })
             if (publicChannels.length > 0) {
               setActiveChannel(publicChannels[0])
             }
@@ -1015,11 +1004,6 @@ export default function Page ({
             'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details',
             ToastType.CHECK
           )
-          actionCompleted({
-            action: 'Change the Private Group name',
-            blockDuplicateCalls: false,
-            debug: false
-          })
         }}
         changeNameModalVisible={changeChatNameModalVisible}
         setChangeNameModalVisible={setChangeChatNameModalVisible}
@@ -1287,7 +1271,7 @@ export default function Page ({
                   }
                 ]}
                 embeddedDemoConfig={embeddedDemoConfig}
-                configuration={appConfiguration}
+                appConfiguration={appConfiguration}
               />
             )}
             <div

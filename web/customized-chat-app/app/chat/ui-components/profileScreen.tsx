@@ -14,14 +14,6 @@ export default function ProfileScreen ({
   showUserMessage,
   changeUserNameScreenVisible
 }) {
-  useEffect(() => {
-    if (!profileScreenVisible) return
-    actionCompleted({
-      action: 'Open your Profile Settings',
-      blockDuplicateCalls: false,
-      debug: false
-    })
-  }, [profileScreenVisible])
 
   return (
     <div

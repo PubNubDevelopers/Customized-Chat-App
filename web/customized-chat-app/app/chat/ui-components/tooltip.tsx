@@ -5,7 +5,7 @@ export default function ToolTip ({ className, tip, messageActionsTip = true }) {
     <div
       className={`${className} absolute w-full ${
         messageActionsTip ? 'right-[0px]' : 'right-[5px]'
-      } bottom-[${messageActionsTip ? '50px' : '0px'}]`}
+      } bottom-[50px]`}
     >
       <div
         className={`flex flex-col ${
