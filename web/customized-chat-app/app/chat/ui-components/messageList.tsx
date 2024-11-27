@@ -397,7 +397,7 @@ export default function MessageList ({
 
         {embeddedDemo && (<div><Message
           received={true}
-          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
+          avatarUrl={'/avatars/f/01.jpg'}
           isOnline={false}
           readReceipts={null}
           quotedMessageSender={null}
@@ -417,7 +417,7 @@ export default function MessageList ({
 
         <Message
           received={false}
-          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
+          avatarUrl={'/avatars/f/02.jpg'}
           isOnline={false}
           readReceipts={null}
           quotedMessageSender={null}
@@ -436,7 +436,7 @@ export default function MessageList ({
 
         <Message
           received={true}
-          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/01.jpg'}
+          avatarUrl={'/avatars/f/01.jpg'}
           isOnline={true}
           readReceipts={null}
           quotedMessageSender={null}
@@ -455,7 +455,7 @@ export default function MessageList ({
 
         <Message
           received={false}
-          avatarUrl={'https://pubnub-fintech-demo.netlify.app/avatars/f/02.jpg'}
+          avatarUrl={'/avatars/f/02.jpg'}
           isOnline={true}
           readReceipts={null}
           quotedMessageSender={null}
