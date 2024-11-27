@@ -291,9 +291,26 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
     })
   }
 
+  function determineConfiguration()
+  {
+    //  This application can be configured in one of 3 ways:
+    //  1. By passing in a prop to this component (used when this component is embedded within the config dashboard)
+    //  2. At build time, by reading the values of configuration.ts
+    //  3. At runtime, through a URL query param
+    //  Priority: 3 > 2 > 1
+    const searchParamsConfig = searchParams.get('configuration')
+    if (searchParamsConfig != null)
+    {
+      //  Test runtime config: configuration=eyJwdWJsaXNoS2V5IjoicHViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4Iiwic3Vic2NyaWJlS2V5Ijoic3ViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4IiwicHVibGljX2NoYW5uZWxzIjp0cnVlLCJncm91cF9jaGF0Ijp0cnVlLCJtZXNzYWdlX2hpc3RvcnkiOnRydWUsIm1lc3NhZ2VfcmVhY3Rpb25zIjp0cnVlLCJtZXNzYWdlX3JlYWRfcmVjZWlwdHMiOnRydWUsIm1lc3NhZ2VfdGhyZWFkcyI6dHJ1ZSwidHlwaW5nX2luZGljYXRvciI6dHJ1ZSwidXNlcl9wcmVzZW5jZSI6dHJ1ZSwibWVzc2FnZV9xdW90ZSI6dHJ1ZSwibWVzc2FnZV9waW4iOnRydWUsIm1lc3NhZ2VfZm9yd2FyZCI6ZmFsc2UsIm1lc3NhZ2VfdW5yZWFkX2NvdW50IjpmYWxzZSwibWVzc2FnZV9lZGl0aW5nIjpmYWxzZSwibWVzc2FnZV9kZWxldGlvbl9zb2Z0IjpmYWxzZSwibWVudGlvbl91c2VyIjpmYWxzZSwiY2hhbm5lbF9yZWZlcmVuY2VzIjpmYWxzZSwidmlld191c2VyX3Byb2ZpbGVzIjp0cnVlLCJlZGl0X3VzZXJfZGV0YWlscyI6ZmFsc2UsImVkaXRfY2hhbm5lbF9kZXRhaWxzIjpmYWxzZSwibWVzc2FnZV9zZWFyY2giOmZhbHNlLCJtZXNzYWdlX3ZvaWNlX25vdGUiOmZhbHNlLCJtZXNzYWdlX3NlbmRfZmlsZSI6ZmFsc2UsIm1lc3NhZ2Vfc2hvd191cmxfcHJldmlldyI6ZmFsc2UsIm1lc3NhZ2VfcmVwb3J0IjpmYWxzZSwiaGFuZGxlX2Jhbm5lZCI6dHJ1ZSwic3VwcG9ydF9wdXNoIjpmYWxzZSwibWVzc2FnZV9lbmNyeXB0aW9uIjpmYWxzZSwic2VuZF9yZWNlaXZlX21lc3NhZ2VzIjp0cnVlfQ==
+      console.log("Found runtime config")
+    }
+  }
+
   /* Initialization logic */
   useEffect(() => {
     async function init () {
+      determineConfiguration()
+
       setUserId(searchParams.get('userId'))
       if (userId == null || userId === '') {
         setLoadMessage('Retrieving User ID')
@@ -823,7 +840,7 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
     clearTimeout(userMsgTimeoutId)
     setUserMsg({ message: message, href: href, title: title, type: type })
     setUserMsgShown(true)
-    let timeoutId = window.setTimeout(setUserMsgShown, 7000, false)
+    const timeoutId = window.setTimeout(setUserMsgShown, 7000, false)
     setUserMsgTimeoutId(timeoutId)
   }
 
