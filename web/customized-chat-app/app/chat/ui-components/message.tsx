@@ -405,7 +405,7 @@ export default function Message ({
                 messageActionsEnter={() => handleMessageActionsEnter()}
                 messageActionsLeave={() => handleMessageActionsLeave()}
                 emojiClick={
-                  appConfiguration.message_reactions == true
+                  appConfiguration?.message_reactions == true
                     ? emoji => console.log(emoji + ' is clicked')
                     : null
                 }
