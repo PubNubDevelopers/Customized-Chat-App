@@ -25,8 +25,10 @@ import {
   PresenceIcon
 } from '../types'
 import { getAuthKey } from '../getAuthKey'
+import { buildConfig } from '../configuration'
 
 export default function Page ({ embeddedDemo = false, configuration = null }) {
+  const [appConfiguration, setAppConfiguration] = useState(null)
   const searchParams = useSearchParams()
   const router = useRouter()
   const [userId, setUserId] = useState<String | null>('')
@@ -303,6 +305,25 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
     {
       //  Test runtime config: configuration=eyJwdWJsaXNoS2V5IjoicHViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4Iiwic3Vic2NyaWJlS2V5Ijoic3ViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4IiwicHVibGljX2NoYW5uZWxzIjp0cnVlLCJncm91cF9jaGF0Ijp0cnVlLCJtZXNzYWdlX2hpc3RvcnkiOnRydWUsIm1lc3NhZ2VfcmVhY3Rpb25zIjp0cnVlLCJtZXNzYWdlX3JlYWRfcmVjZWlwdHMiOnRydWUsIm1lc3NhZ2VfdGhyZWFkcyI6dHJ1ZSwidHlwaW5nX2luZGljYXRvciI6dHJ1ZSwidXNlcl9wcmVzZW5jZSI6dHJ1ZSwibWVzc2FnZV9xdW90ZSI6dHJ1ZSwibWVzc2FnZV9waW4iOnRydWUsIm1lc3NhZ2VfZm9yd2FyZCI6ZmFsc2UsIm1lc3NhZ2VfdW5yZWFkX2NvdW50IjpmYWxzZSwibWVzc2FnZV9lZGl0aW5nIjpmYWxzZSwibWVzc2FnZV9kZWxldGlvbl9zb2Z0IjpmYWxzZSwibWVudGlvbl91c2VyIjpmYWxzZSwiY2hhbm5lbF9yZWZlcmVuY2VzIjpmYWxzZSwidmlld191c2VyX3Byb2ZpbGVzIjp0cnVlLCJlZGl0X3VzZXJfZGV0YWlscyI6ZmFsc2UsImVkaXRfY2hhbm5lbF9kZXRhaWxzIjpmYWxzZSwibWVzc2FnZV9zZWFyY2giOmZhbHNlLCJtZXNzYWdlX3ZvaWNlX25vdGUiOmZhbHNlLCJtZXNzYWdlX3NlbmRfZmlsZSI6ZmFsc2UsIm1lc3NhZ2Vfc2hvd191cmxfcHJldmlldyI6ZmFsc2UsIm1lc3NhZ2VfcmVwb3J0IjpmYWxzZSwiaGFuZGxlX2Jhbm5lZCI6dHJ1ZSwic3VwcG9ydF9wdXNoIjpmYWxzZSwibWVzc2FnZV9lbmNyeXB0aW9uIjpmYWxzZSwic2VuZF9yZWNlaXZlX21lc3NhZ2VzIjp0cnVlfQ==
       console.log("Found runtime config")
+      //  Runtime config is base64 encoded JSON object
+      const jsonConfig = JSON.parse(atob(searchParamsConfig))
+      console.log(jsonConfig)
+      setAppConfiguration(jsonConfig)
+    }
+    else if (buildConfig != null && buildConfig["publishKey"] != null) {
+      console.log("Found build time config")
+      //  Build time config is JSON object
+      const jsonConfig = buildConfig
+      console.log(jsonConfig)
+      setAppConfiguration(jsonConfig)
+    }
+    else if (configuration != null)
+    {
+      console.log("Found configuration passed to this component")
+      setAppConfiguration(configuration)
+    }
+    else {
+      console.log("Failed to find configuration")
     }
   }
 
@@ -1224,7 +1245,7 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
                 setShowThread={setShowThread}
                 showUserMessage={showUserMessage}
                 embeddedDemo={embeddedDemo}
-                configuration={configuration}
+                appConfiguration={appConfiguration}
               />
             )}
             {!quotedMessage &&
@@ -1251,7 +1272,7 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
                 />
               )}
             {
-              configuration?.get('typing_indicator').state == true && (<TypingIndicator
+              appConfiguration?.typing_indicator && (<TypingIndicator
                 typers={['darryn']}
                 users={[
                   {
@@ -1262,7 +1283,7 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
                   }
                 ]}
                 embeddedDemo={embeddedDemo}
-                configuration={configuration}
+                configuration={appConfiguration}
               />)
             }
             <div

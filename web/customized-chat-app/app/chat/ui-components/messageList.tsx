@@ -470,7 +470,7 @@ export default function MessageList ({
           showUserMessage={showUserMessage}
           embeddedDemo={embeddedDemo}
           forceShowActions={true}
-          configuration={configuration}
+          appConfiguration={appConfiguration}
         /></div>)}
 
         {/*

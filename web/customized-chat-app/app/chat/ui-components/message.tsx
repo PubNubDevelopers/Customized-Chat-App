@@ -28,7 +28,7 @@ export default function Message ({
   showUserMessage = (a, b, c, d) => {},
   embeddedDemo = false,
   forceShowActions = false,
-  configuration = null
+  appConfiguration = null
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
   const [actionsShown, setActionsShown] = useState(forceShowActions)
@@ -211,7 +211,7 @@ export default function Message ({
               <Avatar
                 present={isOnline}
                 avatarUrl={avatarUrl ? avatarUrl : '/avatars/placeholder.png'}
-                configuration={configuration}
+                appConfiguration={appConfiguration}
               />
             )}
           </div>
@@ -359,7 +359,7 @@ export default function Message ({
                     ))
                 : ''}*/}
 
-              {embeddedDemo && configuration?.get('message_reactions').state == true &&(
+              {embeddedDemo && appConfiguration?.message_reactions == true &&(
                 <MessageReaction
                   emoji={'🤕'}
                   messageTimetoken={'0123456789'}
@@ -405,12 +405,12 @@ export default function Message ({
                 messageActionsEnter={() => handleMessageActionsEnter()}
                 messageActionsLeave={() => handleMessageActionsLeave()}
                 emojiClick={
-                  configuration?.get('message_reactions').state == true
+                  appConfiguration.message_reactions == true
                     ? emoji => console.log(emoji + ' is clicked')
                     : null
                 }
                 replyInThreadClick={
-                  configuration?.get('message_threads').state == true
+                  appConfiguration?.message_threads == true
                     ? () => {
                         console.log('reply')
                         messageActionHandler(
@@ -421,7 +421,7 @@ export default function Message ({
                     : null
                 }
                 quoteMessageClick={
-                  configuration?.get('message_quote').state == true
+                  appConfiguration?.message_quote == true
                     ? () => {
                         console.log('quote')
                         messageActionHandler(MessageActionsTypes.QUOTE, message)
@@ -429,17 +429,17 @@ export default function Message ({
                     : null
                 }
                 pinMessageClick={
-                  configuration?.get('message_pin').state == true
+                  appConfiguration?.message_pin == true
                     ? () => {
                         console.log('pin')
                         messageActionHandler(MessageActionsTypes.PIN, message)
                       }
                     : null
                 }
-                forwardMessageClick={configuration?.get('message_forward').state == true ? () => console.log('forward') : null}
-                editMessageClick={configuration?.get('message_editing').state == true ? () => console.log('edit') : null}
-                deleteMessageClick={configuration?.get('message_deletion_soft').state == true ? () => console.log('delete') : null}
-                reportMessageClick={configuration?.get('message_report').state == true ? () => console.log('report') : null}
+                forwardMessageClick={appConfiguration?.message_forward == true ? () => console.log('forward') : null}
+                editMessageClick={appConfiguration?.message_editing == true ? () => console.log('edit') : null}
+                deleteMessageClick={appConfiguration?.message_deletion_soft == true ? () => console.log('delete') : null}
+                reportMessageClick={appConfiguration?.message_report == true ? () => console.log('report') : null}
               />
             )}
           </div>
@@ -454,12 +454,12 @@ export default function Message ({
               messageActionsEnter={() => handleMessageActionsEnter()}
               messageActionsLeave={() => handleMessageActionsLeave()}
               emojiClick={
-                configuration?.get('message_reactions').state == true
+                appConfiguration?.message_reactions == true
                   ? emoji => console.log(emoji + ' is clicked')
                   : null
               }
               replyInThreadClick={
-                configuration?.get('message_threads').state == true
+                appConfiguration?.message_threads == true
                   ? () => {
                       console.log('reply')
                       messageActionHandler(
@@ -470,7 +470,7 @@ export default function Message ({
                   : null
               }
               quoteMessageClick={
-                configuration?.get('message_quote').state == true
+                appConfiguration?.message_quote == true
                   ? () => {
                       console.log('quote')
                       messageActionHandler(MessageActionsTypes.QUOTE, message)
@@ -478,17 +478,17 @@ export default function Message ({
                   : null
               }
               pinMessageClick={
-                configuration?.get('message_pin').state == true
+                appConfiguration?.message_pin == true
                   ? () => {
                       console.log('pin')
                       messageActionHandler(MessageActionsTypes.PIN, message)
                     }
                   : null
               }
-              forwardMessageClick={configuration?.get('message_forward').state == true ? () => console.log('forward') : null}
-              editMessageClick={configuration?.get('message_editing').state == true ? () => console.log('edit') : null}
-              deleteMessageClick={configuration?.get('message_deletion_soft').state == true ? () => console.log('delete') : null}
-              reportMessageClick={configuration?.get('message_report').state == true ? () => console.log('report') : null}
+              forwardMessageClick={appConfiguration?.message_forward == true ? () => console.log('forward') : null}
+              editMessageClick={appConfiguration?.message_editing == true ? () => console.log('edit') : null}
+              deleteMessageClick={appConfiguration?.message_deletion_soft == true ? () => console.log('delete') : null}
+              reportMessageClick={appConfiguration?.message_report == true ? () => console.log('report') : null}
             />
           )}
         </div>
