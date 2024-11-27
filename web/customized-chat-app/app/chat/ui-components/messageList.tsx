@@ -31,7 +31,7 @@ export default function MessageList ({
   setShowThread,
   showUserMessage,
   embeddedDemo = false,
-  configuration = null
+  appConfiguration = null
 }) {
   const MAX_AVATARS_SHOWN = 9
   const [messages, setMessages] = useState<pnMessage[]>([])
@@ -412,7 +412,7 @@ export default function MessageList ({
           showUserMessage={showUserMessage}
           embeddedDemo={embeddedDemo}
           forceShowActions={true}
-          configuration={configuration}
+          appConfiguration={appConfiguration}
         />
 
         <Message
@@ -431,7 +431,7 @@ export default function MessageList ({
           currentUserId={'testuser002'}
           showUserMessage={showUserMessage}
           embeddedDemo={embeddedDemo}
-          configuration={configuration}
+          appConfiguration={appConfiguration}
         />
 
         <Message
@@ -450,7 +450,7 @@ export default function MessageList ({
           currentUserId={'testuser001'}
           showUserMessage={showUserMessage}
           embeddedDemo={embeddedDemo}
-          configuration={configuration}
+          appConfiguration={appConfiguration}
         />
 
         <Message

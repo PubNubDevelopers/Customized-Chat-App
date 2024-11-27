@@ -320,12 +320,20 @@ export default function Page ({ embeddedDemo = false, configuration = null }) {
     else if (configuration != null)
     {
       console.log("Found configuration passed to this component")
+      console.log(configuration)
       setAppConfiguration(configuration)
     }
     else {
       console.log("Failed to find configuration")
     }
   }
+
+  useEffect(() => {
+    console.log("Configuration passed to this component has updated")
+    console.log(configuration)
+    setAppConfiguration(configuration)
+
+  }, [configuration])
 
   /* Initialization logic */
   useEffect(() => {
