@@ -23,6 +23,7 @@ export default function Home () {
   const [subscribeKey, setSubscribeKey] = useState(null)
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
+  let userArray = testUsers
 
   useEffect(() => {
     setLoadMessage('No Publish / Subscribe Keys')
@@ -52,11 +53,12 @@ export default function Home () {
     if (buildConfiguration?.subscribeKey != null) {
       setSubscribeKey(buildConfiguration.subscribeKey)
     }
-  }, [searchParams, router])
+  }, [searchParams, router, buildConfiguration.publishKey, buildConfiguration.subscribeKey])
 
   useEffect(() => {
     async function keysetInit() {
       console.log('initializing Chat')
+      /*
       const localChat = await Chat.init({
         publishKey: publishKey,
         subscribeKey: subscribeKey,
@@ -69,9 +71,14 @@ export default function Home () {
         .then(async channelsResponse => {
           //  To Do - If this number is 0, create users and channels (also need to define channels in testData.ts)
           console.log('public channel count: ' + channelsResponse.channels.length)
+          if (channelsResponse.channels.length == 0)
+          {
+            //  Keyset is empty, populate it with default data
+            setLoadMessage('First time Keyset initialization.  Populating with default data')
+          }
         }
       )
-
+*/
   
   
   
@@ -85,14 +92,22 @@ export default function Home () {
     console.log(publishKey)
     console.log(subscribeKey)
     setLoadMessage('Initializing Keyset')
+    shuffleArray(userArray)
     keysetInit()
 
-  }, [publishKey, subscribeKey])
+  }, [publishKey, subscribeKey, userArray])
 
   function login (userId) {
     console.log('person selected: ' + userId)
     router.replace(`/chat/?userId=${userId}&${searchParams}`)
   }
+
+  function shuffleArray(array) {
+    for (let i = array.length - 1; i >= 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
 
   return (
     <main className='flex flex-col min-h-screen size-full gap-8 items-center'>
@@ -142,7 +157,7 @@ export default function Home () {
             <div className='text-xs'>Select a user to log in as</div>
 
             <div className='grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2'>
-              {testUsers.slice(0, 21).map((user, index) => {
+              {userArray.slice(0, 21).map((user, index) => {
                 return (
                   <PersonPicker
                     key={index}
@@ -150,7 +165,7 @@ export default function Home () {
                     name={user.name}
                     avatarUrl={user.avatar}
                     personSelected={key => {
-                      login(testUsers[key].id)
+                      login(userArray[key].id)
                     }}
                   ></PersonPicker>
                 )
