@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
-import { useState, useEffect } from 'react'
 import { ToastType } from '../../types'
 
 export default function ProfileScreen ({
@@ -28,7 +27,7 @@ export default function ProfileScreen ({
       >
         <div
           className='flex cursor-pointer'
-          onClick={e => setProfileScreenVisible(false)}
+          onClick={() => setProfileScreenVisible(false)}
         >
           <Image
             src='/icons/chat-assets/close-rooms.svg'
@@ -48,7 +47,7 @@ export default function ProfileScreen ({
         }`}
       >
         <div
-          className={`${roboto.className} text-sm font-medium flex flex flex-row text-white p-3 justify-between items-center`}
+          className={`${roboto.className} text-sm font-medium flex flex-row text-white p-3 justify-between items-center`}
         >
           Settings
         </div>
@@ -67,6 +66,7 @@ export default function ProfileScreen ({
                 ToastType.INFO
               )
             }}
+            appConfiguration={null}
           />
         </div>
         <div className='flex flex-row justify-between items-center py-4 px-4'>
@@ -76,7 +76,7 @@ export default function ProfileScreen ({
           </div>
           <div
             className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
-            onClick={e => changeName()}
+            onClick={() => changeName()}
           >
             Change
           </div>
@@ -103,7 +103,7 @@ export default function ProfileScreen ({
             }
           >
             {/* Checkbox is currently disabled with no handlers */}
-            <input type='checkbox' className="checked:before:bg-neutral-400 checked:after:translate-x-0" defaultChecked={false} onChange={e => {}} />
+            <input type='checkbox' className="checked:before:bg-neutral-400 checked:after:translate-x-0" defaultChecked={false} onChange={() => {}} />
           </div>
         </div>
         <div className='border border-navy600'></div>
@@ -139,7 +139,7 @@ export default function ProfileScreen ({
 
         <div
           className={`${roboto.className} flex flex-row justify-center items-center my-6 text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
-          onClick={e => logout()}
+          onClick={() => logout()}
         >
           <Image
             src='/icons/chat-assets/logout.svg'

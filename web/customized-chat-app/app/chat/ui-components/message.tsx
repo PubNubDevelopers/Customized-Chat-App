@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Avatar from './avatar'
 import Image from 'next/image'
 import { roboto } from '@/app/fonts'
@@ -28,7 +29,7 @@ export default function Message ({
   showUserMessage = (a, b, c, d) => {},
   embeddedDemoConfig = null,
   forceShowActions = false,
-  appConfiguration = null
+  appConfiguration
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
   const [actionsShown, setActionsShown] = useState(forceShowActions)
@@ -119,8 +120,7 @@ export default function Message ({
   //  readReceipts I set myself in this useCallback
   const determineReadStatus = useCallback((timetoken, readReceipts) => {
     if (!readReceipts) return false
-    let returnVal = false
-    for (var i = 0; i < Object.keys(readReceipts).length; i++) {
+    for (let i = 0; i < Object.keys(readReceipts).length; i++) {
       const receipt = Object.keys(readReceipts)[i]
       const findMe = readReceipts[receipt].indexOf(currentUserId)
       if (findMe > -1) {

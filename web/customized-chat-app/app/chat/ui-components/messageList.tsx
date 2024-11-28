@@ -1,43 +1,47 @@
 import { roboto } from '@/app/fonts'
 import Avatar from './avatar'
 import Message from './message'
-import UnreadIndicator from './unreadIndicator'
+//import UnreadIndicator from './unreadIndicator'
 import Image from 'next/image'
 import { PresenceIcon } from '../../types'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
-//import {
-//  Channel,
-//  User,
-//  Message as pnMessage,
-//  Membership,
-//  MixedTextTypedElement,
-//  TimetokenUtils
-//} from '@pubnub/chat'
+import { useState, useEffect, useRef } from 'react'
+import {
+  //  todo I'm missing some logic here surely, such as rendering message parts
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  Channel,
+  User,
+  Message as pnMessage,
+  Membership,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  MixedTextTypedElement,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  TimetokenUtils
+} from '@pubnub/chat'
 
 export default function MessageList ({
   activeChannel,
   currentUser,
   groupUsers,
   groupMembership,
-  messageActionHandler = (action, vars) => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  messageActionHandler = (a, b) => {},
   usersHaveChanged,
   updateUnreadMessagesCounts,
   setChatSettingsScreenVisible,
   quotedMessage,
-  quotedMessageSender,
   activeChannelPinnedMessage,
   setActiveChannelPinnedMessage,
-  setShowThread,
+  //setShowThread,
   showUserMessage,
-  embeddedDemoConfig = null,
-  appConfiguration = null
+  embeddedDemoConfig,
+  appConfiguration
 }) {
   const MAX_AVATARS_SHOWN = 9
   const [messages, setMessages] = useState<pnMessage[]>([])
   const [currentMembership, setCurrentMembership] = useState<Membership>()
   const [readReceipts, setReadReceipts] = useState()
-  const [pinnedMessageTimetoken, setPinnedMessageTimetoken] = useState('') //  Keep track of if someone else has updated the pinned message
+  //const [pinnedMessageTimetoken, setPinnedMessageTimetoken] = useState('') //  Keep track of if someone else has updated the pinned message
   const messageListRef = useRef<HTMLDivElement>(null)
   const [loadingMessage, setLoadingMessage] = useState('')
 
@@ -59,7 +63,7 @@ export default function MessageList ({
       if (groupMembership == null) {
         console.log('Error: groupMembership should not be null')
       }
-      var localCurrentMembership = groupMembership
+      const localCurrentMembership = groupMembership
       setCurrentMembership(groupMembership)
       activeChannel
         .getHistory({ count: 20 })
@@ -69,11 +73,11 @@ export default function MessageList ({
             if (historicalMessagesObj.messages.length == 0) {
               setLoadingMessage('No messages in this chat yet')
             } else {
-              setMessages(messages => {
+              setMessages(() => {
                 return uniqueById([...historicalMessagesObj.messages]) //  Avoid race condition where message was being added twice
               })
               for (
-                var i = historicalMessagesObj.messages.length - 1;
+                let i = historicalMessagesObj.messages.length - 1;
                 i >= 0;
                 i--
               ) {
@@ -139,6 +143,7 @@ export default function MessageList ({
 
   useEffect(() => {
     if (groupUsers && groupUsers.length > 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       return User.streamUpdatesOn(groupUsers, updatedUsers => {
         usersHaveChanged()
       })
@@ -201,7 +206,8 @@ export default function MessageList ({
         >
           {embeddedDemoConfig != null && (
             <div className='flex flex-row justify-center items-center gap-3'>
-              1:1 between {embeddedDemoConfig.users[0].name} and {embeddedDemoConfig.users[1].name}
+              1:1 between {embeddedDemoConfig.users[0].name} and{' '}
+              {embeddedDemoConfig.users[1].name}
             </div>
           )}
           {activeChannel?.type == 'public' && (
@@ -209,6 +215,7 @@ export default function MessageList ({
               <Avatar
                 present={PresenceIcon.NOT_SHOWN}
                 avatarUrl={activeChannel.custom.profileUrl}
+                appConfiguration={null}
               />
               {activeChannel.name}{' '}
               {activeChannel.type == 'public' && <div>(Public)</div>}
@@ -224,6 +231,7 @@ export default function MessageList ({
                     present={
                       member.active ? PresenceIcon.ONLINE : PresenceIcon.OFFLINE
                     }
+                    appConfiguration={null}
                   />
                 ))}
               </div>
@@ -250,6 +258,7 @@ export default function MessageList ({
                             ? PresenceIcon.ONLINE
                             : PresenceIcon.OFFLINE
                         }
+                        appConfiguration={null}
                       />
                     )
                 )}
@@ -313,21 +322,19 @@ export default function MessageList ({
         }`}
         ref={messageListRef}
       >
-        {messages &&
-          messages.length == 0 &&
-          embeddedDemoConfig == null && (
-            <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
-              <Image
-                src='/chat-logo.svg'
-                alt='Chat Icon'
-                className=''
-                width={100}
-                height={100}
-                priority
-              />
-              {loadingMessage}
-            </div>
-          )}
+        {messages && messages.length == 0 && embeddedDemoConfig == null && (
+          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
+            <Image
+              src='/chat-logo.svg'
+              alt='Chat Icon'
+              className=''
+              width={100}
+              height={100}
+              priority
+            />
+            {loadingMessage}
+          </div>
+        )}
         {/* Show the pinned message first if there is one */}
         {activeChannelPinnedMessage && !activeChannelPinnedMessage.deleted && (
           <Message
@@ -374,38 +381,36 @@ export default function MessageList ({
             message={activeChannelPinnedMessage}
             currentUserId={currentUser.id}
             showUserMessage={showUserMessage}
+            appConfiguration={null}
           />
         )}
 
-        {
-          embeddedDemoConfig?.testMessages?.map((message, index) => {
-            return (
-                <Message
-                  key={index}
-                  received={message.received}
-                  avatarUrl={message.avatarUrl}
-                  isOnline={message.isOnline}
-                  readReceipts={null}
-                  quotedMessageSender={null}
-                  showReadIndicator={message.showReadIndicator}
-                  sender={message.sender}
-                  pinned={message.pinned}
-                  messageActionHandler={(action, vars) =>
-                    messageActionHandler(action, vars)
-                  }
-                  message={message.message}
-                  currentUserId={message.currentUserId}
-                  showUserMessage={showUserMessage}
-                  embeddedDemoConfig={embeddedDemoConfig}
-                  forceShowActions={message.forceShowActions}
-                  appConfiguration={appConfiguration}    
-                />
-              
-            )
-          })
-        }
-       
-       {messages.map((message, index) => {
+        {embeddedDemoConfig?.testMessages?.map((message, index) => {
+          return (
+            <Message
+              key={index}
+              received={message.received}
+              avatarUrl={message.avatarUrl}
+              isOnline={message.isOnline}
+              readReceipts={null}
+              quotedMessageSender={''}
+              showReadIndicator={message.showReadIndicator}
+              sender={message.sender}
+              pinned={message.pinned}
+              messageActionHandler={(action, vars) =>
+                messageActionHandler(action, vars)
+              }
+              message={message.message}
+              currentUserId={message.currentUserId}
+              showUserMessage={showUserMessage}
+              embeddedDemoConfig={embeddedDemoConfig}
+              forceShowActions={message.forceShowActions}
+              appConfiguration={appConfiguration}
+            />
+          )
+        })}
+
+        {messages.map(message => {
           return (
             !message.deleted && (
               <Message
@@ -445,6 +450,7 @@ export default function MessageList ({
                 message={message}
                 currentUserId={currentUser.id}
                 showUserMessage={showUserMessage}
+                appConfiguration={null}
               />
             )
           )

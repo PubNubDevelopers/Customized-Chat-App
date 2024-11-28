@@ -1,6 +1,4 @@
 import Image from 'next/image'
-import { roboto } from '@/app/fonts'
-import { useState } from 'react'
 import { ChatHeaderActionIcon } from '../../types'
 
 export default function ChatMenuHeader ({
@@ -8,6 +6,7 @@ export default function ChatMenuHeader ({
   actionIcon,
   expanded,
   expandCollapse,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   action = b => {}
 }) {
   return (

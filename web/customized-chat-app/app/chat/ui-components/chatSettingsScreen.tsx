@@ -1,8 +1,7 @@
 import Image from 'next/image'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
-import { Membership, User } from '@pubnub/chat'
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { ToastType } from '../../types'
 
 export default function ChatSettingsScreen ({
@@ -22,11 +21,6 @@ export default function ChatSettingsScreen ({
 
   useEffect(() => {
     if (!chatSettingsScreenVisible) return
-    actionCompleted({
-      action: 'Open the Chat Settings',
-      blockDuplicateCalls: false,
-      debug: false
-    })
   }, [chatSettingsScreenVisible])
 
   return (
@@ -43,7 +37,7 @@ export default function ChatSettingsScreen ({
       >
         <div
           className={`flex cursor-pointer`}
-          onClick={e => setChatSettingsScreenVisible(false)}
+          onClick={() => setChatSettingsScreenVisible(false)}
         >
           <Image
             src='/icons/chat-assets/close-rooms.svg'
@@ -81,6 +75,7 @@ export default function ChatSettingsScreen ({
                       avatarUrl={member.profileUrl}
                       width={88}
                       height={88}
+                      appConfiguration={null}
                     />
                   )
               )}
@@ -109,7 +104,7 @@ export default function ChatSettingsScreen ({
               </div>
               <div
                 className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
-                onClick={e => changeChatNameAction()}
+                onClick={() => changeChatNameAction()}
               >
                 Change
               </div>
@@ -125,7 +120,7 @@ export default function ChatSettingsScreen ({
                 <div className='text-lg text-white'>Members</div>
                 <div
                   className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
-                  onClick={e => manageMembershipsAction()}
+                  onClick={() => manageMembershipsAction()}
                 >
                   Manage
                 </div>
@@ -157,7 +152,7 @@ export default function ChatSettingsScreen ({
                 type='checkbox'
                 defaultChecked={false}
                 className="checked:before:bg-neutral-400 checked:after:translate-x-0"
-                onChange={e => {}}
+                onChange={() => {}}
               />
             </div>
           </div>
@@ -166,7 +161,7 @@ export default function ChatSettingsScreen ({
           {isDirectChat ? (
             <div
               className={`${roboto.className} flex flex-row justify-center my-6 items-center text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
-              onClick={e => buttonAction()}
+              onClick={() => buttonAction()}
             >
               <Image
                 src='/icons/chat-assets/logout.svg'
@@ -183,7 +178,7 @@ export default function ChatSettingsScreen ({
               'public' /* To simplify the logic of the demo, do not allow to leave from public channels */ && (
               <div
                 className={`${roboto.className} flex flex-row justify-center my-6 items-center text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
-                onClick={e => buttonAction()}
+                onClick={() => buttonAction()}
               >
                 <Image
                   src='/icons/chat-assets/logout.svg'

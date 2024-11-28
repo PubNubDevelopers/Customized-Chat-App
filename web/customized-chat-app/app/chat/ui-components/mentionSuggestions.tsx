@@ -1,5 +1,3 @@
-import Avatar from './avatar'
-import Image from 'next/image'
 import { roboto } from '@/app/fonts'
 
 export default function MentionSuggestions ({

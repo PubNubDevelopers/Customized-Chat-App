@@ -1,10 +1,10 @@
 'use client'
 
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useState, useEffect, useRef } from 'react'
-import {
-  Chat
-} from '@pubnub/chat'
+import { useState, useEffect } from 'react'
+//import {
+//  Chat
+//} from '@pubnub/chat'
 
 import { buildConfig } from './configuration'
 import { testUsers } from './data/testData'
@@ -23,17 +23,18 @@ export default function Home () {
   const [subscribeKey, setSubscribeKey] = useState(null)
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
-  let userArray = testUsers
+  const userArray = testUsers
 
   useEffect(() => {
     setLoadMessage('No Publish / Subscribe Keys')
     //  1. Check for Runtime configuration
     console.log('checking for runtime config')
+    console.log(searchParams)
     const encodedConfiguration = searchParams.get('configuration')
     if (encodedConfiguration) {
       console.log('Found runtime configuration')
       //setEncodedConfiguration(encodedConfiguration)
-      const decodedConfiguration = atob(encodedConfiguration)
+      //const decodedConfiguration = atob(encodedConfiguration)
       try {
         const jsonConfig = JSON.parse(atob(encodedConfiguration))
         setConfigTypingIndicator(jsonConfig['typing_indicator'])

@@ -9,7 +9,7 @@ export default function Avatar ({
   editIcon = false,
   editActionHandler = () => {},
   border = false,
-  appConfiguration = null
+  appConfiguration
 }) {
   return (
     <div className='relative'>
@@ -37,7 +37,7 @@ export default function Avatar ({
         <div
           className={`w-[40px] h-[40px] rounded-full text-xs border-2 m-2 border-sky-950 bg-sky-950 cursor-pointer absolute -right-[15px] -bottom-[15px]`}
         >
-          <div onClick={e => editActionHandler()}>
+          <div onClick={() => editActionHandler()}>
             <Image
               src={'/icons/chat-assets/edit.svg'}
               alt='Edit'

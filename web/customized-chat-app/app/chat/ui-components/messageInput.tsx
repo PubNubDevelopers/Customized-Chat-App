@@ -1,5 +1,4 @@
 import Image from 'next/image'
-import Avatar from './avatar'
 import UnreadIndicator from './unreadIndicator'
 import { MessageDraft, User, Channel } from '@pubnub/chat'
 import QuotedMessage from './quotedMessage'
@@ -12,13 +11,18 @@ export default function MessageInput ({
   replyInThread,
   quotedMessage,
   quotedMessageSender,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setQuotedMessage = any => {},
-  creatingNewMessage = false,
+  //creatingNewMessage = false,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showUserMessage = (a, b, c, d) => {},
-  plusAction = () => {},
+  //plusAction = () => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setShowEmojiPicker = any => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setEmojiPickerTargetsInput = any => {},
   selectedEmoji = '',
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setSelectedEmoji = a => {}
 }) {
   const [text, setText] = useState('')
@@ -55,11 +59,6 @@ export default function MessageInput ({
       setQuotedMessage(false)
       setText('')
 
-      actionCompleted({
-        action: 'Send a Chat Message',
-        blockDuplicateCalls: false,
-        debug: false
-      })
     }
   }
 
@@ -99,7 +98,7 @@ export default function MessageInput ({
         'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/files',
         ToastType.INFO
       )
-      var myImageFile = new File([base64ToBlob()], "pn-logo.png", {
+      const myImageFile = new File([base64ToBlob()], "pn-logo.png", {
         type: "image/png"
       });
       newMessageDraft.files = [myImageFile]
@@ -118,11 +117,6 @@ export default function MessageInput ({
     setText(newMessageDraft.value)
     setSuggestedUsers([])
     setNameOccurrenceIndex(-1)
-    actionCompleted({
-      action: '@Mention another User',
-      blockDuplicateCalls: false,
-      debug: false
-    })
     inputRef.current?.focus()
   }
 
@@ -132,11 +126,6 @@ export default function MessageInput ({
     setText(newMessageDraft.value)
     setSuggestedChannels([])
     setChannelOccurrenceIndex(-1)
-    actionCompleted({
-      action: '#Reference a Channel',
-      blockDuplicateCalls: false,
-      debug: false
-    })
     inputRef.current?.focus()
   }
 

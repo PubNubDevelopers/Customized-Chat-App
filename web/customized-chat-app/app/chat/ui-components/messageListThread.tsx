@@ -2,15 +2,15 @@ import Message from './message'
 import { roboto } from '@/app/fonts'
 import Image from 'next/image'
 import MessageInput from './messageInput'
-import { useState, useEffect, useCallback, useRef } from 'react'
-//import {
-//  Channel,
-//  User,
-//  Message as pnMessage,
-//  Membership,
-//  MixedTextTypedElement,
-//  TimetokenUtils
-//} from '@pubnub/chat'
+import { useState, useEffect, useRef } from 'react'
+import {
+  //Channel,
+  //User,
+  Message as pnMessage,
+  //Membership,
+  //MixedTextTypedElement,
+  //TimetokenUtils
+} from '@pubnub/chat'
 
 export default function MessageListThread ({
   showThread,
@@ -42,7 +42,7 @@ export default function MessageListThread ({
       activeThreadChannel
         .getHistory({ count: 20 })
         .then(historicalMessagesObj => {
-          setMessages(messages => {
+          setMessages(() => {
             return uniqueById([...historicalMessagesObj.messages])
           })
         })
@@ -85,7 +85,7 @@ export default function MessageListThread ({
             Reply in thread
             <div
               className='flex cursor-pointer p-3'
-              onClick={e => {setShowThread(false);setChatSelectionMenuMinimized(false)}}
+              onClick={() => {setShowThread(false);setChatSelectionMenuMinimized(false)}}
             >
               <Image
                 src='/icons/chat-assets/close.svg'
@@ -128,10 +128,11 @@ export default function MessageListThread ({
               messageActionHandler={() => {}}
               message={activeThreadMessage}
               currentUserId={currentUser.id}
+              appConfiguration={null}
             />
           )}
           {/* THREAD BUBBLES */}
-          {messages.map((message, index) => {
+          {messages.map((message) => {
             return (
               <Message
                 key={message.timetoken}
@@ -154,6 +155,7 @@ export default function MessageListThread ({
                 messageActionHandler={() => {}}
                 message={message}
                 currentUserId={currentUser.id}
+                appConfiguration={null}
               />
             )
           })}
@@ -165,7 +167,7 @@ export default function MessageListThread ({
             replyInThread={true}
             quotedMessage={null}
             quotedMessageSender={''}
-            creatingNewMessage={false}
+            //creatingNewMessage={false}
           />
         </div>
       </div>

@@ -13,9 +13,9 @@ export default function MessageAction ({
   return (
     <div
       className='hover:bg-navy100 hover:rounded-md relative p-1 pr-1 min-w-11'
-      onClick={e => messageActionClickHandler()}
-      onMouseEnter={e => setToolTipVisible(true)}
-      onMouseLeave={e => setToolTipVisible(false)}
+      onClick={() => messageActionClickHandler()}
+      onMouseEnter={() => setToolTipVisible(true)}
+      onMouseLeave={() => setToolTipVisible(false)}
     >
       <Image
         src={iconUrl}

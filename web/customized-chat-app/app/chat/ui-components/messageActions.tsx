@@ -1,5 +1,3 @@
-import Image from 'next/image'
-import ToolTip from './toolTip'
 import { useState } from 'react'
 import MessageAction from './messageAction'
 import MessageActionsEmoji from './messageActionsEmoji'
@@ -12,17 +10,15 @@ export default function MessageActions ({
   isPinned,
   messageActionsEnter,
   messageActionsLeave,
-  emojiClick = null,
-  replyInThreadClick = null,
-  quoteMessageClick = null,
-  pinMessageClick = null,
-  forwardMessageClick = null,
-  editMessageClick = null,
-  deleteMessageClick = null,
-  reportMessageClick = null
+  emojiClick,
+  replyInThreadClick,
+  quoteMessageClick,
+  pinMessageClick,
+  forwardMessageClick,
+  editMessageClick,
+  deleteMessageClick,
+  reportMessageClick
 }) {
-  const [copyToolTip, setCopyToolTip] = useState(false)
-
   const [emoteToolTip, setEmoteToolTip] = useState(false)
   const [quoteToolTip, setQuoteToolTip] = useState(false)
   const [pinToolTip, setPinToolTip] = useState(false)
@@ -32,10 +28,10 @@ export default function MessageActions ({
   const [deleteToolTip, setDeleteToolTip] = useState(false)
   const [reportToolTip, setReportToolTip] = useState(false)
 
-  const handleMessageActionsMouseEnter = e => {
+  const handleMessageActionsMouseEnter = () => {
     messageActionsEnter()
   }
-  const handleMessageActionsMouseLeave = e => {
+  const handleMessageActionsMouseLeave = () => {
     messageActionsLeave()
   }
 

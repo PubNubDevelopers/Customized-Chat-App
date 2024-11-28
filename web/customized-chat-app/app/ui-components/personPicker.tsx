@@ -23,6 +23,7 @@ export default function PersonPicker ({
         present={PresenceIcon.NOT_SHOWN}
         width={48}
         height={48}
+        appConfiguration={null}
       ></Avatar>
       <div className='flex flex-col'>
         <div className='w-full text-md'>{name}</div>
