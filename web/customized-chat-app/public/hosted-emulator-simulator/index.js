@@ -10,23 +10,15 @@ function bootstrap() {
 }
 
 function createSimulators() {
-  var configurationFromQueryParams = "";
-  var queryString = new URL(window.location.href).search.substring(1);
-  const urlParamsArray = queryString.split('&');
-  for (let i = 0; i < urlParamsArray.length; i++) {
-    if (urlParamsArray[i].startsWith('configuration') && urlParamsArray[i].includes('=')) {
-      let identifierPair = urlParamsArray[i].split('=');
-      configurationFromQueryParams = identifierPair[1];
-    }
-  }
-  if (configurationFromQueryParams === "") {
+  var urlParams = new URLSearchParams(window.location.search)
+  var configurationFromQueryParams = urlParams.get('configuration');
+  if (!configurationFromQueryParams) {
     console.log('Failed to detect configuration in URL query params.  Could not load simulator / emulator');
     document.getElementById('ios-device').innerHTML = "Failed to detect identifier in query params.  Could not load iOS simulator"
     document.getElementById('android-device').innerHTML = "Failed to detect identifier in query params.  Could not load Android emulator"
     return;
   }
   else {
-    console.log(configurationFromQueryParams)
     var simulatorWidth = " width='404px'";
     //var simulatorHeight = " height='698px'";
     var simulatorHeight = " height='852px'";
