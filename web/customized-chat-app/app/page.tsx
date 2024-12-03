@@ -2,12 +2,10 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-//import {
-//  Chat
-//} from '@pubnub/chat'
+import { Chat } from '@pubnub/chat'
 
 import { buildConfig } from './configuration'
-import { testUsers } from './data/testData'
+import { testUsers, testPublicChannels } from './data/testData'
 
 import Image from 'next/image'
 import PersonPicker from './ui-components/personPicker'
@@ -17,10 +15,10 @@ export default function Home () {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buildConfiguration: any = buildConfig
   const router = useRouter()
-  //const [encodedConfiguration, setEncodedConfiguration] = useState('')
-  const [configTypingIndicator, setConfigTypingIndicator] = useState(false)
+  //const [configTypingIndicator, setConfigTypingIndicator] = useState(false)
   const [publishKey, setPublishKey] = useState(null)
   const [subscribeKey, setSubscribeKey] = useState(null)
+  const [publicChannelsAvailable, setPublicChannelsAvailable] = useState(false) //  Only create public channel data on the keyset if enabled
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
   const userArray = testUsers
@@ -29,7 +27,6 @@ export default function Home () {
     setLoadMessage('No Publish / Subscribe Keys')
     //  1. Check for Runtime configuration
     console.log('checking for runtime config')
-    console.log(searchParams)
     const encodedConfiguration = searchParams.get('configuration')
     if (encodedConfiguration) {
       console.log('Found runtime configuration')
@@ -37,81 +34,109 @@ export default function Home () {
       //const decodedConfiguration = atob(encodedConfiguration)
       try {
         const jsonConfig = JSON.parse(atob(encodedConfiguration))
-        setConfigTypingIndicator(jsonConfig['typing_indicator'])
+        //setConfigTypingIndicator(jsonConfig['typing_indicator'])
         setPublishKey(jsonConfig['publishKey'])
         setSubscribeKey(jsonConfig['subscribeKey'])
+        setPublicChannelsAvailable(jsonConfig['public_channels'])
         return
       } catch {
         //  Unable to parse provided configuration
-        console.log('Warning: Unable to parse provided configuration')
+        console.log('Warning: Unable to parse provided runtime configuration')
       }
     }
     //  2. Check for Build time configuration
-    console.log('checking for build time config')
+    console.log(
+      'No runtime configuration found.  Checking for build time config'
+    )
     if (buildConfiguration?.publishKey != null) {
       setPublishKey(buildConfiguration.publishKey)
     }
     if (buildConfiguration?.subscribeKey != null) {
       setSubscribeKey(buildConfiguration.subscribeKey)
     }
-  }, [searchParams, router, buildConfiguration.publishKey, buildConfiguration.subscribeKey])
+    if (buildConfiguration?.public_channels != null) {
+      setPublicChannelsAvailable(buildConfiguration.public_channels)
+    }
+  }, [
+    searchParams,
+    router,
+    buildConfiguration.publishKey,
+    buildConfiguration.subscribeKey,
+    buildConfiguration.public_channels
+  ])
 
   useEffect(() => {
-    async function keysetInit() {
-      console.log('initializing Chat')
-      /*
-      const localChat = await Chat.init({
-        publishKey: publishKey,
-        subscribeKey: subscribeKey,
-        userId: "admin-config"
-      })
-      console.log(localChat)
-  
-      await localChat
-        .getChannels({ filter: `type == 'public'` })
-        .then(async channelsResponse => {
-          //  To Do - If this number is 0, create users and channels (also need to define channels in testData.ts)
-          console.log('public channel count: ' + channelsResponse.channels.length)
-          if (channelsResponse.channels.length == 0)
-          {
-            //  Keyset is empty, populate it with default data
-            setLoadMessage('First time Keyset initialization.  Populating with default data')
+    async function keysetInit () {
+      try {
+        const localChat = await Chat.init({
+          publishKey: publishKey,
+          subscribeKey: subscribeKey,
+          userId: 'admin-config'
+        })
+
+          //  Test user did not exist on keyset, create users and, optionally, channels
+          setLoadMessage('Populating keyset with users')
+          userArray.forEach(async user => {
+            let newUser = await localChat.getUser(user.id)
+            if (!newUser)
+            {
+              newUser = await localChat.createUser(user.id, {
+                name: user.name,
+                profileUrl: user.avatar
+              })
+            }
+          })
+          if (publicChannelsAvailable) {
+            setLoadMessage('Creating Public Channel data')
+            testPublicChannels.forEach(async channel => {
+              let newPublicChannel = await localChat.getChannel(channel.id)
+              if (!newPublicChannel) {
+                newPublicChannel = await localChat.createPublicConversation({
+                  channelId: channel.id,
+                  channelData: {
+                    name: channel.name,
+                    description: channel.description,
+                    custom: {
+                      profileUrl: channel.avatar
+                    }
+                  }
+                })
+              }
+            })
           }
-        }
-      )
-*/
-  
-  
-  
-  
-  
-  
-      setInitialized(true)
+          setInitialized(true)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error) {
+        const errorMsg =
+          'Unable to initialize PubNub instance: Are the Pub/Sub keys correct?  Are all configuration options enabled (especially App Context)?'
+        //if (error instanceof Error) {errorMsg += `: ${error.message}`}
+        console.warn(errorMsg)
+        setLoadMessage(errorMsg)
+      }
     }
     if (!publishKey) return
     if (!subscribeKey) return
-    console.log(publishKey)
-    console.log(subscribeKey)
+    console.log('publish key: ' + publishKey)
+    console.log('subscribe key: ' + subscribeKey)
     setLoadMessage('Initializing Keyset')
     shuffleArray(userArray)
     keysetInit()
-
-  }, [publishKey, subscribeKey, userArray])
+  }, [publishKey, subscribeKey, userArray, publicChannelsAvailable])
 
   function login (userId) {
-    console.log('person selected: ' + userId)
-    router.replace(`/chat/?userId=${userId}&${searchParams}`)
+    router.push(`/chat/?userId=${userId}&${searchParams}`)
   }
 
-  function shuffleArray(array) {
+  function shuffleArray (array) {
     for (let i = array.length - 1; i >= 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[array[i], array[j]] = [array[j], array[i]]
     }
-}
+  }
 
   return (
     <main className='flex flex-col min-h-screen size-full gap-8 items-center'>
+      {/*
       <div suppressHydrationWarning={true} className=''>
         Value of Typing Indicator (Runtime){' '}
         {configTypingIndicator ? 'Enabled' : 'Disabled'}
@@ -120,8 +145,8 @@ export default function Home () {
         Value of Typing Indicator (Build){' '}
         {buildConfiguration?.typing_indicator ? 'Enabled' : 'Disabled'}
       </div>
-
-      <div className='flex flex-col gap-3 items-center'>
+        */}
+      <div className='flex flex-col gap-3 m-2 items-center'>
         {!initialized ? (
           <div className='animate-spin'>
             <Image
@@ -144,7 +169,7 @@ export default function Home () {
           />
         )}
         {!initialized && (
-          <div className='text-2xl select-none'>{loadMessage}</div>
+          <div className='text-2xl select-none m-2'>{loadMessage}</div>
         )}
         {initialized && (
           <div className='flex flex-col text-center gap-2'>

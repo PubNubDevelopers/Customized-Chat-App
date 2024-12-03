@@ -1,3 +1,18 @@
+export const testPublicChannels = [
+  {
+    id: "public-general",
+    name: "General Chat",
+    description: "Public group for general conversation.",
+    avatar: "/group/general.jpg"
+  },
+  {
+    id: "public-tech",
+    name: "Technology Chat",
+    description: "Open conversation about any technology topic.",
+    avatar: "/group/technology.jpg"
+  },
+]
+
 export const testUsers = [
   {
     id: "user-01",

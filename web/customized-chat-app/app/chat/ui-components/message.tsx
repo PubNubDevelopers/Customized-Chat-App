@@ -344,7 +344,7 @@ export default function Message ({
             )}
             <div className='absolute right-[10px] -bottom-[20px] flex flex-row items-center z-10 select-none'>
               {/*arrayOfEmojiReactions*/}
-              {/*}
+              
               {message.reactions
                 ? Object?.keys(message.reactions)
                     .slice(0, 18)
@@ -357,7 +357,7 @@ export default function Message ({
                         key={index}
                       />
                     ))
-                : ''}*/}
+                : ''}
 
               {embeddedDemoConfig != null && appConfiguration?.message_reactions == true &&(
                 <MessageReaction
@@ -406,7 +406,7 @@ export default function Message ({
                 messageActionsLeave={() => handleMessageActionsLeave()}
                 emojiClick={
                   appConfiguration?.message_reactions == true
-                    ? emoji => console.log(emoji + ' is clicked')
+                    ? (emoji) => {console.log(emoji + ' is clicked');reactionClicked(emoji)}
                     : null
                 }
                 replyInThreadClick={
@@ -455,7 +455,7 @@ export default function Message ({
               messageActionsLeave={() => handleMessageActionsLeave()}
               emojiClick={
                 appConfiguration?.message_reactions == true
-                  ? emoji => console.log(emoji + ' is clicked')
+                  ? emoji => {console.log(emoji + ' is clicked');reactionClicked(emoji)}
                   : null
               }
               replyInThreadClick={

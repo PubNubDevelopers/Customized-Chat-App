@@ -381,7 +381,7 @@ export default function MessageList ({
             message={activeChannelPinnedMessage}
             currentUserId={currentUser.id}
             showUserMessage={showUserMessage}
-            appConfiguration={null}
+            appConfiguration={appConfiguration}
           />
         )}
 
@@ -450,7 +450,7 @@ export default function MessageList ({
                 message={message}
                 currentUserId={currentUser.id}
                 showUserMessage={showUserMessage}
-                appConfiguration={null}
+                appConfiguration={appConfiguration}
               />
             )
           )

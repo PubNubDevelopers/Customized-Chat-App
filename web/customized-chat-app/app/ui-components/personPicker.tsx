@@ -15,9 +15,6 @@ export default function PersonPicker ({
         personSelected(id)
       }}
     >
-      {/* 
-      Note: This demo will always hardcode the presence as online.  PubNub offers two ways to track whether a user is online or offline using our Chat SDK, either at the global level, or per-channel.  See https://www.pubnub.com/docs/chat/chat-sdk/build/features/users/presence for more information.
-      */}
       <Avatar
         avatarUrl={avatarUrl}
         present={PresenceIcon.NOT_SHOWN}

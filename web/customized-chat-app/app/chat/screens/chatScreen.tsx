@@ -5,13 +5,13 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect, useContext, useCallback, useRef } from 'react'
 import {
-    Channel,
-    Chat,
-    Membership,
-    User,
-    ThreadChannel,
-    Message as pnMessage
-  } from '@pubnub/chat'  
+  Channel,
+  Chat,
+  Membership,
+  User,
+  ThreadChannel,
+  Message as pnMessage
+} from '@pubnub/chat'
 import Image from 'next/image'
 import { roboto } from '@/app/fonts'
 import Header from '../ui-components/header'
@@ -34,7 +34,6 @@ import {
   UnreadMessagesOnChannel,
   PresenceIcon
 } from '../../types'
-import { getAuthKey } from '../../getAuthKey'
 import { buildConfig } from '../../configuration'
 
 export default function ChatScreen ({
@@ -96,9 +95,11 @@ export default function ChatScreen ({
     useState<Membership[]>()
   const [directChatsMemberships, setDirectChatsMemberships] =
     useState<Membership[]>()
-  const [publicChannelsUsers, setPublicChannelsUsers] = useState<User[][]>([])
+//  todo, should be able to do away with these 3 different users 2D arrays
+    const [publicChannelsUsers, setPublicChannelsUsers] = useState<User[][]>([])
   const [privateGroupsUsers, setPrivateGroupsUsers] = useState<User[][]>([])
   const [directChatsUsers, setDirectChatsUsers] = useState<User[][]>([])
+  const [allUsers, setAllUsers] = useState<User[]>()
   const [unreadMessages, setUnreadMessages] = useState<
     UnreadMessagesOnChannel[]
   >([])
@@ -124,6 +125,7 @@ export default function ChatScreen ({
   }
 
   /* Bootstrap the application if it is run in an empty keyset */
+  /*
   async function keysetInit (chat) {
     if (!chat) return
     try {
@@ -151,9 +153,10 @@ export default function ChatScreen ({
         }
       })
     } catch (e) {}
-  }
+  }*/
 
   /*  Initialize or Update all the state arrays related to public groups */
+  /*
   async function updateChannelMembershipsForPublic (chat) {
     if (!chat) return
     //  During development there was an issue filtering on getMemberships on the server, which has since been fixed, so this code could be made more efficient
@@ -189,8 +192,10 @@ export default function ChatScreen ({
         setPublicChannelsUsers(tempPublicUsers)
       })
   }
+      */
 
   /* Initialize or Update all the state arrays related to private groups */
+  /*
   async function updateChannelMembershipsForGroups (
     chat,
     desiredChannelId = ''
@@ -238,8 +243,10 @@ export default function ChatScreen ({
         setPrivateGroupsUsers(tempGroupUsers)
       })
   }
+      */
 
   /* Initialize or Update all the state arrays related to Direct message pairs */
+  /*
   async function updateChannelMembershipsForDirects (
     chat,
     desiredChannelId = ''
@@ -287,6 +294,7 @@ export default function ChatScreen ({
         setDirectChatsUsers(tempDirectUsers)
       })
   }
+      */
 
   function updateUnreadMessagesCounts () {
     chat?.getUnreadMessagesCounts({}).then(result => {
@@ -302,24 +310,31 @@ export default function ChatScreen ({
     })
   }
 
-  function determineConfiguration () {
+  useEffect(() => {
+    //  Configuration passed to this component has been updated
+    setAppConfiguration(configuration)
+  }, [configuration])
+
+  useEffect(() => {
+    //  Page loaded, determine the configuration
     //  This application can be configured in one of 3 ways:
     //  1. By passing in a prop to this component (used when this component is embedded within the config dashboard)
     //  2. At build time, by reading the values of configuration.ts
     //  3. At runtime, through a URL query param
     //  Priority: 3 > 2 > 1
     const searchParamsConfig = searchParams.get('configuration')
+    setUserId(searchParams.get('userId'))
     if (searchParamsConfig != null) {
-      //  Test runtime config: configuration=eyJwdWJsaXNoS2V5IjoicHViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4Iiwic3Vic2NyaWJlS2V5Ijoic3ViLWMtZTA4N2U1MzktYmIwYy00ZDE1LTkxYzktYWE4M2E1ZTk3NWY4IiwicHVibGljX2NoYW5uZWxzIjp0cnVlLCJncm91cF9jaGF0Ijp0cnVlLCJtZXNzYWdlX2hpc3RvcnkiOnRydWUsIm1lc3NhZ2VfcmVhY3Rpb25zIjp0cnVlLCJtZXNzYWdlX3JlYWRfcmVjZWlwdHMiOnRydWUsIm1lc3NhZ2VfdGhyZWFkcyI6dHJ1ZSwidHlwaW5nX2luZGljYXRvciI6dHJ1ZSwidXNlcl9wcmVzZW5jZSI6dHJ1ZSwibWVzc2FnZV9xdW90ZSI6dHJ1ZSwibWVzc2FnZV9waW4iOnRydWUsIm1lc3NhZ2VfZm9yd2FyZCI6ZmFsc2UsIm1lc3NhZ2VfdW5yZWFkX2NvdW50IjpmYWxzZSwibWVzc2FnZV9lZGl0aW5nIjpmYWxzZSwibWVzc2FnZV9kZWxldGlvbl9zb2Z0IjpmYWxzZSwibWVudGlvbl91c2VyIjpmYWxzZSwiY2hhbm5lbF9yZWZlcmVuY2VzIjpmYWxzZSwidmlld191c2VyX3Byb2ZpbGVzIjp0cnVlLCJlZGl0X3VzZXJfZGV0YWlscyI6ZmFsc2UsImVkaXRfY2hhbm5lbF9kZXRhaWxzIjpmYWxzZSwibWVzc2FnZV9zZWFyY2giOmZhbHNlLCJtZXNzYWdlX3ZvaWNlX25vdGUiOmZhbHNlLCJtZXNzYWdlX3NlbmRfZmlsZSI6ZmFsc2UsIm1lc3NhZ2Vfc2hvd191cmxfcHJldmlldyI6ZmFsc2UsIm1lc3NhZ2VfcmVwb3J0IjpmYWxzZSwiaGFuZGxlX2Jhbm5lZCI6dHJ1ZSwic3VwcG9ydF9wdXNoIjpmYWxzZSwibWVzc2FnZV9lbmNyeXB0aW9uIjpmYWxzZSwic2VuZF9yZWNlaXZlX21lc3NhZ2VzIjp0cnVlfQ==
       console.log('Found runtime config')
       //  Runtime config is base64 encoded JSON object
       try {
         const jsonConfig = JSON.parse(atob(searchParamsConfig))
         console.log(jsonConfig)
         setAppConfiguration(jsonConfig)
-      }
-      catch {
-        console.error("Provided Runtime configuration was in an unexpected format: continuing without configuration")
+      } catch {
+        console.error(
+          'Provided Runtime configuration was in an unexpected format: continuing without configuration'
+        )
       }
     } else if (buildConfig != null && buildConfig['publishKey'] != null) {
       console.log('Found build time config')
@@ -334,26 +349,72 @@ export default function ChatScreen ({
     } else {
       console.log('Failed to find configuration')
     }
-  }
-
-  useEffect(() => {
-    //  Configuration passed to this component has been updated
-    setAppConfiguration(configuration)
-  }, [configuration])
-
-  useEffect(() => {
-    //  Page loaded
-    determineConfiguration()
-  }, [searchParams, router])
+  }, [searchParams, router, configuration])
 
   useEffect(() => {
     //  Configuration is available, initialize PubNub
+    async function init () {
+      const localChat = await Chat.init({
+        publishKey: appConfiguration.publishKey,
+        subscribeKey: appConfiguration.subscribeKey,
+        userId: userId,
+        typingTimeout: 5000,
+        storeUserActivityTimestamps: true,
+        storeUserActivityInterval: 300000
+      })
+      setChat(localChat)
+      setCurrentUser(localChat.currentUser)
+
+      //  Retrieve all users
+      const localAllUsers = await localChat.getUsers()
+      setAllUsers(localAllUsers.users)
+
+      //  Join public channels
+      const localPublicChannels = await localChat.getChannels({
+        filter: `type == 'public'`
+      })
+      if (localPublicChannels) {
+        const currentPublicMemberships =
+          await localChat.currentUser.getMemberships({
+            filter: "channel.type == 'public'"
+          })
+        setPublicChannelsMemberships(currentPublicMemberships.memberships)
+        localPublicChannels.channels.forEach(publicChannel => {
+          if (
+            !currentPublicMemberships.memberships.find(
+              membership => membership.channel.id == publicChannel.id
+            )
+          ) {
+            //  No current membership, join channel
+            publicChannel.join(message => {
+              //  todo message listener is elsewhere
+            })
+          }
+        })
+        setPublicChannels(localPublicChannels.channels)
+        //  todo logic of updateChannelMembershipsForGroups
+        //  todo logic of updateChannelMembershipsForDirects
+
+        setActiveChannel(localPublicChannels.channels[0])
+        updateUnreadMessagesCounts() 
+      } else {
+        console.error('No Public Channels Found')
+      }
+    }
+
+    if (chat) return
     if (!appConfiguration) return
     if (embeddedDemoConfig != null) return //  Do not initialize PubNub if we are within the embedded demo
     console.log('Configuration is available, initializing PubNub')
-    console.log('user ID: ' + searchParams.get('userId'))
-    //  todo
-  }, [appConfiguration])
+    console.log('user ID: ' + userId)
+
+    if (!userId) {
+      setLoadMessage('No User ID specified')
+      return
+    }
+
+    init()
+  }, [appConfiguration, embeddedDemoConfig, userId, chat])
 
   /* Initialization logic */
   /*
@@ -571,6 +632,7 @@ export default function ChatScreen ({
     })
   }, [chat, activeChannel])
 
+  /*
   useEffect(() => {
     //  This use effect is only called once after the local user cache has been initialized
     if (chat && publicChannelsUsers?.length > 0 && initOnce == 0) {
@@ -586,6 +648,7 @@ export default function ChatScreen ({
       }
     }
   }, [chat, publicChannelsUsers, initOnce])
+  */
 
   useEffect(() => {
     //  Get updates on the current user's name and profile URL
@@ -668,11 +731,11 @@ export default function ChatScreen ({
                 }
               }
             }
-            refreshMembersFromServer()
+            //refreshMembersFromServer()
             break
           case ChatEventTypes.JOINED:
             //  Someone has joined one of the public channels
-            refreshMembersFromServer()
+            //refreshMembersFromServer()
             break
         }
       }
@@ -726,7 +789,7 @@ export default function ChatScreen ({
       type: 'invite',
       callback: async evt => {
         //  Somebody has added us to a new group chat or DM
-        refreshMembersFromServer()
+        //refreshMembersFromServer()
       }
     })
 
@@ -744,6 +807,7 @@ export default function ChatScreen ({
   this way is expedient for a proof of concept.  The Channel name updates use the StreamUpdatesOn() 
   callback directly.
   */
+ /*
   const refreshMembersFromServer = useCallback(
     async (
       forceUpdateDirectChannels = false,
@@ -773,6 +837,7 @@ export default function ChatScreen ({
     },
     [chat, refreshMembersTimeoutId]
   )
+    */
 
   function sendChatEvent (
     eventType: ChatEventTypes,
@@ -882,8 +947,7 @@ export default function ChatScreen ({
     setUserMsgShown(false)
   }
 
-  /*
-  if (!chat) {
+  if (embeddedDemoConfig == null && !chat) {
     return (
       <main>
         <div className='flex flex-col w-full h-screen justify-center items-center'>
@@ -912,7 +976,6 @@ export default function ChatScreen ({
       </main>
     )
   }
-    */
 
   return (
     <main className='overscroll-none overflow-y-hidden'>
@@ -991,7 +1054,7 @@ export default function ChatScreen ({
               setActiveChannel(publicChannels[0])
             }
             setChatSettingsScreenVisible(false)
-            refreshMembersFromServer()
+            //refreshMembersFromServer()
           }
         }}
         changeChatNameAction={() => {
@@ -1171,11 +1234,11 @@ export default function ChatScreen ({
                 //  sendChatEvent(eventType, recipients, payload)
                 //}}
                 invokeRefresh={(desiredChannelId, createdType) => {
-                  refreshMembersFromServer(
-                    createdType == 'direct',
-                    createdType == 'group',
-                    desiredChannelId
-                  )
+                //  refreshMembersFromServer(
+                //    createdType == 'direct',
+                //    createdType == 'group',
+                //    desiredChannelId
+                //  )
                 }}
               />
             ) : (
@@ -1183,27 +1246,28 @@ export default function ChatScreen ({
                 activeChannel={activeChannel}
                 currentUser={chat?.currentUser}
                 //quotedMessageSender={''}
-                groupUsers={
-                  activeChannel?.type == 'group' && privateGroups
-                    ? privateGroupsUsers[
-                        privateGroups.findIndex(
-                          group => group.id == activeChannel?.id
-                        )
-                      ]
-                    : activeChannel?.type == 'direct' && directChats
-                    ? directChatsUsers[
-                        directChats.findIndex(
-                          dmChannel => dmChannel.id == activeChannel?.id
-                        )
-                      ]
-                    : publicChannels
-                    ? publicChannelsUsers[
-                        publicChannels.findIndex(
-                          channel => channel.id == activeChannel?.id
-                        )
-                      ]
-                    : []
-                }
+                groupUsers={allUsers}
+//                groupUsers={
+//                  activeChannel?.type == 'group' && privateGroups
+//                    ? privateGroupsUsers[
+//                        privateGroups.findIndex(
+//                          group => group.id == activeChannel?.id
+//                        )
+//                      ]
+//                    : activeChannel?.type == 'direct' && directChats
+//                    ? directChatsUsers[
+//                        directChats.findIndex(
+//                          dmChannel => dmChannel.id == activeChannel?.id
+//                        )
+//                      ]
+//                    : publicChannels
+//                    ? publicChannelsUsers[
+//                        publicChannels.findIndex(
+//                          channel => channel.id == activeChannel?.id
+//                        )
+//                      ]
+//                    : []
+//                }
                 groupMembership={
                   activeChannel?.type == 'group' &&
                   privateGroups &&
@@ -1235,7 +1299,7 @@ export default function ChatScreen ({
                   messageActionHandler(action, vars)
                 }
                 usersHaveChanged={() => {
-                  refreshMembersFromServer()
+                  //refreshMembersFromServer()
                 }}
                 updateUnreadMessagesCounts={() => {
                   updateUnreadMessagesCounts()
