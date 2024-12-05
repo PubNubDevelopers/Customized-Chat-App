@@ -38,7 +38,7 @@ import { buildConfig } from '../../configuration'
 
 export default function ChatScreen ({
   embeddedDemoConfig,
-  configuration = null
+  configuration
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [appConfiguration, setAppConfiguration] = useState<any | null>(null)
@@ -361,7 +361,7 @@ export default function ChatScreen ({
       if (configurationSetting == false) {
         userMessage = setFalseMessage
       }
-      showUserMessage(messageTitle, userMessage, ToastType.INFO)
+      showUserMessage(messageTitle, userMessage, '', ToastType.INFO)
     }
   }
 
@@ -1135,7 +1135,6 @@ export default function ChatScreen ({
         manageMembershipsAction={() => {
           setManageMembersModalVisible(true)
         }}
-        showUserMessage={showUserMessage}
         embeddedDemoConfig={embeddedDemoConfig}
         appConfiguration={appConfiguration}
       />
@@ -1275,7 +1274,7 @@ export default function ChatScreen ({
           currentUserId={
             embeddedDemoConfig
               ? embeddedDemoConfig.users[0].id
-              : chat.currentUser.id
+              : chat?.currentUser.id
           }
           setCreatingNewMessage={setCreatingNewMessage}
           unreadMessages={
@@ -1514,6 +1513,7 @@ export default function ChatScreen ({
               : []
           }
           embeddedDemoConfig={embeddedDemoConfig}
+          appConfiguration={appConfiguration}
         />
       </div>
     </main>

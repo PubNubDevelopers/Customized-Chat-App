@@ -9,8 +9,7 @@ import {
   ChatHeaderActionIcon,
   PresenceIcon,
   ToastType,
-  useBreakpoints,
-  useMediaQuery
+  useBreakpoints
 } from '../../types'
 
 export default function ChatSelectionMenu ({

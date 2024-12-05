@@ -85,7 +85,7 @@ export default function Message ({
     )
   }
 
-  async function reactionClicked (emoji, timetoken) {
+  async function reactionClicked (emoji) {
     if (embeddedDemoConfig != null) return
     await message?.toggleReaction(emoji)
   }

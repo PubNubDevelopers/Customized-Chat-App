@@ -20,7 +20,8 @@ export default function MessageListThread ({
   currentUser,
   groupUsers,
   setChatSelectionMenuMinimized,
-  embeddedDemoConfig = null
+  embeddedDemoConfig = null,
+  appConfiguration
 }) {
   const [messages, setMessages] = useState<pnMessage[]>([])
   const messageListRef = useRef<HTMLDivElement>(null)
@@ -170,6 +171,7 @@ export default function MessageListThread ({
             quotedMessageSender={''}
             //creatingNewMessage={false}
             embeddedDemoConfig={embeddedDemoConfig}
+            appConfiguration={appConfiguration}
           />
         </div>
       </div>
