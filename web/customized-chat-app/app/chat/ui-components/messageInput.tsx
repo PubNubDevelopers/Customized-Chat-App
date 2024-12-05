@@ -23,7 +23,9 @@ export default function MessageInput ({
   setEmojiPickerTargetsInput = any => {},
   selectedEmoji = '',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  setSelectedEmoji = a => {}
+  setSelectedEmoji = a => {},
+  embeddedDemoConfig = null,
+  appConfiguration
 }) {
   const [text, setText] = useState('')
   const [newMessageDraft, setNewMessageDraft] = useState<MessageDraft>()
@@ -47,6 +49,7 @@ export default function MessageInput ({
         newMessageDraft.addQuote(quotedMessage)
       }
       await newMessageDraft.send({ storeInHistory: true })
+      //  todo if appConfiguration?.mention_user is false, do not suggest users or channels
       setNewMessageDraft(
         activeChannel?.createMessageDraft({
           userSuggestionSource: 'channel',
@@ -63,6 +66,7 @@ export default function MessageInput ({
   }
 
   async function handleTyping (e) {
+    if (embeddedDemoConfig != null) return
     if (activeChannel.type !== 'public') {
       activeChannel.startTyping()
     }
@@ -85,6 +89,7 @@ export default function MessageInput ({
   }
 
   async function addAttachment () {
+    if (embeddedDemoConfig != null) return
     if (!newMessageDraft) return
     if (hasAttachment)
     {
@@ -107,6 +112,7 @@ export default function MessageInput ({
   }
 
   async function addEmoji () {
+    if (embeddedDemoConfig != null) return
     setEmojiPickerTargetsInput(true)
     setShowEmojiPicker(true)
   }
@@ -143,6 +149,8 @@ export default function MessageInput ({
 }
   useEffect(() => {
     if (!activeChannel) return
+    if (embeddedDemoConfig != null) return
+    //  todo if appConfiguration?.mention_user is false, do not suggest users or channels
     setNewMessageDraft(
       activeChannel.createMessageDraft({
         userSuggestionSource: 'channel',
@@ -242,7 +250,7 @@ export default function MessageInput ({
             />
           </div>
         )}
-        {!replyInThread && (
+        {!replyInThread && (appConfiguration?.message_send_file == true) && (
           <div
             className='cursor-pointer hover:bg-neutral-100 hover:rounded-md relative'
             onClick={() => {

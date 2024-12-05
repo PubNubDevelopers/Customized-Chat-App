@@ -5,12 +5,19 @@ import { useState } from 'react'
 import ChatMenuHeader from './chatMenuHeader'
 import ChatMenuItem from './chatMenuItem'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { ChatHeaderActionIcon, PresenceIcon, ToastType, useBreakpoints, useMediaQuery } from '../../types'
+import {
+  ChatHeaderActionIcon,
+  PresenceIcon,
+  ToastType,
+  useBreakpoints,
+  useMediaQuery
+} from '../../types'
 
 export default function ChatSelectionMenu ({
   chatSelectionMenuMinimized,
   setChatSelectionMenuMinimized,
   chat,
+  currentUserId,
   setCreatingNewMessage,
   setShowThread,
   unreadMessages,
@@ -28,6 +35,7 @@ export default function ChatSelectionMenu ({
   updateUnreadMessagesCounts,
   currentUserProfileUrl,
   showUserMessage,
+  appConfiguration,
   embeddedDemoConfig = null
 }) {
   const [unreadExpanded, setUnreadExpanded] = useState(true)
@@ -35,28 +43,36 @@ export default function ChatSelectionMenu ({
   const [groupsExpanded, setGroupsExpanded] = useState(true)
   const [directMessagesExpanded, setDirectMessagesExpanded] = useState(true)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { isXs, isSm, isMd, isLg, active } = useBreakpoints();
+  const { isXs, isSm, isMd, isLg, active } = useBreakpoints()
   const [searchChannels, setSearchChannels] = useState('')
 
   function handleChatSearch (term: string) {
     setSearchChannels(term)
+    console.log(publicChannels)
   }
 
   return (
     <div
       id='chats-menu'
-      className={`flex flex-col ${!isLg && 
-        chatSelectionMenuMinimized ? 'w-5 min-w-5' : 'lg:min-w-80 lg:w-80 min-w-60 w-60'
-      } bg-navy50 py-0 overflow-y-auto overscroll-none ${embeddedDemoConfig != null ? '' : 'mt-[64px]'} pb-6 select-none border-r border-navy-200`}
+      className={`flex flex-col ${
+        !isLg && chatSelectionMenuMinimized
+          ? 'w-5 min-w-5'
+          : 'lg:min-w-80 lg:w-80 min-w-60 w-60'
+      } bg-navy50 py-0 overflow-y-auto overscroll-none ${
+        embeddedDemoConfig != null ? '' : 'mt-[64px]'
+      } pb-6 select-none border-r border-navy-200`}
     >
       <div
-        className={`${!isLg && 
-          chatSelectionMenuMinimized ? 'flex flex-row' : 'hidden'
+        className={`${
+          !isLg && chatSelectionMenuMinimized ? 'flex flex-row' : 'hidden'
         } min-h-screen h-screen bg-sky-950`}
       >
         <div
           className='flex cursor-pointer'
-          onClick={() => {setChatSelectionMenuMinimized(!chatSelectionMenuMinimized);setShowThread(false)}}
+          onClick={() => {
+            setChatSelectionMenuMinimized(!chatSelectionMenuMinimized)
+            setShowThread(false)
+          }}
         >
           <Image
             src='/icons/chat-assets/close-rooms.svg'
@@ -66,9 +82,13 @@ export default function ChatSelectionMenu ({
             height={36}
             priority
           />
-    </div>
+        </div>
       </div>
-      <div className={`flex flex-col ${!isLg && chatSelectionMenuMinimized ? 'hidden' : 'flex'}`}>
+      <div
+        className={`flex flex-col ${
+          !isLg && chatSelectionMenuMinimized ? 'hidden' : 'flex'
+        }`}
+      >
         <div className={`relative px-4 mt-5`}>
           <input
             id='chats-search-input'
@@ -89,7 +109,7 @@ export default function ChatSelectionMenu ({
           />
         </div>
 
-        {unreadMessages && unreadMessages.length > 0 && (
+        {appConfiguration?.message_unread_count == true && unreadMessages && unreadMessages.length > 0 && (
           <ChatMenuHeader
             text='UNREAD'
             actionIcon={ChatHeaderActionIcon.MARK_READ}
@@ -98,7 +118,8 @@ export default function ChatSelectionMenu ({
               setUnreadExpanded(!unreadExpanded)
             }}
             action={async () => {
-              await chat.markAllMessagesAsRead()
+              if (embeddedDemoConfig != null) return
+              await chat?.markAllMessagesAsRead()
               updateUnreadMessagesCounts()
 
               showUserMessage(
@@ -110,7 +131,8 @@ export default function ChatSelectionMenu ({
             }}
           />
         )}
-        {unreadExpanded && (
+        {(appConfiguration == null ||
+          (appConfiguration?.message_unread_count == true && unreadExpanded)) && (
           <div>
             {unreadMessages?.map(
               (unreadMessage, index) =>
@@ -121,11 +143,13 @@ export default function ChatSelectionMenu ({
                         directChats.findIndex(
                           dmChannel => dmChannel.id == unreadMessage.channel.id
                         )
-                      ]?.find(user => user.id !== chat.currentUser.id)?.name
+                      ]?.find(user => user.id !== currentUserId)?.name
                     : unreadMessage.channel.name) ?? ''
                 )
                   .toLowerCase()
-                  ?.indexOf(searchChannels.toLowerCase()) > -1 && (
+                  ?.indexOf(searchChannels.toLowerCase()) > -1 &&
+                  !(!appConfiguration?.public_channels && unreadMessage.channel.type == 'public') &&
+                  !(!appConfiguration?.group_chat && unreadMessage.channel.type == 'group') && !(!appConfiguration?.group_chat && unreadMessage.channel.type == 'direct') && (
                   <ChatMenuItem
                     key={index}
                     avatarUrl={
@@ -143,14 +167,13 @@ export default function ChatSelectionMenu ({
                               dmChannel =>
                                 dmChannel.id == unreadMessage.channel.id
                             )
-                          ]?.find(user => user.id !== chat.currentUser.id)
-                            ?.profileUrl
+                          ]?.find(user => user.id !== currentUserId)?.profileUrl
                           ? directChatsUsers[
                               directChats.findIndex(
                                 dmChannel =>
                                   dmChannel.id == unreadMessage.channel.id
                               )
-                            ]?.find(user => user.id !== chat.currentUser.id)
+                            ]?.find(user => user.id !== currentUserId)
                               ?.profileUrl
                           : '/avatars/placeholder.png'
                         : '/avatars/placeholder.png'
@@ -161,14 +184,14 @@ export default function ChatSelectionMenu ({
                             privateGroups.findIndex(
                               group => group.id == unreadMessage.channel.id
                             )
-                          ]?.map(user => user.id !== chat.currentUser.id)
+                          ]?.map(user => user.id !== currentUserId)
                           ? `+${
                               privateGroupsUsers[
                                 privateGroups.findIndex(
                                   group => group.id == unreadMessage.channel.id
                                 )
-                              ]?.map(user => user.id !== chat.currentUser.id)
-                                .length - 1
+                              ]?.map(user => user.id !== currentUserId).length -
+                              1
                             }`
                           : ''
                         : ''
@@ -180,7 +203,7 @@ export default function ChatSelectionMenu ({
                               dmChannel =>
                                 dmChannel.id == unreadMessage.channel.id
                             )
-                          ]?.find(user => user.id !== chat.currentUser.id)?.name
+                          ]?.find(user => user.id !== currentUserId)?.name
                         : unreadMessage.channel.name
                     }
                     present={PresenceIcon.NOT_SHOWN}
@@ -188,6 +211,7 @@ export default function ChatSelectionMenu ({
                     markAsRead={true}
                     markAsReadAction={async e => {
                       e.stopPropagation()
+                      if (embeddedDemoConfig != null) return
                       if (
                         unreadMessage.channel.type === 'public' &&
                         publicChannelsMemberships &&
@@ -251,6 +275,7 @@ export default function ChatSelectionMenu ({
                       }
                     }}
                     setActiveChannel={() => {
+                      if (embeddedDemoConfig != null) return
                       setActiveChannelPinnedMessage(null)
                       setCreatingNewMessage(false)
                       if (
@@ -285,26 +310,31 @@ export default function ChatSelectionMenu ({
                         }
                       }
                     }}
+                    appConfiguration={appConfiguration}
                   ></ChatMenuItem>
                 )
             )}
           </div>
         )}
 
-        {unreadMessages && unreadMessages.length > 0 && (
+        {appConfiguration?.message_unread_count == true && unreadMessages && unreadMessages.length > 0 && (
           <div className='w-full border border-navy200 mt-4'></div>
         )}
 
-        <ChatMenuHeader
-          text='PUBLIC CHANNELS'
-          expanded={publicExpanded}
-          expandCollapse={() => {
-            setPublicExpanded(!publicExpanded)
-          }}
-          actionIcon={ChatHeaderActionIcon.NONE}
-          action={() => {}}
-        />
-        {publicExpanded && (
+        {(appConfiguration == null ||
+          appConfiguration?.public_channels == true) && (
+          <ChatMenuHeader
+            text='PUBLIC CHANNELS'
+            expanded={publicExpanded}
+            expandCollapse={() => {
+              setPublicExpanded(!publicExpanded)
+            }}
+            actionIcon={ChatHeaderActionIcon.NONE}
+            action={() => {}}
+          />
+        )}
+        {(appConfiguration == null ||
+          (appConfiguration?.public_channels == true && publicExpanded)) && (
           <div>
             {publicChannels?.map(
               (publicChannel, index) =>
@@ -321,25 +351,34 @@ export default function ChatSelectionMenu ({
                     text={publicChannel.name}
                     present={PresenceIcon.NOT_SHOWN}
                     setActiveChannel={() => {
+                      if (embeddedDemoConfig != null) return
                       setCreatingNewMessage(false)
                       setActiveChannelPinnedMessage(null)
                       setActiveChannel(publicChannels[index])
                     }}
+                    appConfiguration={appConfiguration}
                   ></ChatMenuItem>
                 )
             )}
           </div>
         )}
 
-        <div className='w-full border border-navy200 mt-4'></div>
-        <ChatMenuHeader
-          text='PRIVATE GROUPS'
-          expanded={groupsExpanded}
-          expandCollapse={() => setGroupsExpanded(!groupsExpanded)}
-          actionIcon={ChatHeaderActionIcon.ADD}
-          action={setCreatingNewMessage}
-        />
-        {groupsExpanded && (
+        {(appConfiguration == null ||
+          appConfiguration?.public_channels == true) && (
+          <div className='w-full border border-navy200 mt-4'></div>
+        )}
+
+        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+          <ChatMenuHeader
+            text='PRIVATE GROUPS'
+            expanded={groupsExpanded}
+            expandCollapse={() => setGroupsExpanded(!groupsExpanded)}
+            actionIcon={ChatHeaderActionIcon.ADD}
+            action={setCreatingNewMessage}
+          />
+        )}
+        {(appConfiguration == null ||
+          (appConfiguration?.group_chat == true && groupsExpanded)) && (
           <div>
             {privateGroups?.map(
               (privateGroup, index) =>
@@ -357,43 +396,50 @@ export default function ChatSelectionMenu ({
                     present={PresenceIcon.NOT_SHOWN}
                     avatarBubblePrecedent={
                       privateGroupsUsers[index]?.map(
-                        user => user.id !== chat.currentUser.id
+                        user => user.id !== currentUserId
                       )
                         ? `+${
                             privateGroupsUsers[index]?.map(
-                              user => user.id !== chat.currentUser.id
+                              user => user.id !== currentUserId
                             ).length - 1
                           }`
                         : ''
                     }
                     setActiveChannel={() => {
+                      if (embeddedDemoConfig != null) return
                       setCreatingNewMessage(false)
                       setActiveChannelPinnedMessage(null)
                       setActiveChannel(privateGroups[index])
                     }}
+                    appConfiguration={appConfiguration}
                   />
                 )
             )}
           </div>
         )}
 
-        <div className='w-full border border-navy200 mt-4'></div>
-        <ChatMenuHeader
-          text='DIRECT MESSAGES'
-          expanded={directMessagesExpanded}
-          expandCollapse={() =>
-            setDirectMessagesExpanded(!directMessagesExpanded)
-          }
-          actionIcon={ChatHeaderActionIcon.ADD}
-          action={setCreatingNewMessage}
-        />
-        {directMessagesExpanded && (
+        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+          <div className='w-full border border-navy200 mt-4'></div>
+        )}
+        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+          <ChatMenuHeader
+            text='DIRECT MESSAGES'
+            expanded={directMessagesExpanded}
+            expandCollapse={() =>
+              setDirectMessagesExpanded(!directMessagesExpanded)
+            }
+            actionIcon={ChatHeaderActionIcon.ADD}
+            action={setCreatingNewMessage}
+          />
+        )}
+        {(appConfiguration == null ||
+          (appConfiguration?.group_chat == true && directMessagesExpanded)) && (
           <div>
             {directChats?.map(
               (directChat, index) =>
                 (
                   directChatsUsers[index]?.find(
-                    user => user.id !== chat.currentUser.id
+                    user => user.id !== currentUserId
                   )?.name ?? ''
                 )
                   .toLowerCase()
@@ -402,30 +448,32 @@ export default function ChatSelectionMenu ({
                     key={index}
                     avatarUrl={
                       directChatsUsers[index]?.find(
-                        user => user.id !== chat.currentUser.id
+                        user => user.id !== currentUserId
                       )?.profileUrl
                         ? directChatsUsers[index]?.find(
-                            user => user.id !== chat.currentUser.id
+                            user => user.id !== currentUserId
                           )?.profileUrl
                         : '/avatars/placeholder.png'
                     }
                     text={
                       directChatsUsers[index]?.find(
-                        user => user.id !== chat.currentUser.id
+                        user => user.id !== currentUserId
                       )?.name
                     }
                     present={
                       directChatsUsers[index]?.find(
-                        user => user.id !== chat.currentUser.id
+                        user => user.id !== currentUserId
                       )?.active
                         ? PresenceIcon.ONLINE
                         : PresenceIcon.OFFLINE
                     }
                     setActiveChannel={() => {
+                      if (embeddedDemoConfig != null) return
                       setCreatingNewMessage(false)
                       setActiveChannelPinnedMessage(null)
                       setActiveChannel(directChats[index])
                     }}
+                    appConfiguration={appConfiguration}
                   />
                 )
             )}

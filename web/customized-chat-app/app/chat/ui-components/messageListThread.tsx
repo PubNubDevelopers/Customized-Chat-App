@@ -19,7 +19,8 @@ export default function MessageListThread ({
   activeThreadMessage,
   currentUser,
   groupUsers,
-  setChatSelectionMenuMinimized
+  setChatSelectionMenuMinimized,
+  embeddedDemoConfig = null
 }) {
   const [messages, setMessages] = useState<pnMessage[]>([])
   const messageListRef = useRef<HTMLDivElement>(null)
@@ -73,7 +74,7 @@ export default function MessageListThread ({
       <div
         className={`${
           !showThread && 'hidden'
-        } flex flex-col min-w-80 max-w-80 max-h-screen py-0 mt-[64px] bg-white`}
+        } flex flex-col min-w-80 max-w-80 max-h-screen py-0 ${embeddedDemoConfig == null ? 'mt-[64px]' : ''} bg-white`}
       >
         <div
           id='threads-header'
@@ -99,7 +100,7 @@ export default function MessageListThread ({
           </div>
         </div>
         <div
-          className={`flex flex-col border-x border-navy-200 h-screen overflow-y-auto pb-6 mb-[178px]`}
+          className={`flex flex-col border-x border-navy-200 h-screen overflow-y-auto pb-6 ${embeddedDemoConfig == null ? 'mb-[178px]' : 'mb-[114px]'}`}
           ref={messageListRef}
         >
           {/* ORIGINAL MESSAGE */}
@@ -168,6 +169,7 @@ export default function MessageListThread ({
             quotedMessage={null}
             quotedMessageSender={''}
             //creatingNewMessage={false}
+            embeddedDemoConfig={embeddedDemoConfig}
           />
         </div>
       </div>

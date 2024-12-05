@@ -1,7 +1,7 @@
 import Avatar from './avatar'
 import { PresenceIcon } from '../../types'
 
-export default function TypingIndicator ({ typers, users, embeddedDemoConfig = null, appConfiguration = null }) {
+export default function TypingIndicator ({ typers, users, embeddedDemoConfig = null, appConfiguration }) {
   return (
     users &&
     typers && (

@@ -36,7 +36,7 @@ export default function MessageActions ({
   }
 
   return (
-    <div className={`${!received && 'relative self-start'}`}>
+    <div className={`${!received && 'relative self-start'} select-none`}>
       {emojiPickerShown && (
         <MessageActionsEmoji
           received={received}
@@ -44,7 +44,7 @@ export default function MessageActions ({
         ></MessageActionsEmoji>
       )}
       <div
-        className={`absolute flex flex-row p-2 gap-1 z-10 rounded-sm shadow-lg bg-white mr-24 ${
+        className={`absolute flex flex-row p-2 gap-1 z-10 rounded-sm shadow-lg bg-white mr-24 select-none ${
           received ? 'right-[50px]' : 'left-[10px]'
         } ${received ? '-bottom-[50px]' : '-bottom-[35px]'} cursor-pointer ${
           !actionsShown && 'hidden'

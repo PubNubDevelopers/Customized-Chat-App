@@ -86,6 +86,7 @@ export default function Message ({
   }
 
   async function reactionClicked (emoji, timetoken) {
+    if (embeddedDemoConfig != null) return
     await message?.toggleReaction(emoji)
   }
 
@@ -162,7 +163,7 @@ export default function Message ({
       }
       if (messagePart?.type === 'mention') {
         return (
-          <span
+          appConfiguration?.mention_user && <span
             key={index}
             onClick={() =>
               userClick(
@@ -179,7 +180,7 @@ export default function Message ({
 
       if (messagePart?.type === 'channelReference') {
         return (
-          <span
+          appConfiguration?.channel_references && <span
             key={index}
             onClick={() =>
               channelClick(
@@ -195,7 +196,7 @@ export default function Message ({
       }
       return 'error'
     },
-    []
+    [appConfiguration?.mention_user, appConfiguration?.channel_references]
   )
 
   return (
@@ -303,7 +304,6 @@ export default function Message ({
               )}
               {/* Will chase with the chat team to see why I need these conditions (get an error about missing 'type' if they are absent) */}
               <div className='flex flex-row items-center w-full flex-wrap'>
-                {/* todo 
                 {(message.content.text ||
                   message.content.plainLink ||
                   message.content.textLink ||
@@ -312,12 +312,10 @@ export default function Message ({
                   message
                     .getMessageElements()
                     .map((msgPart, index) => renderMessagePart(msgPart, index))}
-                    */}
-                <span>{message.content.text}</span>
                 {message.actions && message.actions.edited && (
                   <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
                 )}
-                {message.files && message.files.length > 0 && (
+                {message.files && message.files.length > 0 && appConfiguration?.message_send_file == true && (
                   <Image
                     src={`${message.files[0].url}`}
                     alt='PubNub Logo'
@@ -328,7 +326,7 @@ export default function Message ({
                 )}
               </div>
             </div>
-            {!received && showReadIndicator && (
+            {!received && showReadIndicator && (appConfiguration?.message_read_receipts == true) && (
               <Image
                 src={`${
                   determineReadStatus(message.timetoken, readReceipts)
@@ -345,7 +343,7 @@ export default function Message ({
             <div className='absolute right-[10px] -bottom-[20px] flex flex-row items-center z-10 select-none'>
               {/*arrayOfEmojiReactions*/}
               
-              {message.reactions
+              {appConfiguration?.message_reactions && message.reactions
                 ? Object?.keys(message.reactions)
                     .slice(0, 18)
                     .map((emoji, index) => (
@@ -359,14 +357,14 @@ export default function Message ({
                     ))
                 : ''}
 
-              {embeddedDemoConfig != null && appConfiguration?.message_reactions == true &&(
+              {/*embeddedDemoConfig != null && appConfiguration?.message_reactions == true &&(
                 <MessageReaction
                   emoji={'🤕'}
                   messageTimetoken={'0123456789'}
                   count={3}
                   reactionClicked={() => {}}
                 />
-              )}
+              )*/}
             </div>
             {!inThread && message.hasThread && (
               <div
@@ -406,13 +404,12 @@ export default function Message ({
                 messageActionsLeave={() => handleMessageActionsLeave()}
                 emojiClick={
                   appConfiguration?.message_reactions == true
-                    ? (emoji) => {console.log(emoji + ' is clicked');reactionClicked(emoji)}
+                    ? (emoji) => {reactionClicked(emoji)}
                     : null
                 }
                 replyInThreadClick={
                   appConfiguration?.message_threads == true
                     ? () => {
-                        console.log('reply')
                         messageActionHandler(
                           MessageActionsTypes.REPLY_IN_THREAD,
                           message
@@ -423,7 +420,6 @@ export default function Message ({
                 quoteMessageClick={
                   appConfiguration?.message_quote == true
                     ? () => {
-                        console.log('quote')
                         messageActionHandler(MessageActionsTypes.QUOTE, message)
                       }
                     : null
@@ -431,7 +427,6 @@ export default function Message ({
                 pinMessageClick={
                   appConfiguration?.message_pin == true
                     ? () => {
-                        console.log('pin')
                         messageActionHandler(MessageActionsTypes.PIN, message)
                       }
                     : null
@@ -455,13 +450,12 @@ export default function Message ({
               messageActionsLeave={() => handleMessageActionsLeave()}
               emojiClick={
                 appConfiguration?.message_reactions == true
-                  ? emoji => {console.log(emoji + ' is clicked');reactionClicked(emoji)}
+                  ? emoji => {reactionClicked(emoji)}
                   : null
               }
               replyInThreadClick={
                 appConfiguration?.message_threads == true
                   ? () => {
-                      console.log('reply')
                       messageActionHandler(
                         MessageActionsTypes.REPLY_IN_THREAD,
                         message
@@ -472,7 +466,6 @@ export default function Message ({
               quoteMessageClick={
                 appConfiguration?.message_quote == true
                   ? () => {
-                      console.log('quote')
                       messageActionHandler(MessageActionsTypes.QUOTE, message)
                     }
                   : null
@@ -480,7 +473,6 @@ export default function Message ({
               pinMessageClick={
                 appConfiguration?.message_pin == true
                   ? () => {
-                      console.log('pin')
                       messageActionHandler(MessageActionsTypes.PIN, message)
                     }
                   : null

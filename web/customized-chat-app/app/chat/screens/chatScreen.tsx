@@ -95,8 +95,8 @@ export default function ChatScreen ({
     useState<Membership[]>()
   const [directChatsMemberships, setDirectChatsMemberships] =
     useState<Membership[]>()
-//  todo, should be able to do away with these 3 different users 2D arrays
-    const [publicChannelsUsers, setPublicChannelsUsers] = useState<User[][]>([])
+  //  todo, should be able to do away with these 3 different users 2D arrays
+  const [publicChannelsUsers, setPublicChannelsUsers] = useState<User[][]>([])
   const [privateGroupsUsers, setPrivateGroupsUsers] = useState<User[][]>([])
   const [directChatsUsers, setDirectChatsUsers] = useState<User[][]>([])
   const [allUsers, setAllUsers] = useState<User[]>()
@@ -312,8 +312,58 @@ export default function ChatScreen ({
 
   useEffect(() => {
     //  Configuration passed to this component has been updated
+    if (appConfiguration != null) {
+      notifyUserConfigurationChanged(
+        appConfiguration?.support_push,
+        configuration?.support_push,
+        'Push Setting Changed',
+        'The native mobile version of this application WILL support push messaging (GMS on Android, APNS on iOS',
+        'The native mobile version of this application will NOT support push messaging (GMS on Android, APNS on iOS'
+      )
+      notifyUserConfigurationChanged(
+        appConfiguration?.message_history,
+        configuration?.message_history,
+        'Message Persistence Changed',
+        'Message History has been ENABLED',
+        'Message History has been DISABLED'
+      )
+      notifyUserConfigurationChanged(
+        appConfiguration?.view_user_profiles,
+        configuration?.view_user_profiles,
+        'View User Profiles Setting Changed',
+        'View User Profiles has been ENABLED',
+        'View User Profiles has been DISABLED'
+      )
+      notifyUserConfigurationChanged(
+        appConfiguration?.handle_banned,
+        configuration?.handle_banned,
+        'Handle Banned or Muted Users Setting Changed',
+        'Handle Banned / Muted Users has been ENABLED',
+        'Handle Banned / Muted Users has been DISABLED'
+      )
+    }
+
     setAppConfiguration(configuration)
   }, [configuration])
+
+  function notifyUserConfigurationChanged (
+    appConfigurationSetting,
+    configurationSetting,
+    messageTitle,
+    setTrueMessage,
+    setFalseMessage
+  ) {
+    if (
+      appConfiguration != null &&
+      appConfigurationSetting != configurationSetting
+    ) {
+      let userMessage = setTrueMessage
+      if (configurationSetting == false) {
+        userMessage = setFalseMessage
+      }
+      showUserMessage(messageTitle, userMessage, ToastType.INFO)
+    }
+  }
 
   useEffect(() => {
     //  Page loaded, determine the configuration
@@ -347,7 +397,7 @@ export default function ChatScreen ({
       console.log(configuration)
       setAppConfiguration(configuration)
     } else {
-      console.log('Failed to find configuration')
+      //console.log('Failed to find configuration')
     }
   }, [searchParams, router, configuration])
 
@@ -396,7 +446,7 @@ export default function ChatScreen ({
         //  todo logic of updateChannelMembershipsForDirects
 
         setActiveChannel(localPublicChannels.channels[0])
-        updateUnreadMessagesCounts() 
+        updateUnreadMessagesCounts()
       } else {
         console.error('No Public Channels Found')
       }
@@ -404,7 +454,18 @@ export default function ChatScreen ({
 
     if (chat) return
     if (!appConfiguration) return
-    if (embeddedDemoConfig != null) return //  Do not initialize PubNub if we are within the embedded demo
+    if (embeddedDemoConfig != null) {
+      setTypingData([embeddedDemoConfig.activeChannelGroup.users[0].id])
+      setQuotedMessageSender('<<Sender of the Quoted Message>>')
+      if (appConfiguration?.group_chat == true) {
+        setActiveChannel(embeddedDemoConfig.activeChannelGroup)
+      } else if (appConfiguration?.public_channels) {
+        setActiveChannel(embeddedDemoConfig.activeChannelPublic)
+      } else {
+        setActiveChannel(null)
+      }
+      return //  Do not initialize PubNub if we are within the embedded demo
+    }
     console.log('Configuration is available, initializing PubNub')
     console.log('user ID: ' + userId)
 
@@ -807,7 +868,7 @@ export default function ChatScreen ({
   this way is expedient for a proof of concept.  The Channel name updates use the StreamUpdatesOn() 
   callback directly.
   */
- /*
+  /*
   const refreshMembersFromServer = useCallback(
     async (
       forceUpdateDirectChannels = false,
@@ -865,6 +926,7 @@ export default function ChatScreen ({
       case MessageActionsTypes.REPLY_IN_THREAD:
         setShowThread(true)
         setChatSelectionMenuMinimized(true)
+        if (embeddedDemoConfig != null) return
         //  The data parameter is the message we are to reply to
         if (!data.hasThread) {
           setActiveThreadChannel(await data.createThread())
@@ -874,7 +936,11 @@ export default function ChatScreen ({
         setActiveThreadMessage(data)
         break
       case MessageActionsTypes.QUOTE:
-        setQuotedMessage(data)
+        if (embeddedDemoConfig != null) {
+          setQuotedMessage({ text: '<<Text of the Quoted Message>>' })
+        } else {
+          setQuotedMessage(data)
+        }
         chat?.getUser(data.userId).then(user => {
           if (user && user.name) {
             setQuotedMessageSender(user.name)
@@ -882,6 +948,7 @@ export default function ChatScreen ({
         })
         break
       case MessageActionsTypes.PIN:
+        if (embeddedDemoConfig != null) return
         if (activeChannel) {
           //  The data parameter is the message we are to reply to
           let localActiveChannel = await chat?.getChannel(activeChannel?.id)
@@ -978,7 +1045,7 @@ export default function ChatScreen ({
   }
 
   return (
-    <main className='overscroll-none overflow-y-hidden'>
+    <main className={`overscroll-none overflow-y-hidden ${embeddedDemoConfig != null && ''}`}>
       {/*<RoomSelector
         roomSelectorVisible={roomSelectorVisible}
         setRoomSelectorVisible={setRoomSelectorVisible}
@@ -1019,9 +1086,14 @@ export default function ChatScreen ({
                   channel => channel.id == activeChannel?.id
                 )
               ]
+            : embeddedDemoConfig != null
+            ? embeddedDemoConfig.activeChannelGroup.users
             : []
         }
         buttonAction={async () => {
+          if (embeddedDemoConfig != null) {
+            setChatSettingsScreenVisible(false)
+          }
           if (activeChannel && publicChannels) {
             sendChatEvent(
               ChatEventTypes.LEAVE,
@@ -1064,6 +1136,8 @@ export default function ChatScreen ({
           setManageMembersModalVisible(true)
         }}
         showUserMessage={showUserMessage}
+        embeddedDemoConfig={embeddedDemoConfig}
+        appConfiguration={appConfiguration}
       />
       {/* Modal to change the Chat group name*/}
       {/*<ModalChangeName
@@ -1181,9 +1255,10 @@ export default function ChatScreen ({
           }}
         />
       </div>*/}
+      {/* todo adjust the bottom mb- of the window for typing indicator and quoted message... I don't think it's right within the embedded demo if we set it to 750 here (& elsewhere) */}
       <div
         id='chat-main'
-        className={`flex flex-row min-h-screen h-screen overscroll-none  ${
+        className={`flex flex-row ${embeddedDemoConfig != 0 ? 'max-h-[750px]' : 'min-h-screen h-screen'} overscroll-none  ${
           (roomSelectorVisible ||
             profileScreenVisible ||
             chatSettingsScreenVisible ||
@@ -1197,15 +1272,42 @@ export default function ChatScreen ({
           setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
           setShowThread={setShowThread}
           chat={chat}
+          currentUserId={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.users[0].id
+              : chat.currentUser.id
+          }
           setCreatingNewMessage={setCreatingNewMessage}
-          unreadMessages={unreadMessages}
-          publicChannels={publicChannels}
+          unreadMessages={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.unreadMessages
+              : unreadMessages
+          }
+          publicChannels={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.publicChannels
+              : publicChannels
+          }
           publicChannelsMemberships={publicChannelsMemberships}
-          privateGroups={privateGroups}
-          privateGroupsUsers={privateGroupsUsers}
+          privateGroups={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.privateGroups
+              : privateGroups
+          }
+          privateGroupsUsers={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.privateGroupsUsers
+              : privateGroupsUsers
+          }
           privateGroupsMemberships={privateGroupsMemberships}
-          directChats={directChats}
-          directChatsUsers={directChatsUsers}
+          directChats={
+            embeddedDemoConfig ? embeddedDemoConfig.directChats : directChats
+          }
+          directChatsUsers={
+            embeddedDemoConfig
+              ? embeddedDemoConfig.tempAllUsers
+              : directChatsUsers
+          }
           directChatsMemberships={directChatsMemberships}
           activeChannel={setActiveChannel}
           setActiveChannel={setActiveChannel}
@@ -1213,8 +1315,11 @@ export default function ChatScreen ({
           updateUnreadMessagesCounts={() => {
             updateUnreadMessagesCounts()
           }}
-          currentUserProfileUrl={profileUrl}
+          currentUserProfileUrl={
+            embeddedDemoConfig ? embeddedDemoConfig.users[0].avatar : profileUrl
+          }
           showUserMessage={showUserMessage}
+          appConfiguration={appConfiguration}
           embeddedDemoConfig={embeddedDemoConfig}
         />
         <div className='relative w-full bg-white'>
@@ -1224,7 +1329,7 @@ export default function ChatScreen ({
               embeddedDemoConfig == null ? 'mt-[64px]' : ''
             } bg-white`}
           >
-            {creatingNewMessage ? (
+            {embeddedDemoConfig == null && creatingNewMessage ? (
               <NewMessageGroup
                 chat={chat}
                 currentUser={currentUser}
@@ -1234,40 +1339,47 @@ export default function ChatScreen ({
                 //  sendChatEvent(eventType, recipients, payload)
                 //}}
                 invokeRefresh={(desiredChannelId, createdType) => {
-                //  refreshMembersFromServer(
-                //    createdType == 'direct',
-                //    createdType == 'group',
-                //    desiredChannelId
-                //  )
+                  //  refreshMembersFromServer(
+                  //    createdType == 'direct',
+                  //    createdType == 'group',
+                  //    desiredChannelId
+                  //  )
                 }}
               />
             ) : (
               <MessageList
                 activeChannel={activeChannel}
-                currentUser={chat?.currentUser}
+                currentUser={
+                  embeddedDemoConfig != null
+                    ? embeddedDemoConfig.users[0]
+                    : chat?.currentUser
+                }
                 //quotedMessageSender={''}
-                groupUsers={allUsers}
-//                groupUsers={
-//                  activeChannel?.type == 'group' && privateGroups
-//                    ? privateGroupsUsers[
-//                        privateGroups.findIndex(
-//                          group => group.id == activeChannel?.id
-//                        )
-//                      ]
-//                    : activeChannel?.type == 'direct' && directChats
-//                    ? directChatsUsers[
-//                        directChats.findIndex(
-//                          dmChannel => dmChannel.id == activeChannel?.id
-//                        )
-//                      ]
-//                    : publicChannels
-//                    ? publicChannelsUsers[
-//                        publicChannels.findIndex(
-//                          channel => channel.id == activeChannel?.id
-//                        )
-//                      ]
-//                    : []
-//                }
+                //  todo need to set this correctly for direct and groups and account for embeddedDemo
+                //groupUsers={allUsers}
+                groupUsers={
+                  activeChannel?.type == 'group' && privateGroups
+                    ? privateGroupsUsers[
+                        privateGroups.findIndex(
+                          group => group.id == activeChannel?.id
+                        )
+                      ]
+                    : activeChannel?.type == 'direct' && directChats
+                    ? directChatsUsers[
+                        directChats.findIndex(
+                          dmChannel => dmChannel.id == activeChannel?.id
+                        )
+                      ]
+                    : publicChannels
+                    ? publicChannelsUsers[
+                        publicChannels.findIndex(
+                          channel => channel.id == activeChannel?.id
+                        )
+                      ]
+                    : embeddedDemoConfig
+                    ? embeddedDemoConfig.activeChannelGroup.users
+                    : []
+                }
                 groupMembership={
                   activeChannel?.type == 'group' &&
                   privateGroups &&
@@ -1306,7 +1418,11 @@ export default function ChatScreen ({
                 }}
                 setChatSettingsScreenVisible={setChatSettingsScreenVisible}
                 quotedMessage={quotedMessage}
-                activeChannelPinnedMessage={activeChannelPinnedMessage}
+                activeChannelPinnedMessage={
+                  embeddedDemoConfig != null
+                    ? embeddedDemoConfig.pinnedMessage.message
+                    : activeChannelPinnedMessage
+                }
                 setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
                 //setShowThread={setShowThread}
                 showUserMessage={showUserMessage}
@@ -1317,6 +1433,7 @@ export default function ChatScreen ({
             {!quotedMessage &&
               typingData &&
               typingData.length > 0 &&
+              appConfiguration?.typing_indicator == true &&
               activeChannel?.type !== 'public' && (
                 <TypingIndicator
                   typers={typingData}
@@ -1333,28 +1450,17 @@ export default function ChatScreen ({
                             dmChannel => dmChannel.id == activeChannel?.id
                           )
                         ]
+                      : embeddedDemoConfig != null
+                      ? embeddedDemoConfig.activeChannelGroup.users
                       : []
                   }
+                  appConfiguration={appConfiguration}
                 />
               )}
-            {embeddedDemoConfig != null && appConfiguration?.typing_indicator && (
-              <TypingIndicator
-                typers={[embeddedDemoConfig.users[0].id]}
-                users={[
-                  {
-                    id: embeddedDemoConfig.users[0].id,
-                    profileUrl: embeddedDemoConfig.users[0].avatar,
-                    active: true,
-                    name: embeddedDemoConfig.users[0].name
-                  }
-                ]}
-                embeddedDemoConfig={embeddedDemoConfig}
-                appConfiguration={appConfiguration}
-              />
-            )}
+
             <div
               className={`${
-                creatingNewMessage && 'hidden'
+                embeddedDemoConfig == null && creatingNewMessage && 'hidden'
               } absolute bottom-0 left-0 right-0 bg-white`}
             >
               <MessageInput
@@ -1365,6 +1471,8 @@ export default function ChatScreen ({
                 setQuotedMessage={setQuotedMessage}
                 //creatingNewMessage={creatingNewMessage}
                 showUserMessage={showUserMessage}
+                embeddedDemoConfig={embeddedDemoConfig}
+                appConfiguration={appConfiguration}
                 //setEmojiPickerTargetsInput={() =>
                 //  setEmojiPickerTargetsInput(true)
                 //}
@@ -1405,6 +1513,7 @@ export default function ChatScreen ({
                 ]
               : []
           }
+          embeddedDemoConfig={embeddedDemoConfig}
         />
       </div>
     </main>

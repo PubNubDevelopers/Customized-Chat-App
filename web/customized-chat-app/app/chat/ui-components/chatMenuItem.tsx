@@ -12,7 +12,8 @@ export default function ChatMenuItem ({
   markAsRead = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   markAsReadAction = (e) => {},
-  setActiveChannel = () => {}
+  setActiveChannel = () => {},
+  appConfiguration
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
 
@@ -36,7 +37,7 @@ export default function ChatMenuItem ({
             present={present}
             bubblePrecedent={avatarBubblePrecedent}
             avatarUrl={avatarUrl}
-            appConfiguration={null}
+            appConfiguration={appConfiguration}
           />
           {text}
         </div>
