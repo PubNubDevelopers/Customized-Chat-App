@@ -312,7 +312,7 @@ export default function ChatScreen ({
 
   useEffect(() => {
     //  Configuration passed to this component has been updated
-    if (appConfiguration != null) {
+    if (configuration != null && appConfiguration != null) {
       notifyUserConfigurationChanged(
         appConfiguration?.support_push,
         configuration?.support_push,
@@ -936,11 +936,7 @@ export default function ChatScreen ({
         setActiveThreadMessage(data)
         break
       case MessageActionsTypes.QUOTE:
-        if (embeddedDemoConfig != null) {
-          setQuotedMessage({ text: '<<Text of the Quoted Message>>' })
-        } else {
-          setQuotedMessage(data)
-        }
+        setQuotedMessage(data)
         chat?.getUser(data.userId).then(user => {
           if (user && user.name) {
             setQuotedMessageSender(user.name)
@@ -1257,7 +1253,7 @@ export default function ChatScreen ({
       {/* todo adjust the bottom mb- of the window for typing indicator and quoted message... I don't think it's right within the embedded demo if we set it to 750 here (& elsewhere) */}
       <div
         id='chat-main'
-        className={`flex flex-row ${embeddedDemoConfig != 0 ? 'max-h-[750px]' : 'min-h-screen h-screen'} overscroll-none  ${
+        className={`flex flex-row ${embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'} overscroll-none  ${
           (roomSelectorVisible ||
             profileScreenVisible ||
             chatSettingsScreenVisible ||
