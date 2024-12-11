@@ -221,14 +221,13 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       console.log(configuration)
       setAppConfiguration(configuration)
     } else {
-      //console.log('Failed to find configuration')
+      console.log('Failed to find configuration')
     }
   }, [searchParams, router, configuration])
 
   useEffect(() => {
     //  Configuration is available, initialize PubNub
     async function init () {
-      console.log(appConfiguration.publishKey)
       const localChat = await Chat.init({
         publishKey: appConfiguration.publishKey,
         subscribeKey: appConfiguration.subscribeKey,
@@ -260,7 +259,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       const localPublicChannels = await localChat.getChannels({
         filter: `type == 'public'`
       })
-      console.log(localPublicChannels)
       if (localPublicChannels) {
         const currentPublicMemberships =
           await localChat.currentUser.getMemberships({
@@ -273,32 +271,22 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           currentPublicMemberships.total < localPublicChannels.total
         ) {
           //  There are public channels that we are not a member of, join them all
-          console.log('there are public channels we are not a member of')
           //const localPublicChannelMemberships = []
           const localPublicChannelMemberships =
             currentPublicMemberships.memberships
-          //console.log(localPublicChannelMemberships)
-          //console.log(localPublicChannelMemberships.total)
           for (const publicChannel of localPublicChannels.channels) {
-            console.log('joining channel ' + publicChannel.id)
             if (
               !currentPublicMemberships.memberships.find(
                 membership => membership.channel.id == publicChannel.id
               )
             ) {
-              console.log('join 2')
               //  No current membership, join channel
               const newMembership = await publicChannel.join(message => {
                 //  I have a message listener elsewhere for consistency with private and direct chats
               })
-              console.log(newMembership)
               localPublicChannelMemberships.push(newMembership.membership)
             }
           }
-          //          localPublicChannels.channels.forEach(async publicChannel => {
-          //          })
-          console.log('init: set public channels memberships')
-          console.log(localPublicChannelMemberships)
           setPublicChannelsMemberships(localPublicChannelMemberships)
         } else {
           setPublicChannelsMemberships(currentPublicMemberships.memberships)
@@ -324,7 +312,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       tempDirectUsers[0] = embeddedDemoConfig.users.filter(user => user.name == 'David Smith')
       tempDirectUsers[1] = embeddedDemoConfig.users.filter(user => user.name == 'James Brown')
       tempDirectUsers[2] = embeddedDemoConfig.users.filter(user => user.name == 'Emma Lee')
-      console.log(tempDirectUsers)
       setDirectChatsUsers(tempDirectUsers)
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
       setTypingData([embeddedDemoConfig.users[0].id])
@@ -417,7 +404,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               message.channelId == activeChannel.id
             )
           ) {
-            console.log('received direct message')
             updateUnreadMessagesCounts()
           }
         })
@@ -442,18 +428,11 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
 
   /**  Maintain the users and group memberships for the currently active channel */
   useEffect(() => {
-    console.log('maintaining users and group memberships')
     if (!chat) return
-    console.log('.1')
     if (!activeChannel) return
-    console.log('.2')
     if (!publicChannelsMemberships) return
-    console.log('.3')
-    console.log(publicChannelsMemberships)
     if (publicChannelsMemberships.length == 0) return
-    console.log('.4')
     if (!allUsers) return
-    console.log('passed checks')
 
     //  Populate the activeChannelUsers array based on the memberships of the active channel
     if (embeddedDemoConfig != null) {
@@ -465,7 +444,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         //  Note: Public channels do not use the activeChannelUsers array, they just use
         //  allUsers
         setActiveChannelUsers(allUsers)
-        console.log('setting active channel memberships for public')
         activeChannelMemberships = publicChannelsMemberships?.find(
           membership => membership.channel.id == activeChannel.id
         )
@@ -483,9 +461,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
             membership => membership.channel.id == activeChannel.id
           )
         } else if (activeChannel.type == 'direct') {
-          console.log('setting direct membership')
-          console.log(activeChannel.id)
-          console.log(activeChannel)
           activeChannelMemberships = directChatsMemberships?.find(
             membership => membership.channel.id == activeChannel.id
           )
@@ -617,6 +592,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       const updatedUser = allUsersUpdated.find(
         updatedUser => updatedUser.id == user.id
       )
+      //  I test here whether the updated values are null, this was to accommodate a bug in an earlier
+      //  version of the Chat SDK which has since been fixed (in 0.9.1)
       if (updatedUser.name && updatedUser.name != user.name) {
         madeUpdates = true
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -630,14 +607,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       if (updatedUser.lastActiveTimestamp != user.lastActiveTimestamp) {
         //  User activity has changed (do not update our own user)
         if (updatedUser.id != currentUser?.id) {
-          console.log(
-            'updating activity of user ' +
-              updatedUser.name +
-              ' with id ' +
-              updatedUser.id +
-              ' to ' +
-              updatedUser.active
-          )
           madeUpdates = true
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ;(user as any).lastActiveTimestamp = updatedUser.lastActiveTimestamp
@@ -801,7 +770,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       ) {
         const currentMemberOfTheseDirectChannels =
           directChannelMemberships.memberships.map(m => m.channel)
-        console.log(currentMemberOfTheseDirectChannels)
         if (!onlyUpdateUsers) {
           setDirectChats(currentMemberOfTheseDirectChannels)
           setDirectChatsMemberships(directChannelMemberships?.memberships)
@@ -974,8 +942,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details'
       )
       if (publicChannels.length > 0) {
-        console.log('setting active channel')
-
         setActiveChannel(publicChannels[0])
       }
       setChatSettingsScreenVisible(false)
@@ -1228,7 +1194,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 setCreatingNewMessage={setCreatingNewMessage}
                 showUserMessage={showUserMessage}
                 invokeRefresh={(desiredChannelId, createdType) => {
-                  console.log('calling refresh groups from invokeRefresh')
                   refreshGroups(createdType)
                 }}
                 setActiveChannel={setActiveChannel}

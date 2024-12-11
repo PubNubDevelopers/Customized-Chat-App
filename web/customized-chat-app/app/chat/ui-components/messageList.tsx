@@ -56,25 +56,15 @@ export default function MessageList ({
 
   useEffect(() => {
     if (embeddedDemoConfig != null) return
-    console.log('1')
     if (activeChannel == null) return
-    console.log('2')
     if (groupMembership == null) return
-    console.log('3')
-    console.log(groupMembership)
     if (!groupMembership.channel) return
-    console.log(groupMembership.channel.id)
-    console.log('4')
-    console.log(messages)
     //if (messages && messages.length > 0) return
-    console.log('passed checks')
     //  UseEffect to handle initial configuration of the Message List including reading the historical messages
     setLoadingMessage('Fetching History from Server...')
     async function initMessageList () {
       if (activeChannel.id !== groupMembership.channel.id) {
         console.log('channel IDs did not match, returning')
-        console.log(activeChannel.id)
-        console.log(groupMembership.channel.id)
         return
       }
       setMessages([])
@@ -125,7 +115,6 @@ export default function MessageList ({
   useEffect(() => {
     if (embeddedDemoConfig != null) return
     activeChannel?.streamUpdates(async channelUpdate => {
-      console.log('channel update')
       if (channelUpdate.custom) {
         const pinnedMessageTimetoken =
           channelUpdate.custom.pinnedMessageTimetoken
@@ -147,7 +136,7 @@ export default function MessageList ({
     //  UseEffect to receive new messages sent on the channel
     if (!activeChannel) return
     if (embeddedDemoConfig != null) return
-    console.log('connecting to active channel: ' + activeChannel.name)
+    if (!currentMembership) return
 
     return activeChannel.connect(message => {
       currentMembership?.setLastReadMessageTimetoken(message.timetoken)

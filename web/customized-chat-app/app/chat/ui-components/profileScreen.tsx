@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
 import { ToastType } from '../../types'
+import { useState } from 'react'
 
 export default function ProfileScreen ({
   profileScreenVisible,
@@ -13,6 +14,8 @@ export default function ProfileScreen ({
   showUserMessage,
   changeUserNameScreenVisible
 }) {
+
+  const [logoutButtonText, setLogoutButtonText] = useState('Log Out')
 
   return (
     <div
@@ -88,7 +91,7 @@ export default function ProfileScreen ({
 
         <div
           className={`${roboto.className} flex flex-row justify-center items-center my-6 text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
-          onClick={() => logout()}
+          onClick={() => {setLogoutButtonText('Please Wait...');logout()}}
         >
           <Image
             src='/icons/chat-assets/logout.svg'
@@ -98,7 +101,7 @@ export default function ProfileScreen ({
             height={36}
             priority
           />
-          Log out
+          {logoutButtonText}
         </div>
       </div>
     </div>

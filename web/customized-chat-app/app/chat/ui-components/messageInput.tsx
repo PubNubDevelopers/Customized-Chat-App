@@ -167,6 +167,7 @@ export default function MessageInput ({
     setText(text + selectedEmoji)
     newMessageDraft?.onChange(text + selectedEmoji)
     setSelectedEmoji('')
+    inputRef.current?.focus()
   }, [newMessageDraft, selectedEmoji, setSelectedEmoji, text])
 
   return (
