@@ -13,7 +13,8 @@ export default function NewMessageGroup ({
   setCreatingNewMessage,
   showUserMessage,
   //sendChatEvent,
-  invokeRefresh
+  invokeRefresh,
+  setActiveChannel
 }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<User[]>([])
@@ -31,7 +32,7 @@ export default function NewMessageGroup ({
         filter: `name LIKE "*${term}*" || id LIKE "*${term}*"`
       }) //  Could also filter by Profile URL:  || profileUrl LIKE "*${term}*"
       .then(userResults => {
-        setSearchResults(userResults.users)
+        setSearchResults(userResults.users.filter((user) => (user.id != 'admin-config' && user.id != 'PUBNUB_INTERNAL_MODERATOR')))
       })
   }
 
@@ -70,10 +71,10 @@ export default function NewMessageGroup ({
   }
 
   async function createGroup () {
+    console.log('CREATE GROUP')
     setCreationInProgress(true)
     //  Call createGroup or direct conversation, depending on which one it is.
     //  Send joined events to all participants to let them know they are in a new group
-    //  Refresh all my membership arrays from the server
     //  Set the new group as the active chat session
 
     let desiredChannelId = ''
@@ -89,6 +90,7 @@ export default function NewMessageGroup ({
       desiredChannelId = channel.id
       createdChannel = channel
     } else {
+
       //  Creating a group conversation
       const randomNewChannelName = 'Group ' + Math.floor(Math.random() * 1000)
       const others = newDraftGroupUsers.filter(
@@ -102,8 +104,13 @@ export default function NewMessageGroup ({
       createdChannel = channel
     }
     if (createdChannel) {
-      invokeRefresh(desiredChannelId, createdChannel['type'])
+      console.log('created channel')
+      console.log(createdChannel['type'])
+      await invokeRefresh(desiredChannelId, createdChannel['type'])
+      console.log('setting active channel 1')
+      setActiveChannel(createdChannel)
     }
+    console.log('set to false')
     setCreatingNewMessage(false)
   }
 
@@ -119,7 +126,7 @@ export default function NewMessageGroup ({
               onClick={() => setCreatingNewMessage(false)}
             >
               <Image
-                src='/icons/west.svg'
+                src='/icons/chat-assets/west.svg'
                 alt='Send'
                 className='m-3'
                 width={24}
@@ -225,7 +232,7 @@ export default function NewMessageGroup ({
             }  w-[40px] h-[40px] animate-spin mr-3`}
           >
             <Image
-              src='/icons/loading.png'
+              src='/icons/chat-assets/loading.png'
               alt='Chat Icon'
               className=''
               width={40}

@@ -17,7 +17,7 @@ export default function NewMessageUserPill ({
           onClick={() => removePillAction(user.id)}
         >
           <Image
-            src='/icons/close.svg'
+            src='/icons/chat-assets/close.svg'
             alt='Remove'
             className='ml-2'
             width={24}

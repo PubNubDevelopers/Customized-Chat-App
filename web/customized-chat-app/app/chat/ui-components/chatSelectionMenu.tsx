@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ChatMenuHeader from './chatMenuHeader'
 import ChatMenuItem from './chatMenuItem'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -45,9 +45,81 @@ export default function ChatSelectionMenu ({
   const { isXs, isSm, isMd, isLg, active } = useBreakpoints()
   const [searchChannels, setSearchChannels] = useState('')
 
+  const [showUnreadMessageCount, setShowUnreadMessageCount] = useState(true)
+  const [showPublicChannels, setShowPublicChannels] = useState(true)
+  const [showGroupChat, setShowGroupChat] = useState(true)
+
   function handleChatSearch (term: string) {
     setSearchChannels(term)
     console.log(publicChannels)
+  }
+
+  useEffect(() => {
+    if (!appConfiguration) return
+    setShowUnreadMessageCount(appConfiguration.message_unread_count == true)
+    setShowPublicChannels(appConfiguration.public_channels == true)
+    setShowGroupChat(appConfiguration.group_chat == true)
+  }, [appConfiguration])
+
+  function giveUserAvatarUrl (userArray) {
+    if (!userArray) {
+      return '/avatars/placeholder.png'
+    }
+    return userArray?.find(user => user.id !== currentUserId)?.profileUrl
+      ? userArray?.find(user => user.id !== currentUserId)?.profileUrl
+      : '/avatars/placeholder.png'
+  }
+
+  function giveGroupAvatarUrl () {
+    return currentUserProfileUrl ?? '/avatars/placeholder.png'
+  }
+
+  function givePublicAvatarUrl (channel) {
+    return channel?.custom?.profileUrl ?? '/avatars/placeholder.png'
+  }
+
+  function giveUserName (searchArray) {
+    return (
+      searchArray?.find(item => item.id !== currentUserId)?.name ??
+      'User Left Conversation'
+    )
+  }
+
+  function giveGroupBubblePrecedent (userArray) {
+    return userArray?.map(user => user.id !== currentUserId)
+      ? `+${userArray?.map(user => user.id !== currentUserId).length - 1}`
+      : ''
+  }
+
+  function findIndex (searchArray, idToSearchFor) {
+    return searchArray.findIndex(item => item.id == idToSearchFor)
+  }
+
+  function setActiveChannelAction (channel) {
+    if (embeddedDemoConfig != null) return
+    setCreatingNewMessage(false)
+    setActiveChannelPinnedMessage(null)
+    setActiveChannel(channel)
+  }
+
+  async function markMessageAsRead (
+    membershipsArray,
+    channelsArray,
+    messageChannelId
+  ) {
+    const index = membershipsArray.findIndex(
+      membership => membership.channel.id == messageChannelId
+    )
+    if (index > -1) {
+      const lastMessage = await channelsArray[index]?.getHistory({ count: 1 })
+      if (lastMessage && lastMessage.messages) {
+        await membershipsArray[index].setLastReadMessage(
+          lastMessage.messages[0]
+        )
+        console.log('setting unread message counts')
+        updateUnreadMessagesCounts()
+      }
+    }
   }
 
   return (
@@ -108,30 +180,32 @@ export default function ChatSelectionMenu ({
           />
         </div>
 
-        {appConfiguration?.message_unread_count == true && unreadMessages && unreadMessages.length > 0 && (
-          <ChatMenuHeader
-            text='UNREAD'
-            actionIcon={ChatHeaderActionIcon.MARK_READ}
-            expanded={unreadExpanded}
-            expandCollapse={() => {
-              setUnreadExpanded(!unreadExpanded)
-            }}
-            action={async () => {
-              if (embeddedDemoConfig != null) return
-              await chat?.markAllMessagesAsRead()
-              updateUnreadMessagesCounts()
+        {showUnreadMessageCount &&
+          unreadMessages &&
+          unreadMessages.length > 0 && (
+            <ChatMenuHeader
+              text={`UNREAD`}
+              actionIcon={ChatHeaderActionIcon.MARK_READ}
+              expanded={unreadExpanded}
+              expandCollapse={() => {
+                setUnreadExpanded(!unreadExpanded)
+              }}
+              action={async () => {
+                if (embeddedDemoConfig != null) return
+                await chat?.markAllMessagesAsRead()
+                updateUnreadMessagesCounts()
 
-              showUserMessage(
-                'Success:',
-                'All messsages have been marked as read, and sent receipts are updated accordingly',
-                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/unread#mark-messages-as-read-all-channels',
-                ToastType.CHECK
-              )
-            }}
-          />
-        )}
-        {(appConfiguration == null ||
-          (appConfiguration?.message_unread_count == true && unreadExpanded)) && (
+                showUserMessage(
+                  'Success:',
+                  'All messsages have been marked as read, and sent receipts are updated accordingly',
+                  'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/unread#mark-messages-as-read-all-channels',
+                  ToastType.CHECK
+                )
+              }}
+            />
+          )}
+        {showUnreadMessageCount &&
+            unreadExpanded && (
           <div>
             {unreadMessages?.map(
               (unreadMessage, index) =>
@@ -139,70 +213,55 @@ export default function ChatSelectionMenu ({
                 (
                   (unreadMessage.channel.type === 'direct' && directChats
                     ? directChatsUsers[
-                        directChats.findIndex(
-                          dmChannel => dmChannel.id == unreadMessage.channel.id
-                        )
+                        findIndex(directChats, unreadMessage.channel.id)
                       ]?.find(user => user.id !== currentUserId)?.name
                     : unreadMessage.channel.name) ?? ''
                 )
                   .toLowerCase()
                   ?.indexOf(searchChannels.toLowerCase()) > -1 &&
-                  !(!appConfiguration?.public_channels && unreadMessage.channel.type == 'public') &&
-                  !(!appConfiguration?.group_chat && unreadMessage.channel.type == 'group') && !(!appConfiguration?.group_chat && unreadMessage.channel.type == 'direct') && (
+                !(
+                  !showPublicChannels &&
+                  unreadMessage.channel.type == 'public'
+                ) &&
+                !(
+                  !showGroupChat &&
+                  unreadMessage.channel.type == 'group'
+                ) &&
+                !(
+                  !showGroupChat &&
+                  unreadMessage.channel.type == 'direct'
+                ) && (
                   <ChatMenuItem
                     key={index}
                     avatarUrl={
                       unreadMessage.channel.type === 'group'
-                        ? currentUserProfileUrl
-                          ? currentUserProfileUrl
-                          : '/avatars/placeholder.png'
+                        ? giveGroupAvatarUrl()
                         : unreadMessage.channel.type == 'public'
-                        ? unreadMessage.channel.custom?.profileUrl
-                          ? unreadMessage.channel.custom?.profileUrl
-                          : '/avatars/placeholder.png'
+                        ? givePublicAvatarUrl(unreadMessage.channel)
                         : unreadMessage.channel.type == 'direct' && directChats
-                        ? directChatsUsers[
-                            directChats.findIndex(
-                              dmChannel =>
-                                dmChannel.id == unreadMessage.channel.id
-                            )
-                          ]?.find(user => user.id !== currentUserId)?.profileUrl
-                          ? directChatsUsers[
-                              directChats.findIndex(
-                                dmChannel =>
-                                  dmChannel.id == unreadMessage.channel.id
-                              )
-                            ]?.find(user => user.id !== currentUserId)
-                              ?.profileUrl
-                          : '/avatars/placeholder.png'
+                        ? giveUserAvatarUrl(
+                            directChatsUsers[
+                              findIndex(directChats, unreadMessage.channel.id)
+                            ]
+                          )
                         : '/avatars/placeholder.png'
                     }
                     avatarBubblePrecedent={
                       unreadMessage.channel.type === 'group' && privateGroups
-                        ? privateGroupsUsers[
-                            privateGroups.findIndex(
-                              group => group.id == unreadMessage.channel.id
-                            )
-                          ]?.map(user => user.id !== currentUserId)
-                          ? `+${
-                              privateGroupsUsers[
-                                privateGroups.findIndex(
-                                  group => group.id == unreadMessage.channel.id
-                                )
-                              ]?.map(user => user.id !== currentUserId).length -
-                              1
-                            }`
-                          : ''
+                        ? giveGroupBubblePrecedent(
+                            privateGroupsUsers[
+                              findIndex(privateGroups, unreadMessage.channel.id)
+                            ]
+                          )
                         : ''
                     }
                     text={
                       unreadMessage.channel.type === 'direct' && directChats
-                        ? directChatsUsers[
-                            directChats.findIndex(
-                              dmChannel =>
-                                dmChannel.id == unreadMessage.channel.id
-                            )
-                          ]?.find(user => user.id !== currentUserId)?.name
+                        ? giveUserName(
+                            directChatsUsers[
+                              findIndex(directChats, unreadMessage.channel.id)
+                            ]
+                          )
                         : unreadMessage.channel.name
                     }
                     present={PresenceIcon.NOT_SHOWN}
@@ -216,97 +275,53 @@ export default function ChatSelectionMenu ({
                         publicChannelsMemberships &&
                         publicChannels
                       ) {
-                        const index = publicChannelsMemberships.findIndex(
-                          membership =>
-                            membership.channel.id == unreadMessage.channel.id
+                        await markMessageAsRead(
+                          publicChannelsMemberships,
+                          publicChannels,
+                          unreadMessage.channel.id
                         )
-                        if (index > -1) {
-                          const lastMessage = await publicChannels[
-                            index
-                          ]?.getHistory({ count: 1 })
-                          if (lastMessage && lastMessage.messages) {
-                            await publicChannelsMemberships[
-                              index
-                            ].setLastReadMessage(lastMessage.messages[0])
-                            updateUnreadMessagesCounts()
-                          }
-                        }
                       } else if (
                         unreadMessage.channel.type === 'group' &&
                         privateGroupsMemberships &&
                         privateGroups
                       ) {
-                        const index = privateGroupsMemberships.findIndex(
-                          membership =>
-                            membership.channel.id == unreadMessage.channel.id
-                        )
-                        if (index > -1) {
-                          const lastMessage = await privateGroups[
-                            index
-                          ]?.getHistory({ count: 1 })
-                          if (lastMessage && lastMessage.messages) {
-                            await privateGroupsMemberships[
-                              index
-                            ].setLastReadMessage(lastMessage.messages[0])
-                            updateUnreadMessagesCounts()
-                          }
-                        }
+                        await markMessageAsRead(privateGroupsMemberships, privateGroups, unreadMessage.channel.id)
                       } else if (
                         unreadMessage.channel.type === 'direct' &&
                         directChatsMemberships &&
                         directChats
                       ) {
-                        const index = directChatsMemberships.findIndex(
-                          membership =>
-                            membership.channel.id == unreadMessage.channel.id
-                        )
-                        if (index > -1) {
-                          const lastMessage = await directChats[
-                            index
-                          ]?.getHistory({ count: 1 })
-                          if (lastMessage && lastMessage.messages) {
-                            await directChatsMemberships[
-                              index
-                            ].setLastReadMessage(lastMessage.messages[0])
-                            updateUnreadMessagesCounts()
-                          }
-                        }
+                        await markMessageAsRead(directChatsMemberships, directChats, unreadMessage.channel.id)
                       }
                     }}
                     setActiveChannel={() => {
-                      if (embeddedDemoConfig != null) return
-                      setActiveChannelPinnedMessage(null)
-                      setCreatingNewMessage(false)
                       if (
                         unreadMessage.channel.type === 'public' &&
                         publicChannels
                       ) {
-                        const index = publicChannels.findIndex(
-                          channel => channel.id == unreadMessage.channel.id
+                        setActiveChannelAction(
+                          publicChannels[
+                            findIndex(publicChannels, unreadMessage.channel.id)
+                          ]
                         )
-                        if (index > -1) {
-                          setActiveChannel(publicChannels[index])
-                        }
                       } else if (
                         unreadMessage.channel.type === 'group' &&
                         privateGroups
                       ) {
-                        const index = privateGroups.findIndex(
-                          group => group.id == unreadMessage.channel.id
+                        setActiveChannelAction(
+                          privateGroups[
+                            findIndex(privateGroups, unreadMessage.channel.id)
+                          ]
                         )
-                        if (index > -1) {
-                          setActiveChannel(privateGroups[index])
-                        }
                       } else if (
                         unreadMessage.channel.type === 'direct' &&
                         directChats
                       ) {
-                        const index = directChats.findIndex(
-                          dmChannel => dmChannel.id == unreadMessage.channel.id
+                        setActiveChannelAction(
+                          directChats[
+                            findIndex(directChats, unreadMessage.channel.id)
+                          ]
                         )
-                        if (index > -1) {
-                          setActiveChannel(directChats[index])
-                        }
                       }
                     }}
                     appConfiguration={appConfiguration}
@@ -316,12 +331,13 @@ export default function ChatSelectionMenu ({
           </div>
         )}
 
-        {appConfiguration?.message_unread_count == true && unreadMessages && unreadMessages.length > 0 && (
-          <div className='w-full border border-navy200 mt-4'></div>
-        )}
+        {showUnreadMessageCount == true &&
+          unreadMessages &&
+          unreadMessages.length > 0 && (
+            <div className='w-full border border-navy200 mt-4'></div>
+          )}
 
-        {(appConfiguration == null ||
-          appConfiguration?.public_channels == true) && (
+        {showPublicChannels && (
           <ChatMenuHeader
             text='PUBLIC CHANNELS'
             expanded={publicExpanded}
@@ -332,8 +348,7 @@ export default function ChatSelectionMenu ({
             action={() => {}}
           />
         )}
-        {(appConfiguration == null ||
-          (appConfiguration?.public_channels == true && publicExpanded)) && (
+        {showPublicChannels && publicExpanded && (
           <div>
             {publicChannels?.map(
               (publicChannel, index) =>
@@ -342,18 +357,15 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={
-                      publicChannel.custom.profileUrl
-                        ? publicChannel.custom.profileUrl
-                        : '/avatars/placeholder.png'
-                    }
+                    avatarUrl={givePublicAvatarUrl(publicChannel)}
                     text={publicChannel.name}
                     present={PresenceIcon.NOT_SHOWN}
                     setActiveChannel={() => {
-                      if (embeddedDemoConfig != null) return
-                      setCreatingNewMessage(false)
-                      setActiveChannelPinnedMessage(null)
-                      setActiveChannel(publicChannels[index])
+                      setActiveChannelAction(publicChannels[index])
+                      //                      if (embeddedDemoConfig != null) return
+                      //                      setCreatingNewMessage(false)
+                      //                      setActiveChannelPinnedMessage(null)
+                      //                      setActiveChannel(publicChannels[index])
                     }}
                     appConfiguration={appConfiguration}
                   ></ChatMenuItem>
@@ -362,12 +374,11 @@ export default function ChatSelectionMenu ({
           </div>
         )}
 
-        {(appConfiguration == null ||
-          appConfiguration?.public_channels == true) && (
+        {showPublicChannels && (
           <div className='w-full border border-navy200 mt-4'></div>
         )}
 
-        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+        {showGroupChat && (
           <ChatMenuHeader
             text='PRIVATE GROUPS'
             expanded={groupsExpanded}
@@ -376,8 +387,7 @@ export default function ChatSelectionMenu ({
             action={setCreatingNewMessage}
           />
         )}
-        {(appConfiguration == null ||
-          (appConfiguration?.group_chat == true && groupsExpanded)) && (
+        {showGroupChat && groupsExpanded && (
           <div>
             {privateGroups?.map(
               (privateGroup, index) =>
@@ -386,29 +396,18 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={
-                      currentUserProfileUrl
-                        ? currentUserProfileUrl
-                        : '/avatars/placeholder.png'
-                    }
+                    avatarUrl={giveGroupAvatarUrl()}
                     text={privateGroup.name}
                     present={PresenceIcon.NOT_SHOWN}
-                    avatarBubblePrecedent={
-                      privateGroupsUsers[index]?.map(
-                        user => user.id !== currentUserId
-                      )
-                        ? `+${
-                            privateGroupsUsers[index]?.map(
-                              user => user.id !== currentUserId
-                            ).length - 1
-                          }`
-                        : ''
-                    }
+                    avatarBubblePrecedent={giveGroupBubblePrecedent(
+                      privateGroupsUsers[index]
+                    )}
                     setActiveChannel={() => {
-                      if (embeddedDemoConfig != null) return
-                      setCreatingNewMessage(false)
-                      setActiveChannelPinnedMessage(null)
-                      setActiveChannel(privateGroups[index])
+                      setActiveChannelAction(privateGroups[index])
+                      //                      if (embeddedDemoConfig != null) return
+                      //                      setCreatingNewMessage(false)
+                      //                      setActiveChannelPinnedMessage(null)
+                      //                      setActiveChannel(privateGroups[index])
                     }}
                     appConfiguration={appConfiguration}
                   />
@@ -417,12 +416,12 @@ export default function ChatSelectionMenu ({
           </div>
         )}
 
-        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+        {showGroupChat && (
           <div className='w-full border border-navy200 mt-4'></div>
         )}
-        {(appConfiguration == null || appConfiguration?.group_chat == true) && (
+        {showGroupChat && (
           <ChatMenuHeader
-            text='DIRECT MESSAGES'
+            text={`DIRECT MESSAGES`}
             expanded={directMessagesExpanded}
             expandCollapse={() =>
               setDirectMessagesExpanded(!directMessagesExpanded)
@@ -431,8 +430,7 @@ export default function ChatSelectionMenu ({
             action={setCreatingNewMessage}
           />
         )}
-        {(appConfiguration == null ||
-          (appConfiguration?.group_chat == true && directMessagesExpanded)) && (
+        {showGroupChat && directMessagesExpanded && (
           <div>
             {directChats?.map(
               (directChat, index) =>
@@ -445,20 +443,8 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={
-                      directChatsUsers[index]?.find(
-                        user => user.id !== currentUserId
-                      )?.profileUrl
-                        ? directChatsUsers[index]?.find(
-                            user => user.id !== currentUserId
-                          )?.profileUrl
-                        : '/avatars/placeholder.png'
-                    }
-                    text={
-                      directChatsUsers[index]?.find(
-                        user => user.id !== currentUserId
-                      )?.name
-                    }
+                    avatarUrl={giveUserAvatarUrl(directChatsUsers[index])}
+                    text={giveUserName(directChatsUsers[index])}
                     present={
                       directChatsUsers[index]?.find(
                         user => user.id !== currentUserId
@@ -467,10 +453,13 @@ export default function ChatSelectionMenu ({
                         : PresenceIcon.OFFLINE
                     }
                     setActiveChannel={() => {
-                      if (embeddedDemoConfig != null) return
-                      setCreatingNewMessage(false)
-                      setActiveChannelPinnedMessage(null)
-                      setActiveChannel(directChats[index])
+                      setActiveChannelAction(directChats[index])
+                      //                      if (embeddedDemoConfig != null) return
+                      //                      setCreatingNewMessage(false)
+                      //                      setActiveChannelPinnedMessage(null)
+                      //                      console.log('setting active channel to direct')
+                      //                      console.log(directChats[index])
+                      //                      setActiveChannel(directChats[index])
                     }}
                     appConfiguration={appConfiguration}
                   />

@@ -122,7 +122,7 @@ export default function ChatSettingsScreen ({
                   className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
                   onClick={() => {if (embeddedDemoConfig != null) return;manageMembershipsAction()}}
                 >
-                  Manage
+                  View
                 </div>
               </div>
               <div className='border border-navy600'></div>

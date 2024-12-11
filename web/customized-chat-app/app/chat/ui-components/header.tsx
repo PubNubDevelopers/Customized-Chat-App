@@ -3,6 +3,7 @@ import { roboto } from '@/app/fonts'
 import { ToastType } from '../../types'
 
 export default function Header ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setRoomSelectorVisible,
   setProfileScreenVisible,
   //creatingNewMessage,
@@ -20,7 +21,7 @@ export default function Header ({
       <div
         id='room-selector'
         className='flex items-center justify-center gap-2.5 ml-2.5 hover:bg-sky-900 cursor-pointer rounded-md m-1 px-2'
-        onClick={() => setRoomSelectorVisible(true)}
+        onClick={() => {/*setRoomSelectorVisible(true)*/}}
       >
         <div
           id='room-avatar'

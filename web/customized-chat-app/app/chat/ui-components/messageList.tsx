@@ -10,7 +10,6 @@ import {
   //  todo I'm missing some logic here surely, such as rendering message parts
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Channel,
-  User,
   Message as pnMessage,
   Membership,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -20,19 +19,20 @@ import {
 } from '@pubnub/chat'
 
 export default function MessageList ({
+  loaded,
   activeChannel,
   currentUser,
   groupUsers,
   groupMembership,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   messageActionHandler = (a, b) => {},
-  usersHaveChanged,
   updateUnreadMessagesCounts,
   setChatSettingsScreenVisible,
   quotedMessage,
   activeChannelPinnedMessage,
   setActiveChannelPinnedMessage,
   //setShowThread,
+  allUsers,
   showUserMessage,
   embeddedDemoConfig,
   appConfiguration
@@ -56,15 +56,28 @@ export default function MessageList ({
 
   useEffect(() => {
     if (embeddedDemoConfig != null) return
+    console.log('1')
+    if (activeChannel == null) return
+    console.log('2')
+    if (groupMembership == null) return
+    console.log('3')
+    console.log(groupMembership)
+    if (!groupMembership.channel) return
+    console.log(groupMembership.channel.id)
+    console.log('4')
+    console.log(messages)
+    //if (messages && messages.length > 0) return
+    console.log('passed checks')
     //  UseEffect to handle initial configuration of the Message List including reading the historical messages
     setLoadingMessage('Fetching History from Server...')
-    if (!activeChannel) return
     async function initMessageList () {
-      setMessages([])
-      if (groupMembership == null) {
-        console.log('Error: groupMembership should not be null')
+      if (activeChannel.id !== groupMembership.channel.id) {
+        console.log('channel IDs did not match, returning')
+        console.log(activeChannel.id)
+        console.log(groupMembership.channel.id)
+        return
       }
-      const localCurrentMembership = groupMembership
+      setMessages([])
       setCurrentMembership(groupMembership)
       activeChannel
         .getHistory({ count: 20 })
@@ -82,7 +95,10 @@ export default function MessageList ({
                 i >= 0;
                 i--
               ) {
-                await localCurrentMembership?.setLastReadMessageTimetoken(
+                console.log(
+                  'setting read on ' + historicalMessagesObj.messages[i].text
+                )
+                await groupMembership.setLastReadMessageTimetoken(
                   historicalMessagesObj.messages[i].timetoken
                 )
                 updateUnreadMessagesCounts()
@@ -93,7 +109,7 @@ export default function MessageList ({
         })
     }
     initMessageList()
-  }, [activeChannel, embeddedDemoConfig])
+  }, [activeChannel, groupMembership, embeddedDemoConfig])
 
   useEffect(() => {
     //  UseEffect to stream Read Receipts
@@ -109,6 +125,7 @@ export default function MessageList ({
   useEffect(() => {
     if (embeddedDemoConfig != null) return
     activeChannel?.streamUpdates(async channelUpdate => {
+      console.log('channel update')
       if (channelUpdate.custom) {
         const pinnedMessageTimetoken =
           channelUpdate.custom.pinnedMessageTimetoken
@@ -130,6 +147,7 @@ export default function MessageList ({
     //  UseEffect to receive new messages sent on the channel
     if (!activeChannel) return
     if (embeddedDemoConfig != null) return
+    console.log('connecting to active channel: ' + activeChannel.name)
 
     return activeChannel.connect(message => {
       currentMembership?.setLastReadMessageTimetoken(message.timetoken)
@@ -144,16 +162,6 @@ export default function MessageList ({
     if (!messages || messages.length == 0) return
     return pnMessage.streamUpdatesOn(messages, setMessages)
   }, [messages])
-
-  useEffect(() => {
-    if (embeddedDemoConfig != null) return
-    if (groupUsers && groupUsers.length > 0) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return User.streamUpdatesOn(groupUsers, updatedUsers => {
-        usersHaveChanged()
-      })
-    }
-  }, [groupUsers, embeddedDemoConfig])
 
   useEffect(() => {
     if (!messageListRef.current) return
@@ -174,18 +182,22 @@ export default function MessageList ({
   {
     if (!activeChannel && embeddedDemoConfig == null)
       return (
-        <div className={`flex flex-col ${embeddedDemoConfig != 0 ? 'max-h-[750px]' : 'min-h-screen h-screen'} justify-center items-center w-full`}>
+        <div
+          className={`flex flex-col  ${
+            embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
+          } justify-center items-center w-full`}
+        >
           <div className='max-w-96 max-h-96 '>
             <Image
               src='/chat-logo.svg'
               alt='Chat Icon'
-              className=''
+              className='mb-4'
               width={200}
               height={200}
               priority
             />
           </div>
-          <div className='flex mb-5 animate-spin'>
+          <div className={`flex mb-5 animate-spin ${loaded && 'hidden'}`}>
             <Image
               src='/icons/chat-assets/loading.png'
               alt='Chat Icon'
@@ -195,13 +207,17 @@ export default function MessageList ({
               priority
             />
           </div>
-          <div className='text-2xl'>Loading...</div>
+          <div className='text-2xl'>{loaded ? "Please create a new message / group or choose a channel" : "Loading..."}</div>
         </div>
       )
   }
 
   return (
-    <div className={`flex flex-col ${embeddedDemoConfig != 0 ? 'max-h-[750px]' : 'min-h-screen h-screen'}`}>
+    <div
+      className={`flex flex-col ${
+        embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
+      }`}
+    >
       <div
         id='chats-header'
         className='flex flex-row items-center h-16 min-h-16 border-y border-navy-200 select-none'
@@ -220,7 +236,7 @@ export default function MessageList ({
               {activeChannel.type == 'public' && <div>(Public)</div>}
             </div>
           )}
-          {activeChannel?.type == 'direct' && (
+          {activeChannel?.type == 'direct' && groupUsers?.length <= 2 && (
             <div className='flex flex-row justify-center items-center gap-3'>
               <div className='flex flex-row -space-x-2.0'>
                 {groupUsers?.map((member, index) => (
@@ -228,7 +244,9 @@ export default function MessageList ({
                     key={index}
                     avatarUrl={member.profileUrl}
                     present={
-                      member.active ? PresenceIcon.ONLINE : PresenceIcon.OFFLINE
+                      member.active || member.id == currentUser.id
+                        ? PresenceIcon.ONLINE
+                        : PresenceIcon.OFFLINE
                     }
                     appConfiguration={appConfiguration}
                   />
@@ -243,7 +261,7 @@ export default function MessageList ({
               )}
             </div>
           )}
-          {activeChannel?.type == 'group' && (
+          {activeChannel?.type == 'group' && groupUsers?.length != allUsers?.length && (
             <div className='flex flex-row justify-center items-center gap-3'>
               <div className='flex flex-row -space-x-2.0'>
                 {groupUsers?.map(
@@ -253,7 +271,7 @@ export default function MessageList ({
                         key={index}
                         avatarUrl={member.profileUrl}
                         present={
-                          member.active
+                          member.active || member.id == currentUser.id
                             ? PresenceIcon.ONLINE
                             : PresenceIcon.OFFLINE
                         }
@@ -269,33 +287,35 @@ export default function MessageList ({
 
         <div className='flex flex-row'>
           {/* Icons on the top right of a chat screen */}
-          {appConfiguration?.message_pin == true && <div className='flex flex-row'>
-            {/* Pin with number of pinned messages */}
-            <div className='flex justify-center items-center rounded min-w-6 px-2 my-2 border text-xs font-normal border-navy50 bg-neutral-100'>
-              {activeChannelPinnedMessage ? '1' : '0'}
+          {appConfiguration?.message_pin == true && (
+            <div className='flex flex-row'>
+              {/* Pin with number of pinned messages */}
+              <div className='flex justify-center items-center rounded min-w-6 px-2 my-2 border text-xs font-normal border-navy50 bg-neutral-100'>
+                {activeChannelPinnedMessage ? '1' : '0'}
+              </div>
+              <div
+                className={`p-3 py-3 ${
+                  activeChannelPinnedMessage &&
+                  'cursor-pointer hover:bg-neutral-100 hover:rounded-md'
+                } `}
+                onClick={() => {
+                  if (!activeChannelPinnedMessage) return
+                  if (messageListRef && messageListRef.current) {
+                    messageListRef.current.scrollTop = 0
+                  }
+                }}
+              >
+                <Image
+                  src='/icons/chat-assets/pin.svg'
+                  alt='Pin'
+                  className=''
+                  width={24}
+                  height={24}
+                  priority
+                />
+              </div>
             </div>
-            <div
-              className={`p-3 py-3 ${
-                activeChannelPinnedMessage &&
-                'cursor-pointer hover:bg-neutral-100 hover:rounded-md'
-              } `}
-              onClick={() => {
-                if (!activeChannelPinnedMessage) return
-                if (messageListRef && messageListRef.current) {
-                  messageListRef.current.scrollTop = 0
-                }
-              }}
-            >
-              <Image
-                src='/icons/chat-assets/pin.svg'
-                alt='Pin'
-                className=''
-                width={24}
-                height={24}
-                priority
-              />
-            </div>
-          </div>}
+          )}
           {(appConfiguration == null ||
             appConfiguration?.edit_channel_details == true) && (
             <div
@@ -323,7 +343,7 @@ export default function MessageList ({
         id='chats-bubbles'
         className={`flex flex-col overflow-y-auto pb-8 ${
           quotedMessage
-            ? 'mb-[234px]'
+            ? embeddedDemoConfig == null ? 'mb-[234px]' : 'mb-[180px]'
             : embeddedDemoConfig == null
             ? 'mb-[178px]'
             : 'mb-[114px]'
@@ -344,54 +364,56 @@ export default function MessageList ({
           </div>
         )}
         {/* Show the pinned message first if there is one */}
-        {activeChannelPinnedMessage && !activeChannelPinnedMessage.deleted && appConfiguration?.message_pin == true && (
-          <Message
-            key={activeChannelPinnedMessage.timetoken}
-            received={currentUser?.id !== activeChannelPinnedMessage.userId}
-            avatarUrl={
-              activeChannelPinnedMessage.userId === currentUser?.id
-                ? currentUser?.profileUrl
-                : groupUsers?.find(
-                    user => user.id === activeChannelPinnedMessage.userId
-                  )?.profileUrl
-            }
-            isOnline={
-              activeChannelPinnedMessage.userId === currentUser?.id
-                ? currentUser?.active
-                : groupUsers?.find(
-                    user => user.id === activeChannelPinnedMessage.userId
-                  )?.active
-            }
-            readReceipts={readReceipts}
-            quotedMessageSender={
-              activeChannelPinnedMessage.quotedMessage &&
-              (activeChannelPinnedMessage.quotedMessage.userId ===
-              currentUser?.id
-                ? currentUser.name
-                : groupUsers?.find(
-                    user =>
-                      user.id ===
-                      activeChannelPinnedMessage.quotedMessage.userId
-                  )?.name)
-            }
-            showReadIndicator={false}
-            sender={
-              activeChannelPinnedMessage.userId === currentUser?.id
-                ? currentUser?.name
-                : groupUsers?.find(
-                    user => user.id === activeChannelPinnedMessage.userId
-                  )?.name
-            }
-            pinned={true}
-            messageActionHandler={(action, vars) =>
-              messageActionHandler(action, vars)
-            }
-            message={activeChannelPinnedMessage}
-            currentUserId={currentUser?.id}
-            showUserMessage={showUserMessage}
-            appConfiguration={appConfiguration}
-          />
-        )}
+        {activeChannelPinnedMessage &&
+          !activeChannelPinnedMessage.deleted &&
+          appConfiguration?.message_pin == true && (
+            <Message
+              key={activeChannelPinnedMessage.timetoken}
+              received={currentUser?.id !== activeChannelPinnedMessage.userId}
+              avatarUrl={
+                activeChannelPinnedMessage.userId === currentUser?.id
+                  ? currentUser?.profileUrl
+                  : groupUsers?.find(
+                      user => user.id === activeChannelPinnedMessage.userId
+                    )?.profileUrl
+              }
+              isOnline={
+                activeChannelPinnedMessage.userId === currentUser?.id
+                  ? currentUser?.active
+                  : groupUsers?.find(
+                      user => user.id === activeChannelPinnedMessage.userId
+                    )?.active
+              }
+              readReceipts={readReceipts}
+              quotedMessageSender={
+                activeChannelPinnedMessage.quotedMessage &&
+                (activeChannelPinnedMessage.quotedMessage.userId ===
+                currentUser?.id
+                  ? currentUser.name
+                  : groupUsers?.find(
+                      user =>
+                        user.id ===
+                        activeChannelPinnedMessage.quotedMessage.userId
+                    )?.name)
+              }
+              showReadIndicator={false}
+              sender={
+                activeChannelPinnedMessage.userId === currentUser?.id
+                  ? currentUser?.name
+                  : allUsers?.find(
+                      user => user.id === activeChannelPinnedMessage.userId
+                    )?.name
+              }
+              pinned={true}
+              messageActionHandler={(action, vars) =>
+                messageActionHandler(action, vars)
+              }
+              message={activeChannelPinnedMessage}
+              currentUserId={currentUser?.id}
+              showUserMessage={showUserMessage}
+              appConfiguration={appConfiguration}
+            />
+          )}
 
         {embeddedDemoConfig?.privateTestMessages?.map((message, index) => {
           return (
@@ -457,7 +479,7 @@ export default function MessageList ({
                 avatarUrl={
                   message.userId === currentUser.id
                     ? currentUser.profileUrl
-                    : groupUsers?.find(user => user.id === message.userId)
+                    : allUsers?.find(user => user.id === message.userId)
                         ?.profileUrl
                 }
                 isOnline={
@@ -471,7 +493,7 @@ export default function MessageList ({
                   message.quotedMessage &&
                   (message.quotedMessage.userId === currentUser.id
                     ? currentUser.name
-                    : groupUsers?.find(
+                    : allUsers?.find(
                         user => user.id === message.quotedMessage.userId
                       )?.name)
                 }
@@ -479,7 +501,7 @@ export default function MessageList ({
                 sender={
                   message.userId === currentUser.id
                     ? currentUser.name
-                    : groupUsers?.find(user => user.id === message.userId)?.name
+                    : allUsers?.find(user => user.id === message.userId)?.name
                 }
                 pinned={false}
                 messageActionHandler={(action, vars) =>

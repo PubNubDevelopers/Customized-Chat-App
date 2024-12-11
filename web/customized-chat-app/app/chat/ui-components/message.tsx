@@ -357,14 +357,6 @@ export default function Message ({
                     ))
                 : ''}
 
-              {/*embeddedDemoConfig != null && appConfiguration?.message_reactions == true &&(
-                <MessageReaction
-                  emoji={'🤕'}
-                  messageTimetoken={'0123456789'}
-                  count={3}
-                  reactionClicked={() => {}}
-                />
-              )*/}
             </div>
             {!inThread && message.hasThread && (
               <div
@@ -379,7 +371,7 @@ export default function Message ({
                 {/*Whether or not there is a threaded reply*/}
                 <div className='flex flex-row cursor-pointer'>
                   <Image
-                    src='/icons/reveal-thread.svg'
+                    src='/icons/chat-assets/reveal-thread.svg'
                     alt='Expand'
                     className=''
                     width={20}

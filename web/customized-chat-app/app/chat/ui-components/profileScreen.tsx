@@ -82,58 +82,7 @@ export default function ProfileScreen ({
           </div>
         </div>
 
-        <div className='border border-navy600'></div>
 
-        <div className='flex flex-row py-6 px-4'>
-          <div className='flex flex-col'>
-            <div className='text-lg text-white pb-2'>Notifications</div>
-            <div className='text-base text-white'>
-              Get notified about new messages and mentions from chats
-            </div>
-          </div>
-          <div
-            className='h-6 relative inline-block'
-            onClick={() =>
-              showUserMessage(
-                'Demo Limitation:',
-                'Although not supported by this demo, you use the Chat SDK to alert your users with built-in or custom events',
-                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/custom-events',
-                ToastType.INFO
-              )
-            }
-          >
-            {/* Checkbox is currently disabled with no handlers */}
-            <input type='checkbox' className="checked:before:bg-neutral-400 checked:after:translate-x-0" defaultChecked={false} onChange={() => {}} />
-          </div>
-        </div>
-        <div className='border border-navy600'></div>
-
-        <div className='flex flex-row py-6 px-4'>
-          <div className='flex flex-col'>
-            <div className='text-lg text-white pb-2'>Read receipts</div>
-            <div className='text-base text-white'>
-              Receive receipts when messages are sent and read
-            </div>
-          </div>
-          <div
-            className='h-6 relative inline-block'
-            onClick={() =>
-              showUserMessage(
-                'Demo Limitation:',
-                'Though supported by the Chat SDK, this demo does not support disabling read receipts',
-                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/read-receipts',
-                ToastType.INFO
-              )
-            }
-          >
-            {/* Checkbox is currently disabled with no handlers */}
-            <input
-              type='checkbox'
-              className='before:bg-sky-600 after:translate-x-4'
-              onChange={() => {}}
-            />
-          </div>
-        </div>
 
         <div className='border border-navy600'></div>
 
