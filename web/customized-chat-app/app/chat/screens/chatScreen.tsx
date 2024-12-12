@@ -169,6 +169,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     }
 
     setAppConfiguration(configuration)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration])
 
   function notifyUserConfigurationChanged (
@@ -371,6 +372,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     //  Initial loading of the groups and direct messages
     refreshGroups('group')
     refreshGroups('direct')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat])
 
   useEffect(() => {
@@ -537,6 +539,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       if (findMe > -1) value.splice(findMe, 1)
       setTypingData(value)
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat, activeChannel])
 
   useEffect(() => {
@@ -602,6 +605,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         applyUsersUpdateWithHysteresis(allUsersUpdated)
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat, allUsers])
 
   async function applyUsersUpdateWithHysteresis (allUsersUpdated) {
@@ -748,6 +752,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       removeMentionsListener()
       removeInvite()
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, chat, publicChannels, appConfiguration?.handle_banned])
 
   //  Function called when we need to update the private or direct groups because

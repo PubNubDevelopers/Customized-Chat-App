@@ -152,7 +152,6 @@ export default function MessageInput ({
   useEffect(() => {
     if (!activeChannel) return
     if (embeddedDemoConfig != null) return
-    //  todo if appConfiguration?.mention_user is false, do not suggest users or channels
     setNewMessageDraft(
       activeChannel.createMessageDraft({
         userSuggestionSource: 'channel',
@@ -161,7 +160,7 @@ export default function MessageInput ({
         channelLimit: 6
       })
     )
-  }, [activeChannel])
+  }, [activeChannel, embeddedDemoConfig])
 
   useEffect(() => {
     if (!selectedEmoji) return

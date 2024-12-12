@@ -23,7 +23,7 @@ export default function MessageAction ({
         className='m-2'
         width={20}
         height={20}
-        priority
+        priority={true}
       />
       {!emojiPickerShown && (
         <ToolTip

@@ -98,6 +98,7 @@ export default function MessageList ({
       }
     }
     initMessageList()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, groupMembership, embeddedDemoConfig])
 
   useEffect(() => {
@@ -129,6 +130,7 @@ export default function MessageList ({
         setActiveChannelPinnedMessage(null)
       }
     })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, embeddedDemoConfig])
 
   useEffect(() => {

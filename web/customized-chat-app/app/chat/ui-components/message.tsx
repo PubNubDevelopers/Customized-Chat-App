@@ -132,7 +132,7 @@ export default function Message ({
       }
     }
     return false
-  }, [])
+  }, [currentUserId])
 
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
@@ -196,6 +196,7 @@ export default function Message ({
       }
       return 'error'
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [appConfiguration?.mention_user, appConfiguration?.channel_references]
   )
 
