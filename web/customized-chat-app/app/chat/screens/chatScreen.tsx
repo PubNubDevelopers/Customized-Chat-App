@@ -328,14 +328,14 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
       setTypingData([embeddedDemoConfig.users[1].id])
       setQuotedMessageSender('<<Sender of the Quoted Message>>')
-      if (appConfiguration?.group_chat == true) {
+      if (appConfiguration?.group_chat == true && (activeChannel == null || appConfiguration?.public_channels == false)) {
         setActiveChannel(
           embeddedDemoConfig.channels.find(
             channel => channel.id == 'privategroup-bike'
           )
         )
         setActiveChannelUsers(embeddedDemoConfig.users.slice(1, 5))
-      } else if (appConfiguration?.public_channels) {
+      } else if (appConfiguration?.public_channels && (activeChannel == null || appConfiguration.group_chat == false)) {
         setActiveChannel(
           embeddedDemoConfig.channels.find(
             channel => channel.id == 'public-general'
