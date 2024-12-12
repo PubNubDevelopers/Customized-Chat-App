@@ -325,7 +325,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       )
       setDirectChatsUsers(tempDirectUsers)
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
-      setTypingData([embeddedDemoConfig.users[0].id])
+      setTypingData([embeddedDemoConfig.users[1].id])
       setQuotedMessageSender('<<Sender of the Quoted Message>>')
       if (appConfiguration?.group_chat == true) {
         setActiveChannel(
