@@ -61,7 +61,7 @@ export default function MessageList ({
     if (!groupMembership.channel) return
     //if (messages && messages.length > 0) return
     //  UseEffect to handle initial configuration of the Message List including reading the historical messages
-    setLoadingMessage('Fetching History from Server...')
+    setLoadingMessage(`${appConfiguration?.message_history ? 'Fetching History from Server...' : 'Message Persistence Disabled for this Application'}`)
     async function initMessageList () {
       if (activeChannel.id !== groupMembership.channel.id) {
         console.log('channel IDs did not match, returning')
@@ -69,34 +69,33 @@ export default function MessageList ({
       }
       setMessages([])
       setCurrentMembership(groupMembership)
-      activeChannel
-        .getHistory({ count: 20 })
-        .then(async historicalMessagesObj => {
-          //  Run through the historical messages and set the most recently received one (that we were not the sender of) as read
-          if (historicalMessagesObj.messages) {
-            if (historicalMessagesObj.messages.length == 0) {
-              setLoadingMessage('No messages in this chat yet')
-            } else {
-              setMessages(() => {
-                return uniqueById([...historicalMessagesObj.messages]) //  Avoid race condition where message was being added twice
-              })
-              for (
-                let i = historicalMessagesObj.messages.length - 1;
-                i >= 0;
-                i--
-              ) {
-                console.log(
-                  'setting read on ' + historicalMessagesObj.messages[i].text
-                )
-                await groupMembership.setLastReadMessageTimetoken(
-                  historicalMessagesObj.messages[i].timetoken
-                )
-                updateUnreadMessagesCounts()
-                break
+      if (appConfiguration?.message_history) {
+        activeChannel
+          .getHistory({ count: 20 })
+          .then(async historicalMessagesObj => {
+            //  Run through the historical messages and set the most recently received one (that we were not the sender of) as read
+            if (historicalMessagesObj.messages) {
+              if (historicalMessagesObj.messages.length == 0) {
+                setLoadingMessage('No messages in this chat yet')
+              } else {
+                setMessages(() => {
+                  return uniqueById([...historicalMessagesObj.messages]) //  Avoid race condition where message was being added twice
+                })
+                for (
+                  let i = historicalMessagesObj.messages.length - 1;
+                  i >= 0;
+                  i--
+                ) {
+                  await groupMembership.setLastReadMessageTimetoken(
+                    historicalMessagesObj.messages[i].timetoken
+                  )
+                  updateUnreadMessagesCounts()
+                  break
+                }
               }
             }
-          }
-        })
+          })
+      }
     }
     initMessageList()
   }, [activeChannel, groupMembership, embeddedDemoConfig])
@@ -173,7 +172,9 @@ export default function MessageList ({
       return (
         <div
           className={`flex flex-col  ${
-            embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
+            embeddedDemoConfig != null
+              ? 'max-h-[750px]'
+              : 'min-h-screen h-screen'
           } justify-center items-center w-full`}
         >
           <div className='max-w-96 max-h-96 '>
@@ -196,7 +197,11 @@ export default function MessageList ({
               priority
             />
           </div>
-          <div className='text-2xl'>{loaded ? "Please create a new message / group or choose a channel" : "Loading..."}</div>
+          <div className='text-2xl'>
+            {loaded
+              ? 'Please create a new message / group or choose a channel'
+              : 'Loading...'}
+          </div>
         </div>
       )
   }
@@ -250,28 +255,29 @@ export default function MessageList ({
               )}
             </div>
           )}
-          {activeChannel?.type == 'group' && groupUsers?.length != allUsers?.length && (
-            <div className='flex flex-row justify-center items-center gap-3'>
-              <div className='flex flex-row -space-x-2.0'>
-                {groupUsers?.map(
-                  (member, index) =>
-                    index < MAX_AVATARS_SHOWN && (
-                      <Avatar
-                        key={index}
-                        avatarUrl={member.profileUrl}
-                        present={
-                          member.active || member.id == currentUser.id
-                            ? PresenceIcon.ONLINE
-                            : PresenceIcon.OFFLINE
-                        }
-                        appConfiguration={appConfiguration}
-                      />
-                    )
-                )}
+          {activeChannel?.type == 'group' &&
+            groupUsers?.length != allUsers?.length && (
+              <div className='flex flex-row justify-center items-center gap-3'>
+                <div className='flex flex-row -space-x-2.0'>
+                  {groupUsers?.map(
+                    (member, index) =>
+                      index < MAX_AVATARS_SHOWN && (
+                        <Avatar
+                          key={index}
+                          avatarUrl={member.profileUrl}
+                          present={
+                            member.active || member.id == currentUser.id
+                              ? PresenceIcon.ONLINE
+                              : PresenceIcon.OFFLINE
+                          }
+                          appConfiguration={appConfiguration}
+                        />
+                      )
+                  )}
+                </div>
+                {activeChannel.name} (Private Group)
               </div>
-              {activeChannel.name} (Private Group)
-            </div>
-          )}
+            )}
         </div>
 
         <div className='flex flex-row'>
@@ -332,7 +338,9 @@ export default function MessageList ({
         id='chats-bubbles'
         className={`flex flex-col overflow-y-auto pb-8 ${
           quotedMessage
-            ? embeddedDemoConfig == null ? 'mb-[234px]' : 'mb-[180px]'
+            ? embeddedDemoConfig == null
+              ? 'mb-[234px]'
+              : 'mb-[180px]'
             : embeddedDemoConfig == null
             ? 'mb-[178px]'
             : 'mb-[114px]'

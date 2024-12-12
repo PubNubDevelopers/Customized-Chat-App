@@ -11,7 +11,7 @@ export default function Header ({
   showNotificationBadge = false,
   showMentionsBadge = false,
   showUserMessage,
-  guidedDemo
+  appConfiguration
 }) {
   return (
     <div
@@ -38,17 +38,12 @@ export default function Header ({
         </div>
         <div className='text-neutral50 text-base'>PubNub</div>
       </div>
-      {guidedDemo && (
-        <div className='hidden items-center text-neutral50 text-2xl font-semibold md:flex'>
-          Guided Demo - demo@pubnub.com
-        </div>
-      )}
       <div className='flex items-center mr-2.5'>
         <div
           id='btn-message-new'
           className={`${
             roboto.className
-          } flex flex-row min-w-52 items-center font-medium text-sm px-4 mx-2.5 h-10 rounded-lg ${'bg-pubnubbabyblue'} cursor-pointer`}
+          } flex flex-row min-w-52 items-center font-medium text-sm px-4 mx-2.5 h-10 rounded-lg ${'bg-pubnubbabyblue'} cursor-pointer ${(!appConfiguration?.group_chat || appConfiguration?.group_chat == false) && 'hidden'}`}
           onClick={() => setCreatingNewMessage(true)}
         >
           <Image

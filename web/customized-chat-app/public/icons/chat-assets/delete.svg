@@ -17,7 +17,7 @@
   <sodipodi:namedview
      id="namedview1"
      pagecolor="#ffffff"
-     bordercolor="#000000"
+     bordercolor="#334155"
      borderopacity="0.25"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
@@ -34,7 +34,7 @@
      inkscape:current-layer="svg1" />
   <path
      d="m 4.2297297,16.711712 c 0,1.035586 0.8148649,1.882883 1.8108108,1.882883 h 7.2432435 c 0.995946,0 1.810811,-0.847297 1.810811,-1.882883 V 5.4144144 H 4.2297297 Z M 6.0405405,7.2972973 H 13.283784 V 16.711712 H 6.0405405 Z M 12.831082,2.5900901 11.925676,1.6486487 H 7.3986486 L 6.4932432,2.5900901 H 3.3243243 V 4.472973 H 16.000001 V 2.5900901 Z"
-     fill="#000000"
+     fill="#334155"
      id="path1"
      style="stroke-width:0.923248" />
 </svg>

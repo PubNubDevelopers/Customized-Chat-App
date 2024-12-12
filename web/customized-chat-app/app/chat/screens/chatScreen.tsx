@@ -48,7 +48,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [userId, setUserId] = useState<string | null>('')
   const [chat, setChat] = useState<Chat | null>(null)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
-  const [guidedDemo, setGuidedDemo] = useState<string | null>(null)
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [selectedEmoji, setSelectedEmoji] = useState('')
@@ -264,7 +263,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           await localChat.currentUser.getMemberships({
             filter: "channel.type == 'public'"
           })
-          if (
+        if (
           currentPublicMemberships &&
           currentPublicMemberships.total != null &&
           localPublicChannels.total &&
@@ -301,28 +300,48 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     if (!appConfiguration) return
     if (embeddedDemoConfig != null) {
       //  Any special initialization when we are running within the embedded demo?
-      setPublicChannels(embeddedDemoConfig.channels.filter(channel => channel.type == 'public'))
-      setPrivateGroups(embeddedDemoConfig.channels.filter(channel => channel.type == 'group'))
-      setDirectChats(embeddedDemoConfig.channels.filter(channel => channel.type == 'direct'))
+      setPublicChannels(
+        embeddedDemoConfig.channels.filter(channel => channel.type == 'public')
+      )
+      setPrivateGroups(
+        embeddedDemoConfig.channels.filter(channel => channel.type == 'group')
+      )
+      setDirectChats(
+        embeddedDemoConfig.channels.filter(channel => channel.type == 'direct')
+      )
       const tempGroupUsers: User[][] = []
       tempGroupUsers[0] = embeddedDemoConfig.users.slice(1, 5)
       tempGroupUsers[1] = embeddedDemoConfig.users.slice(6, 9)
       setPrivateGroupsUsers(tempGroupUsers)
       const tempDirectUsers: User[][] = []
-      tempDirectUsers[0] = embeddedDemoConfig.users.filter(user => user.name == 'David Smith')
-      tempDirectUsers[1] = embeddedDemoConfig.users.filter(user => user.name == 'James Brown')
-      tempDirectUsers[2] = embeddedDemoConfig.users.filter(user => user.name == 'Emma Lee')
+      tempDirectUsers[0] = embeddedDemoConfig.users.filter(
+        user => user.name == 'David Smith'
+      )
+      tempDirectUsers[1] = embeddedDemoConfig.users.filter(
+        user => user.name == 'James Brown'
+      )
+      tempDirectUsers[2] = embeddedDemoConfig.users.filter(
+        user => user.name == 'Emma Lee'
+      )
       setDirectChatsUsers(tempDirectUsers)
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
       setTypingData([embeddedDemoConfig.users[0].id])
       setQuotedMessageSender('<<Sender of the Quoted Message>>')
       if (appConfiguration?.group_chat == true) {
-        setActiveChannel(embeddedDemoConfig.channels.find(channel => channel.id == 'privategroup-bike'))
+        setActiveChannel(
+          embeddedDemoConfig.channels.find(
+            channel => channel.id == 'privategroup-bike'
+          )
+        )
         setActiveChannelUsers(embeddedDemoConfig.users.slice(1, 5))
       } else if (appConfiguration?.public_channels) {
-        setActiveChannel(embeddedDemoConfig.channels.find(channel => channel.id == 'public-general'))
+        setActiveChannel(
+          embeddedDemoConfig.channels.find(
+            channel => channel.id == 'public-general'
+          )
+        )
         setActiveChannelUsers(embeddedDemoConfig.users)
-      } 
+      }
       setUnreadMessages(embeddedDemoConfig.unreadMessages)
       return //  Do not initialize PubNub if we are within the embedded demo
     }
@@ -330,6 +349,18 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     if (!userId) {
       setLoadMessage('No User ID specified')
       return
+    }
+
+    if (appConfiguration?.send_receive_messages == false) {
+      console.error(
+        'Always expect Send / Receive messages to be configured as TRUE'
+      )
+    }
+
+    if (appConfiguration?.support_push) {
+      console.log(
+        'Mobile Push: This web application does not support push messaging.  Native Kotlin for Android will use GCM and Native Swift for iOS will use APNS.'
+      )
     }
 
     init()
@@ -347,6 +378,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     //  Called once everything is initialized
     if (!chat) return
     if (!activeChannel) return
+    if (appConfiguration?.message_unread_count == false) return //  message counts turned off at the app level
 
     function updateUnreadMessagesCounts () {
       chat?.getUnreadMessagesCounts({}).then(result => {
@@ -424,57 +456,57 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         handler()
       })
     }
-  }, [chat, publicChannels, directChats, activeChannel, privateGroups])
+  }, [
+    chat,
+    publicChannels,
+    directChats,
+    activeChannel,
+    privateGroups,
+    appConfiguration?.message_unread_count
+  ])
 
   /**  Maintain the users and group memberships for the currently active channel */
   useEffect(() => {
     if (!chat) return
     if (!activeChannel) return
-    if (!publicChannelsMemberships) return
-    if (publicChannelsMemberships.length == 0) return
     if (!allUsers) return
 
-    //  Populate the activeChannelUsers array based on the memberships of the active channel
-    if (embeddedDemoConfig != null) {
-      //  We are running within the embeddedDemo
-      //setActiveChannelUsers(embeddedDemoConfig.activeChannelGroup.users)
-    } else {
-      let activeChannelMemberships
-      if (activeChannel.type == 'public') {
-        //  Note: Public channels do not use the activeChannelUsers array, they just use
-        //  allUsers
-        setActiveChannelUsers(allUsers)
+    let activeChannelMemberships
+    if (activeChannel.type == 'public') {
+      //  Note: Public channels do not use the activeChannelUsers array, they just use
+      //  allUsers
+      setActiveChannelUsers(allUsers)
+      if (publicChannelsMemberships && publicChannelsMemberships.length > 0) {
         activeChannelMemberships = publicChannelsMemberships?.find(
           membership => membership.channel.id == activeChannel.id
         )
-      } else {
-        //  Channel is either group or direct
-        activeChannel.getMembers({}).then(membersResponse => {
-          setActiveChannelUsers(
-            membersResponse.members.map((membership, index) => {
-              return membership.user
-            })
-          )
-        })
-        if (activeChannel.type == 'group') {
-          activeChannelMemberships = privateGroupsMemberships?.find(
-            membership => membership.channel.id == activeChannel.id
-          )
-        } else if (activeChannel.type == 'direct') {
-          activeChannelMemberships = directChatsMemberships?.find(
-            membership => membership.channel.id == activeChannel.id
-          )
-        }
       }
-      if (activeChannelMemberships) {
-        setActiveChannelGroupMembership(activeChannelMemberships)
+    } else {
+      //  Channel is either group or direct
+      activeChannel.getMembers({}).then(membersResponse => {
+        setActiveChannelUsers(
+          membersResponse.members.map((membership, index) => {
+            return membership.user
+          })
+        )
+      })
+      if (activeChannel.type == 'group') {
+        activeChannelMemberships = privateGroupsMemberships?.find(
+          membership => membership.channel.id == activeChannel.id
+        )
+      } else if (activeChannel.type == 'direct') {
+        activeChannelMemberships = directChatsMemberships?.find(
+          membership => membership.channel.id == activeChannel.id
+        )
       }
+    }
+    if (activeChannelMemberships) {
+      setActiveChannelGroupMembership(activeChannelMemberships)
     }
   }, [
     chat,
     activeChannel,
     allUsers,
-    embeddedDemoConfig,
     publicChannelsMemberships,
     publicChannels,
     privateGroupsMemberships,
@@ -497,8 +529,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         })
     })
 
-    //  Only register typing indicators for non-public channels
+    //  Only register typing indicators for non-public channels and if this app has typing indicators enabled
     if (activeChannel.type == 'public') return
+    if (appConfiguration?.typing_indicator == false) return
     return activeChannel.getTyping(value => {
       const findMe = value.indexOf(chat.currentUser.id)
       if (findMe > -1) value.splice(findMe, 1)
@@ -625,7 +658,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   /* Listen for events using the Chat event mechanism*/
   useEffect(() => {
     if (!chat) return
-    if (!activeChannel) return
+    //if (!activeChannel) return
     const removeCustomListener = chat.listenForEvents({
       channel: chat.currentUser.id,
       type: 'custom',
@@ -641,6 +674,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               if (activeChannel?.id === evt.payload.body.channelId) {
                 if (publicChannels && publicChannels.length > 0) {
                   setActiveChannel(publicChannels[0])
+                } else {
+                  setActiveChannel(null)
                 }
               }
             }
@@ -654,24 +689,27 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       channel: chat.currentUser.id,
       type: 'moderation',
       callback: async evt => {
-        let moderationMessage = ''
-        let notificationSeverity: ToastType = ToastType.INFO
-        if (evt.payload.restriction == 'muted') {
-          moderationMessage = `You have been MUTED by the administrator`
-          notificationSeverity = ToastType.ERROR
-        } else if (evt.payload.restriction == 'banned') {
-          moderationMessage = `You have been BANNED by the administrator for the following reason: ${evt.payload.reason}`
-          notificationSeverity = ToastType.ERROR
-        } else if (evt.payload.restriction == 'lifted') {
-          moderationMessage = `Your previous restrictions have been LIFTED by the administrator`
-          notificationSeverity = ToastType.CHECK
+        console.log(appConfiguration?.handle_banned)
+        if (appConfiguration?.handle_banned == true) {
+          let moderationMessage = ''
+          let notificationSeverity: ToastType = ToastType.INFO
+          if (evt.payload.restriction == 'muted') {
+            moderationMessage = `You have been MUTED by the administrator`
+            notificationSeverity = ToastType.ERROR
+          } else if (evt.payload.restriction == 'banned') {
+            moderationMessage = `You have been BANNED by the administrator for the following reason: ${evt.payload.reason}`
+            notificationSeverity = ToastType.ERROR
+          } else if (evt.payload.restriction == 'lifted') {
+            moderationMessage = `Your previous restrictions have been LIFTED by the administrator`
+            notificationSeverity = ToastType.CHECK
+          }
+          showUserMessage(
+            'Moderation Event:',
+            moderationMessage,
+            'https://www.pubnub.com/how-to/monitor-and-moderate-conversations-with-bizops-workspace/',
+            notificationSeverity
+          )
         }
-        showUserMessage(
-          'Moderation Event:',
-          moderationMessage,
-          'https://www.pubnub.com/how-to/monitor-and-moderate-conversations-with-bizops-workspace/',
-          notificationSeverity
-        )
       }
     })
 
@@ -697,6 +735,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       channel: chat.currentUser.id,
       type: 'invite',
       callback: async evt => {
+        console.log('we have been invited to a channel')
         //  Somebody has added us to a new group chat or DM
         const channelType = evt.payload.channelType
         refreshGroups(channelType)
@@ -709,7 +748,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       removeMentionsListener()
       removeInvite()
     }
-  }, [activeChannel, chat, publicChannels])
+  }, [activeChannel, chat, publicChannels, appConfiguration?.handle_banned])
 
   //  Function called when we need to update the private or direct groups because
   //  e.g. we have been added to a group
@@ -913,7 +952,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       setChatSettingsScreenVisible(false)
       return
     }
-    if (activeChannel && publicChannels) {
+    if (activeChannel) {
       sendChatEvent(
         ChatEventTypes.LEAVE,
         activeChannel.type == 'group' && privateGroups
@@ -936,13 +975,15 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       const channelType = activeChannel.type
 
       await activeChannel.leave()
-      showUserMessage(
-        'You Left:',
-        'You have left this group, please select a different channel or create a new group / DM',
-        'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details'
-      )
-      if (publicChannels.length > 0) {
+      //showUserMessage(
+      //  'You Left:',
+      //  'You have left this group, please select a different channel or create a new group / DM',
+      //  'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details'
+      //)
+      if (publicChannels && publicChannels.length > 0) {
         setActiveChannel(publicChannels[0])
+      } else {
+        setActiveChannel(null)
       }
       setChatSettingsScreenVisible(false)
 
@@ -999,7 +1040,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         showUserMessage={showUserMessage}
       />
       <ChatSettingsScreen
-        chatSettingsScreenVisible={chatSettingsScreenVisible}
+        chatSettingsScreenVisible={
+          chatSettingsScreenVisible && appConfiguration?.edit_channel_details
+        }
         setChatSettingsScreenVisible={setChatSettingsScreenVisible}
         changeChatNameScreenVisible={changeChatNameModalVisible}
         manageMembersModalVisible={manageMembersModalVisible}
@@ -1086,7 +1129,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           showMentionsBadge={false}
           setCreatingNewMessage={setCreatingNewMessage}
           showUserMessage={showUserMessage}
-          guidedDemo={guidedDemo}
+          appConfiguration={appConfiguration}
         />
       )}
       <UserMessage
@@ -1129,7 +1172,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         } overscroll-none  ${
           (roomSelectorVisible ||
             profileScreenVisible ||
-            chatSettingsScreenVisible ||
+            (chatSettingsScreenVisible &&
+              appConfiguration.edit_channel_details) ||
             changeChatNameModalVisible ||
             manageMembersModalVisible) &&
           'blur-sm opacity-40'
@@ -1146,26 +1190,14 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               : chat?.currentUser.id
           }
           setCreatingNewMessage={setCreatingNewMessage}
-          unreadMessages={
-            unreadMessages
-          }
-          publicChannels={
-            publicChannels
-          }
+          unreadMessages={unreadMessages}
+          publicChannels={publicChannels}
           publicChannelsMemberships={publicChannelsMemberships}
-          privateGroups={
-            privateGroups
-          }
-          privateGroupsUsers={
-            privateGroupsUsers
-          }
+          privateGroups={privateGroups}
+          privateGroupsUsers={privateGroupsUsers}
           privateGroupsMemberships={privateGroupsMemberships}
-          directChats={
-            directChats
-          }
-          directChatsUsers={
-            directChatsUsers
-          }
+          directChats={directChats}
+          directChatsUsers={directChatsUsers}
           directChatsMemberships={directChatsMemberships}
           activeChannel={activeChannel}
           setActiveChannel={setActiveChannel}
@@ -1173,9 +1205,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           updateUnreadMessagesCounts={() => {
             updateUnreadMessagesCounts()
           }}
-          currentUserProfileUrl={
-            profileUrl
-          }
+          currentUserProfileUrl={profileUrl}
           showUserMessage={showUserMessage}
           appConfiguration={appConfiguration}
           embeddedDemoConfig={embeddedDemoConfig}
@@ -1187,7 +1217,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               embeddedDemoConfig == null ? 'mt-[64px]' : ''
             } bg-white`}
           >
-            {embeddedDemoConfig == null && creatingNewMessage ? (
+            {embeddedDemoConfig == null &&
+            appConfiguration?.group_chat &&
+            creatingNewMessage ? (
               <NewMessageGroup
                 chat={chat}
                 currentUser={currentUser}
@@ -1272,7 +1304,11 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           </div>
         </div>
         <MessageListThread
-          showThread={showThread && !creatingNewMessage}
+          showThread={
+            showThread &&
+            !creatingNewMessage &&
+            appConfiguration?.message_threads == true
+          }
           setShowThread={setShowThread}
           setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
           activeThreadChannel={activeThreadChannel}

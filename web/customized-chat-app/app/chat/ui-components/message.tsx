@@ -163,7 +163,7 @@ export default function Message ({
       }
       if (messagePart?.type === 'mention') {
         return (
-          appConfiguration?.mention_user && <span
+          appConfiguration?.mention_user == true ? (<span
             key={index}
             onClick={() =>
               userClick(
@@ -174,13 +174,13 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             @{messagePart.content.name}
-          </span>
+          </span>) : <span className='px-1'>{messagePart.content.name}</span>
         )
       }
 
       if (messagePart?.type === 'channelReference') {
         return (
-          appConfiguration?.channel_references && <span
+          appConfiguration?.channel_references == true ? (<span
             key={index}
             onClick={() =>
               channelClick(
@@ -191,7 +191,7 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             #{messagePart.content.name}
-          </span>
+          </span>) : <span className='px-1'>{messagePart.content.name}</span>
         )
       }
       return 'error'
@@ -292,7 +292,7 @@ export default function Message ({
               </div>
             )}
             <div className='flex flex-col w-full'>
-              {message.quotedMessage && (
+              {message.quotedMessage && appConfiguration.message_quote && (
                 <QuotedMessage
                   originalMessage={message}
                   originalMessageReceived={received}
@@ -358,7 +358,7 @@ export default function Message ({
                 : ''}
 
             </div>
-            {!inThread && message.hasThread && (
+            {!inThread && message.hasThread && appConfiguration?.message_threads && (
               <div
                 className='absolute right-[10px] -bottom-[28px] flex flex-row items-center z-0 cursor-pointer select-none'
                 onClick={() => {

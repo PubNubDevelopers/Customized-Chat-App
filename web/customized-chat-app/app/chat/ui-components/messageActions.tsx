@@ -121,7 +121,7 @@ export default function MessageActions ({
             toolTipText='Edit Message'
             toolTipVisible={editToolTip}
             setToolTipVisible={setEditToolTip}
-            iconUrl='/icons/chat-assets/edit.svg'
+            iconUrl='/icons/chat-assets/edit-dark.svg'
             iconAlt='Edit'
           ></MessageAction>
         )}
