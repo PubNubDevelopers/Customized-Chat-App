@@ -365,6 +365,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     }
 
     init()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appConfiguration, embeddedDemoConfig, userId, chat])
 
   useEffect(() => {
@@ -1206,6 +1207,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           directChatsMemberships={directChatsMemberships}
           activeChannel={activeChannel}
           setActiveChannel={setActiveChannel}
+          setActiveChannelUsers={setActiveChannelUsers}
           setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
           updateUnreadMessagesCounts={() => {
             updateUnreadMessagesCounts()

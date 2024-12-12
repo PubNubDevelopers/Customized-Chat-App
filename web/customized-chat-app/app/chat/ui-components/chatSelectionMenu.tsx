@@ -29,13 +29,14 @@ export default function ChatSelectionMenu ({
   directChatsUsers,
   directChatsMemberships,
   activeChannel,
+  setActiveChannelUsers,
   setActiveChannel,
   setActiveChannelPinnedMessage,
   updateUnreadMessagesCounts,
   currentUserProfileUrl,
   showUserMessage,
   appConfiguration,
-  embeddedDemoConfig = null
+  embeddedDemoConfig
 }) {
   const [unreadExpanded, setUnreadExpanded] = useState(true)
   const [publicExpanded, setPublicExpanded] = useState(true)
@@ -97,8 +98,12 @@ export default function ChatSelectionMenu ({
 
   function setActiveChannelAction (channel) {
     if (embeddedDemoConfig != null) {
-      if (channel.type == 'public' || channel.type == 'group') {
+      if (channel.type == 'public') {
         setActiveChannel(channel)
+        setActiveChannelUsers(embeddedDemoConfig.users)
+      } else if (channel.type == 'group') {
+        setActiveChannel(channel)
+        setActiveChannelUsers(embeddedDemoConfig.users.slice(1, 5))
       }
       return
     }
