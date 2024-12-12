@@ -414,6 +414,7 @@ export default function MessageList ({
 
         {embeddedDemoConfig?.privateTestMessages?.map((message, index) => {
           return (
+            activeChannel?.type == 'group' &&
             appConfiguration?.group_chat == true && (
               <Message
                 key={index}
@@ -441,8 +442,8 @@ export default function MessageList ({
 
         {embeddedDemoConfig?.publicTestMessages?.map((message, index) => {
           return (
-            appConfiguration?.public_channels == true &&
-            appConfiguration?.group_chat == false && (
+            activeChannel?.type == 'public' &&
+            appConfiguration?.public_channels == true && (
               <Message
                 key={index}
                 received={message.received}

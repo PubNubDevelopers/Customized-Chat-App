@@ -96,7 +96,12 @@ export default function ChatSelectionMenu ({
   }
 
   function setActiveChannelAction (channel) {
-    if (embeddedDemoConfig != null) return
+    if (embeddedDemoConfig != null) {
+      if (channel.type == 'public' || channel.type == 'group') {
+        setActiveChannel(channel)
+      }
+      return
+    }
     setCreatingNewMessage(false)
     setActiveChannelPinnedMessage(null)
     setActiveChannel(channel)
@@ -180,32 +185,29 @@ export default function ChatSelectionMenu ({
           />
         </div>
 
-        {showUnreadMessageCount &&
-          unreadMessages &&
-          unreadMessages.length > 0 && (
-            <ChatMenuHeader
-              text={`UNREAD`}
-              actionIcon={ChatHeaderActionIcon.MARK_READ}
-              expanded={unreadExpanded}
-              expandCollapse={() => {
-                setUnreadExpanded(!unreadExpanded)
-              }}
-              action={async () => {
-                if (embeddedDemoConfig != null) return
-                await chat?.markAllMessagesAsRead()
-                updateUnreadMessagesCounts()
+        {showUnreadMessageCount && unreadMessages && unreadMessages.length > 0 && (
+          <ChatMenuHeader
+            text={`UNREAD`}
+            actionIcon={ChatHeaderActionIcon.MARK_READ}
+            expanded={unreadExpanded}
+            expandCollapse={() => {
+              setUnreadExpanded(!unreadExpanded)
+            }}
+            action={async () => {
+              if (embeddedDemoConfig != null) return
+              await chat?.markAllMessagesAsRead()
+              updateUnreadMessagesCounts()
 
-                showUserMessage(
-                  'Success:',
-                  'All messsages have been marked as read, and sent receipts are updated accordingly',
-                  'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/unread#mark-messages-as-read-all-channels',
-                  ToastType.CHECK
-                )
-              }}
-            />
-          )}
-        {showUnreadMessageCount &&
-            unreadExpanded && (
+              showUserMessage(
+                'Success:',
+                'All messsages have been marked as read, and sent receipts are updated accordingly',
+                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/messages/unread#mark-messages-as-read-all-channels',
+                ToastType.CHECK
+              )
+            }}
+          />
+        )}
+        {showUnreadMessageCount && unreadExpanded && (
           <div>
             {unreadMessages?.map(
               (unreadMessage, index) =>
@@ -220,17 +222,10 @@ export default function ChatSelectionMenu ({
                   .toLowerCase()
                   ?.indexOf(searchChannels.toLowerCase()) > -1 &&
                 !(
-                  !showPublicChannels &&
-                  unreadMessage.channel.type == 'public'
+                  !showPublicChannels && unreadMessage.channel.type == 'public'
                 ) &&
-                !(
-                  !showGroupChat &&
-                  unreadMessage.channel.type == 'group'
-                ) &&
-                !(
-                  !showGroupChat &&
-                  unreadMessage.channel.type == 'direct'
-                ) && (
+                !(!showGroupChat && unreadMessage.channel.type == 'group') &&
+                !(!showGroupChat && unreadMessage.channel.type == 'direct') && (
                   <ChatMenuItem
                     key={index}
                     avatarUrl={
@@ -285,13 +280,21 @@ export default function ChatSelectionMenu ({
                         privateGroupsMemberships &&
                         privateGroups
                       ) {
-                        await markMessageAsRead(privateGroupsMemberships, privateGroups, unreadMessage.channel.id)
+                        await markMessageAsRead(
+                          privateGroupsMemberships,
+                          privateGroups,
+                          unreadMessage.channel.id
+                        )
                       } else if (
                         unreadMessage.channel.type === 'direct' &&
                         directChatsMemberships &&
                         directChats
                       ) {
-                        await markMessageAsRead(directChatsMemberships, directChats, unreadMessage.channel.id)
+                        await markMessageAsRead(
+                          directChatsMemberships,
+                          directChats,
+                          unreadMessage.channel.id
+                        )
                       }
                     }}
                     setActiveChannel={() => {
@@ -362,10 +365,6 @@ export default function ChatSelectionMenu ({
                     present={PresenceIcon.NOT_SHOWN}
                     setActiveChannel={() => {
                       setActiveChannelAction(publicChannels[index])
-                      //                      if (embeddedDemoConfig != null) return
-                      //                      setCreatingNewMessage(false)
-                      //                      setActiveChannelPinnedMessage(null)
-                      //                      setActiveChannel(publicChannels[index])
                     }}
                     appConfiguration={appConfiguration}
                   ></ChatMenuItem>

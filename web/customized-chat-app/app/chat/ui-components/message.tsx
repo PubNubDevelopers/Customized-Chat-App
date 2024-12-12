@@ -174,7 +174,7 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             @{messagePart.content.name}
-          </span>) : <span className='px-1'>{messagePart.content.name}</span>
+          </span>) : <span key={index} className='px-1'>{messagePart.content.name}</span>
         )
       }
 
@@ -191,7 +191,7 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             #{messagePart.content.name}
-          </span>) : <span className='px-1'>{messagePart.content.name}</span>
+          </span>) : <span key={index} className='px-1'>{messagePart.content.name}</span>
         )
       }
       return 'error'

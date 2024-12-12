@@ -52,6 +52,7 @@ export default function Home () {
       'No runtime configuration found.  Checking for build time config'
     )
     if (buildConfiguration?.publishKey != null) {
+      console.log('Found build time config')
       setPublishKey(buildConfiguration.publishKey)
     }
     if (buildConfiguration?.subscribeKey != null) {
