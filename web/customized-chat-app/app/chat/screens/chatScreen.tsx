@@ -937,8 +937,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         setCurrentlyEditingMessage(data)
         break;
       case MessageActionsTypes.DELETE:
+        if (embeddedDemoConfig) return
         const updatedMessage = await data?.delete({soft: true}, {preserveFiles: true})
-        console.log('marking message as deleted')
         break;
       case MessageActionsTypes.COPY:
         showUserMessage('Copied', `${data.text}`, '', ToastType.CHECK)
