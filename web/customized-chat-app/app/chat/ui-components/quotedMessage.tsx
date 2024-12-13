@@ -26,7 +26,7 @@ export default function QuotedMessage ({
         </div>
         <div className='font-normal text-sm text-neutral-900 line-clamp-2'>
           {/* Usually you would use message.text but I'm using content here for the embedded demo test data */}
-          {quotedMessage.content ? quotedMessage.content.text : quotedMessage.text}
+          {quotedMessage?.text ? quotedMessage.text : quotedMessage?.content.text}
         </div>
       </div>
       {displayedWithMesageInput && setQuotedMessage && (

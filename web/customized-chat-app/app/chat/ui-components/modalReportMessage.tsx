@@ -41,7 +41,8 @@ export default function ModalReportMessage ({
             You are reporting the following message:
           </div>
           <div className='flex font-normal text-base justify-center text-neutral-600'>
-            {message?.text}
+            {/* Usually you would use message.text but I'm using content here for the embedded demo test data */}
+            {message?.text ? message.text : message?.content?.text}
           </div>
 
           <div className='flex flex-col gap-1 my-4'>
