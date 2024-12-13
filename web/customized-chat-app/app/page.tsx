@@ -21,10 +21,8 @@ export default function Home () {
   const [publicChannelsAvailable, setPublicChannelsAvailable] = useState(false) //  Only create public channel data on the keyset if enabled
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
+  const [loggingIn, setLoggingIn]     = useState(false)
   const userArray = testUsers
-
-  //  todo test in Dark mode - currently looks too dark
-    
 
   useEffect(() => {
     setLoadMessage('No Publish / Subscribe Keys')
@@ -128,6 +126,7 @@ export default function Home () {
   }, [publishKey, subscribeKey, userArray, publicChannelsAvailable])
 
   function login (userId) {
+    setLoggingIn(true)
     router.push(`/chat/?userId=${userId}&${searchParams}`)
   }
 
@@ -151,7 +150,7 @@ export default function Home () {
       </div>
         */}
       <div className='flex flex-col gap-3 m-2 items-center'>
-        {!initialized ? (
+        {(!initialized || loggingIn) ? (
           <div className='animate-spin'>
             <Image
               src='/icons/chat-assets/loading.png'
