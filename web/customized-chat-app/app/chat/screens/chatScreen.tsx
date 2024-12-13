@@ -67,7 +67,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [manageMembersModalVisible, setManageMembersModalVisible] =
     useState(false)
   const [reportedMessage, setReportedMessage] = useState<pnMessage | null>(null)
-  const [reportMessageModalVisible, setReportMessageModalVisible] = useState(true)
+  const [reportMessageModalVisible, setReportMessageModalVisible] =
+    useState(false)
 
   const [name, setName] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
@@ -171,7 +172,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     }
 
     setAppConfiguration(configuration)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration])
 
   function notifyUserConfigurationChanged (
@@ -329,14 +330,20 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
       setTypingData([embeddedDemoConfig.users[1].id])
       setQuotedMessageSender('<<Sender of the Quoted Message>>')
-      if (appConfiguration?.group_chat == true && (activeChannel == null || appConfiguration?.public_channels == false)) {
+      if (
+        appConfiguration?.group_chat == true &&
+        (activeChannel == null || appConfiguration?.public_channels == false)
+      ) {
         setActiveChannel(
           embeddedDemoConfig.channels.find(
             channel => channel.id == 'privategroup-bike'
           )
         )
         setActiveChannelUsers(embeddedDemoConfig.users.slice(1, 5))
-      } else if (appConfiguration?.public_channels && (activeChannel == null || appConfiguration.group_chat == false)) {
+      } else if (
+        appConfiguration?.public_channels &&
+        (activeChannel == null || appConfiguration.group_chat == false)
+      ) {
         setActiveChannel(
           embeddedDemoConfig.channels.find(
             channel => channel.id == 'public-general'
@@ -366,7 +373,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     }
 
     init()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appConfiguration, embeddedDemoConfig, userId, chat])
 
   useEffect(() => {
@@ -374,7 +381,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     //  Initial loading of the groups and direct messages
     refreshGroups('group')
     refreshGroups('direct')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat])
 
   useEffect(() => {
@@ -541,7 +548,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       if (findMe > -1) value.splice(findMe, 1)
       setTypingData(value)
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat, activeChannel])
 
   useEffect(() => {
@@ -607,7 +614,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         applyUsersUpdateWithHysteresis(allUsersUpdated)
       })
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat, allUsers])
 
   async function applyUsersUpdateWithHysteresis (allUsersUpdated) {
@@ -754,7 +761,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       removeMentionsListener()
       removeInvite()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, chat, publicChannels, appConfiguration?.handle_banned])
 
   //  Function called when we need to update the private or direct groups because
@@ -924,7 +931,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       case MessageActionsTypes.REPORT:
         setReportedMessage(data)
         setReportMessageModalVisible(true)
-        break;
+        break
       case MessageActionsTypes.COPY:
         showUserMessage('Copied', `${data.text}`, '', ToastType.CHECK)
         break
@@ -1135,6 +1142,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       <ModalReportMessage
         message={reportedMessage}
         reportAction={async reportReason => {
+          if (embeddedDemoConfig != null) {
+            setReportMessageModalVisible(false)
+            return
+          }
           const reportResult = await reportedMessage?.report(reportReason)
           showUserMessage(
             'Message Reported:',
@@ -1144,7 +1155,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           )
         }}
         reportMessageModalVisible={reportMessageModalVisible}
-        setReportMessageModalVisible={setReportMessageModalVisible}/>
+        setReportMessageModalVisible={setReportMessageModalVisible}
+      />
 
       {embeddedDemoConfig == null && (
         <Header
@@ -1192,11 +1204,11 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         className={`flex flex-row ${
           embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
         } overscroll-none  ${
-          ( profileScreenVisible ||
+          (profileScreenVisible ||
             (chatSettingsScreenVisible &&
               appConfiguration.edit_channel_details) ||
             changeChatNameModalVisible ||
-            manageMembersModalVisible || 
+            manageMembersModalVisible ||
             reportMessageModalVisible) &&
           'blur-sm opacity-40'
         }`}

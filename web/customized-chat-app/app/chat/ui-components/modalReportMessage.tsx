@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { roboto } from '@/app/fonts'
 
 export default function ModalReportMessage ({
@@ -8,6 +8,7 @@ export default function ModalReportMessage ({
   reportMessageModalVisible,
   setReportMessageModalVisible
 }) {
+  const inputRef = useRef<HTMLInputElement>(null)
   const [reportReason, setReportReason] = useState('')
 
   return (
@@ -53,6 +54,7 @@ export default function ModalReportMessage ({
                 className='flex w-full rounded-md bg-white border h-12 px-6 border-neutral-300 shadow-sm text-sm focus:ring-1 focus:ring-inputring outline-none placeholder:text-neutral-600'
                 placeholder='Please specify a reason'
                 value={reportReason}
+                ref={inputRef}
                 onChange={e => {
                   setReportReason(e.target.value)
                 }}
@@ -75,6 +77,8 @@ export default function ModalReportMessage ({
                   reportAction(reportReason)
                   setReportMessageModalVisible(false)
                   setReportReason('')
+                } else {
+                  inputRef.current?.focus()
                 }
               }}
             >
