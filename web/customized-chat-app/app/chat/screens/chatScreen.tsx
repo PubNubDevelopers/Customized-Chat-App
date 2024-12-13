@@ -69,6 +69,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [reportedMessage, setReportedMessage] = useState<pnMessage | null>(null)
   const [reportMessageModalVisible, setReportMessageModalVisible] =
     useState(false)
+  const [currentlyEditingMessage, setCurrentlyEditingMessage] = useState<pnMessage | null>(null)
 
   const [name, setName] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
@@ -932,6 +933,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         setReportedMessage(data)
         setReportMessageModalVisible(true)
         break
+      case MessageActionsTypes.EDIT:
+        setCurrentlyEditingMessage(data)
+        break;
       case MessageActionsTypes.COPY:
         showUserMessage('Copied', `${data.text}`, '', ToastType.CHECK)
         break
@@ -1325,8 +1329,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 setQuotedMessage={setQuotedMessage}
                 //creatingNewMessage={creatingNewMessage}
                 showUserMessage={showUserMessage}
-                embeddedDemoConfig={embeddedDemoConfig}
-                appConfiguration={appConfiguration}
                 setShowEmojiPicker={() => {
                   setTimeout(function () {
                     setShowEmojiPicker(!showEmojiPicker)
@@ -1334,6 +1336,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 }}
                 selectedEmoji={selectedEmoji}
                 setSelectedEmoji={setSelectedEmoji}
+                currentlyEditingMessage={currentlyEditingMessage}
+                setCurrentlyEditingMessage={setCurrentlyEditingMessage}
+                embeddedDemoConfig={embeddedDemoConfig}
+                appConfiguration={appConfiguration}
               />
             </div>
           </div>

@@ -449,7 +449,9 @@ export default function Message ({
                 }
                 editMessageClick={
                   appConfiguration?.message_editing == true
-                    ? () => console.log('edit')
+                    ? () => {
+                        messageActionHandler(MessageActionsTypes.EDIT, message)
+                      }
                     : null
                 }
                 deleteMessageClick={
@@ -518,7 +520,9 @@ export default function Message ({
               }
               editMessageClick={
                 appConfiguration?.message_editing == true
-                  ? () => console.log('edit')
+                  ? () => {
+                      messageActionHandler(MessageActionsTypes.EDIT, message)
+                    }
                   : null
               }
               deleteMessageClick={

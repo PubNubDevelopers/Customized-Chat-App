@@ -24,6 +24,8 @@ export default function MessageInput ({
   selectedEmoji = '',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setSelectedEmoji = a => {},
+  currentlyEditingMessage = null,
+  setCurrentlyEditingMessage,
   embeddedDemoConfig = null,
   appConfiguration
 }) {
@@ -39,7 +41,20 @@ export default function MessageInput ({
 
   async function handleSend (event: React.SyntheticEvent) {
     event.preventDefault()
-    if (!text || !newMessageDraft || !activeChannel) return
+    if (!text || !activeChannel) return
+    if (currentlyEditingMessage) {
+      if (currentlyEditingMessage.text == text)
+      {
+        //  The text has not changed
+        return
+      }
+      await currentlyEditingMessage?.editText(text)
+      setCurrentlyEditingMessage(null)
+      setText('')
+      return
+    }
+
+    if (!newMessageDraft) return
     if (replyInThread) {
       //  This demo only supports text replies in the thread UI
       await activeChannel.sendText(text, { storeInHistory: true })
@@ -49,7 +64,6 @@ export default function MessageInput ({
         newMessageDraft.addQuote(quotedMessage)
       }
       await newMessageDraft.send({ storeInHistory: true })
-      //  todo if appConfiguration?.mention_user is false, do not suggest users or channels
       setNewMessageDraft(
         activeChannel?.createMessageDraft({
           userSuggestionSource: 'channel',
@@ -67,10 +81,13 @@ export default function MessageInput ({
   async function handleTyping (e) {
     if (embeddedDemoConfig != null) return
     if (!activeChannel) return
+    setText(e.target.value)
+    if (currentlyEditingMessage) return
+
     if (activeChannel.type !== 'public') {
       activeChannel.startTyping()
     }
-    setText(e.target.value)
+
     const response = await newMessageDraft?.onChange(e.target.value)
     if ((response?.users.suggestedUsers.length ?? 0) > 0) {
       if (appConfiguration?.mention_user) {
@@ -151,6 +168,13 @@ export default function MessageInput ({
   }
   useEffect(() => {
     if (!activeChannel) return
+    if (currentlyEditingMessage != null) {
+      setText(currentlyEditingMessage?.text)
+      setHasAttachment(false)
+      setQuotedMessage(false)
+      setNewMessageDraft(null)
+      return
+    }
     if (embeddedDemoConfig != null) return
     setNewMessageDraft(
       activeChannel.createMessageDraft({
@@ -160,7 +184,7 @@ export default function MessageInput ({
         channelLimit: 6
       })
     )
-  }, [activeChannel, embeddedDemoConfig])
+  }, [activeChannel, currentlyEditingMessage, embeddedDemoConfig])
 
   useEffect(() => {
     if (!selectedEmoji) return
@@ -177,6 +201,9 @@ export default function MessageInput ({
         quotedMessage ? 'h-[170px]' : ''
       } pr-6`}
     >
+      {currentlyEditingMessage && (
+        <div className='text-cherryDark w-full ml-12 pt-2'>Editing Message</div>
+      )}
       {((suggestedUsers && suggestedUsers.length > 0) ||
         (suggestedChannels && suggestedChannels.length > 0)) && (
         <MentionSuggestions
@@ -226,8 +253,8 @@ export default function MessageInput ({
             onClick={e => handleSend(e)}
           >
             <Image
-              src='/icons/chat-assets/send.svg'
-              alt='Send'
+              src={`${currentlyEditingMessage ? '/icons/chat-assets/save.svg' : '/icons/chat-assets/send.svg'}`}
+              alt={`${currentlyEditingMessage ? 'Save' : 'Send'}`}
               className='m-3 cursor-pointer'
               width={24}
               height={24}
@@ -239,11 +266,19 @@ export default function MessageInput ({
           <div
             className='cursor-pointer hover:bg-neutral-100 hover:rounded-md'
             onClick={() => {
-              addEmoji()
+              if (currentlyEditingMessage)
+              {
+                setText('')
+                setCurrentlyEditingMessage(null)
+              }
+              else
+              {
+                addEmoji()
+              }
             }}
           >
             <Image
-              src='/icons/chat-assets/smile.svg'
+              src={`${currentlyEditingMessage ? '/icons/chat-assets/close.svg' : '/icons/chat-assets/smile.svg'}`}
               alt='Smile'
               className='m-3 cursor-pointer'
               width={24}

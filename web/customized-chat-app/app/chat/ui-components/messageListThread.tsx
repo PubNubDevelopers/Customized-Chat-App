@@ -170,6 +170,8 @@ export default function MessageListThread ({
             quotedMessage={null}
             quotedMessageSender={''}
             //creatingNewMessage={false}
+            currentlyEditingMessage={null}
+            setCurrentlyEditingMessage={() => {}}
             embeddedDemoConfig={embeddedDemoConfig}
             appConfiguration={appConfiguration}
           />
