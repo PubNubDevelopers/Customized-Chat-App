@@ -162,7 +162,7 @@ export default function MessageList ({
   useEffect(() => {
     if (!messageListRef.current) return
     if (
-      /*messageListRef.current.scrollTop != 0 && */
+      messageListRef.current.scrollTop != 0 && 
       messageListRef.current.scrollHeight - messageListRef.current.scrollTop >
         900
     ) {

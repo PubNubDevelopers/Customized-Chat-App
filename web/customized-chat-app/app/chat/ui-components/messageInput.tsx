@@ -24,13 +24,13 @@ export default function MessageInput ({
   selectedEmoji = '',
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setSelectedEmoji = a => {},
-  currentlyEditingMessage = null,
+  currentlyEditingMessage,
   setCurrentlyEditingMessage,
   embeddedDemoConfig = null,
   appConfiguration
 }) {
   const [text, setText] = useState('')
-  const [newMessageDraft, setNewMessageDraft] = useState<MessageDraft>()
+  const [newMessageDraft, setNewMessageDraft] = useState<MessageDraft | null>()
   const [suggestedUsers, setSuggestedUsers] = useState<User[]>([])
   const [nameOccurrenceIndex, setNameOccurrenceIndex] = useState<number>(-1)
   const [suggestedChannels, setSuggestedChannels] = useState<Channel[]>([])
