@@ -53,7 +53,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [selectedEmoji, setSelectedEmoji] = useState('')
 
   const [showThread, setShowThread] = useState(false)
-  const [roomSelectorVisible, setRoomSelectorVisible] = useState(false)
   const [profileScreenVisible, setProfileScreenVisible] = useState(false)
   const [chatSettingsScreenVisible, setChatSettingsScreenVisible] =
     useState(false)
@@ -247,7 +246,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
 
       //  Retrieve all users
       const localAllUsers = await localChat.getUsers()
-      console.log(localAllUsers)
       setAllUsers(
         localAllUsers.users.filter(
           user =>
@@ -1129,12 +1127,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
 
       {embeddedDemoConfig == null && (
         <Header
-          setRoomSelectorVisible={setRoomSelectorVisible}
+          currentUser={currentUser}
           setProfileScreenVisible={setProfileScreenVisible}
-          showNotificationBadge={true}
-          showMentionsBadge={false}
           setCreatingNewMessage={setCreatingNewMessage}
-          showUserMessage={showUserMessage}
           appConfiguration={appConfiguration}
         />
       )}
@@ -1176,8 +1171,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         className={`flex flex-row ${
           embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
         } overscroll-none  ${
-          (roomSelectorVisible ||
-            profileScreenVisible ||
+          ( profileScreenVisible ||
             (chatSettingsScreenVisible &&
               appConfiguration.edit_channel_details) ||
             changeChatNameModalVisible ||

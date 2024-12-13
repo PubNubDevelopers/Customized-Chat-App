@@ -8,7 +8,7 @@ import { buildConfig } from './configuration'
 import { testUsers, testPublicChannels } from './data/testData'
 
 import Image from 'next/image'
-import PersonPicker from './ui-components/personPicker'
+import PersonPicker from './chat/ui-components/personPicker'
 
 export default function Home () {
   const searchParams = useSearchParams()

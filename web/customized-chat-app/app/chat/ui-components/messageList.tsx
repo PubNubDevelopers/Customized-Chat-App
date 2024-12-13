@@ -64,7 +64,7 @@ export default function MessageList ({
     setLoadingMessage(`${appConfiguration?.message_history ? 'Fetching History from Server...' : 'Message Persistence Disabled for this Application'}`)
     async function initMessageList () {
       if (activeChannel.id !== groupMembership.channel.id) {
-        console.log('channel IDs did not match, returning')
+        //console.log('channel IDs did not match, returning')
         return
       }
       setMessages([])

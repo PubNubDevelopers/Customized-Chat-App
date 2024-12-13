@@ -1,8 +1,9 @@
-import Avatar from '../chat/ui-components/avatar'
-import { PresenceIcon } from '../types'
+import Avatar from './avatar'
+import { PresenceIcon } from '../../types'
 
 export default function PersonPicker ({
   id,
+  isThin = false,
   name,
   avatarUrl,
   className = '',
@@ -10,7 +11,11 @@ export default function PersonPicker ({
 }) {
   return (
     <div
-      className={`bg-navy50 hover:bg-navy200 cursor-pointer ${className} p-2 border-2 w-56 border-navy300 rounded-xl flex flex-row items-center gap-3 select-none`}
+      className={`cursor-pointer flex flex-row items-center gap-3 select-none ${className} ${
+        isThin
+          ? 'h-12 px-3 text-white flex-row-reverse'
+          : 'bg-navy50 hover:bg-navy200 p-2 w-56 border-2 border-navy300'
+      } rounded-xl`}
       onClick={() => {
         personSelected(id)
       }}
@@ -18,8 +23,8 @@ export default function PersonPicker ({
       <Avatar
         avatarUrl={avatarUrl}
         present={PresenceIcon.NOT_SHOWN}
-        width={48}
-        height={48}
+        width={isThin ? 42 : 48}
+        height={isThin ? 42 : 48}
         appConfiguration={null}
       ></Avatar>
       <div className='flex flex-col'>

@@ -52,7 +52,6 @@ export default function ChatSelectionMenu ({
 
   function handleChatSearch (term: string) {
     setSearchChannels(term)
-    console.log(publicChannels)
   }
 
   useEffect(() => {
@@ -352,8 +351,15 @@ export default function ChatSelectionMenu ({
             expandCollapse={() => {
               setPublicExpanded(!publicExpanded)
             }}
-            actionIcon={ChatHeaderActionIcon.NONE}
-            action={() => {}}
+            actionIcon={ChatHeaderActionIcon.ADD}
+            action={() => {
+              showUserMessage(
+                'Demo Limitation:',
+                'Although not supported by this demo, you can use the Chat SDK to create new Public Channels',
+                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/create#create-public-channel',
+                ToastType.INFO
+              )
+            }}
           />
         )}
         {showPublicChannels && publicExpanded && (
@@ -408,10 +414,6 @@ export default function ChatSelectionMenu ({
                     )}
                     setActiveChannel={() => {
                       setActiveChannelAction(privateGroups[index])
-                      //                      if (embeddedDemoConfig != null) return
-                      //                      setCreatingNewMessage(false)
-                      //                      setActiveChannelPinnedMessage(null)
-                      //                      setActiveChannel(privateGroups[index])
                     }}
                     appConfiguration={appConfiguration}
                   />
@@ -458,12 +460,6 @@ export default function ChatSelectionMenu ({
                     }
                     setActiveChannel={() => {
                       setActiveChannelAction(directChats[index])
-                      //                      if (embeddedDemoConfig != null) return
-                      //                      setCreatingNewMessage(false)
-                      //                      setActiveChannelPinnedMessage(null)
-                      //                      console.log('setting active channel to direct')
-                      //                      console.log(directChats[index])
-                      //                      setActiveChannel(directChats[index])
                     }}
                     appConfiguration={appConfiguration}
                   />

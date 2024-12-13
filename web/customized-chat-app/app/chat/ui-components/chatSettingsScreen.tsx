@@ -41,7 +41,7 @@ export default function ChatSettingsScreen ({
         >
           <Image
             src='/icons/chat-assets/close-rooms.svg'
-            alt='Close Rooms'
+            alt='Close Settings'
             className='p-3'
             width={36}
             height={36}

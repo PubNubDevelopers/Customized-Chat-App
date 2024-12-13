@@ -34,7 +34,7 @@ export default function ProfileScreen ({
         >
           <Image
             src='/icons/chat-assets/close-rooms.svg'
-            alt='Close Rooms'
+            alt='Close Profile'
             className='p-3'
             width={36}
             height={36}
