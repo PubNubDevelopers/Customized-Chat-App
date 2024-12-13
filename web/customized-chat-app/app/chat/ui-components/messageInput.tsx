@@ -43,12 +43,13 @@ export default function MessageInput ({
     event.preventDefault()
     if (!text || !activeChannel) return
     if (currentlyEditingMessage) {
-      if (currentlyEditingMessage.text == text)
-      {
+      if (currentlyEditingMessage.text == text) {
         //  The text has not changed
         return
       }
-      await currentlyEditingMessage?.editText(text)
+      if (!embeddedDemoConfig) {
+        await currentlyEditingMessage?.editText(text)
+      }
       setCurrentlyEditingMessage(null)
       setText('')
       return
@@ -169,7 +170,14 @@ export default function MessageInput ({
   useEffect(() => {
     if (!activeChannel) return
     if (currentlyEditingMessage != null) {
-      setText(currentlyEditingMessage?.text)
+      {
+        /* Usually you would use message.text but I'm using content here for the embedded demo test data */
+      }
+      setText(
+        currentlyEditingMessage?.text
+          ? currentlyEditingMessage.text
+          : currentlyEditingMessage?.content?.text
+      )
       setHasAttachment(false)
       setQuotedMessage(false)
       setNewMessageDraft(null)
@@ -253,7 +261,11 @@ export default function MessageInput ({
             onClick={e => handleSend(e)}
           >
             <Image
-              src={`${currentlyEditingMessage ? '/icons/chat-assets/save.svg' : '/icons/chat-assets/send.svg'}`}
+              src={`${
+                currentlyEditingMessage
+                  ? '/icons/chat-assets/save.svg'
+                  : '/icons/chat-assets/send.svg'
+              }`}
               alt={`${currentlyEditingMessage ? 'Save' : 'Send'}`}
               className='m-3 cursor-pointer'
               width={24}
@@ -266,19 +278,20 @@ export default function MessageInput ({
           <div
             className='cursor-pointer hover:bg-neutral-100 hover:rounded-md'
             onClick={() => {
-              if (currentlyEditingMessage)
-              {
+              if (currentlyEditingMessage) {
                 setText('')
                 setCurrentlyEditingMessage(null)
-              }
-              else
-              {
+              } else {
                 addEmoji()
               }
             }}
           >
             <Image
-              src={`${currentlyEditingMessage ? '/icons/chat-assets/close.svg' : '/icons/chat-assets/smile.svg'}`}
+              src={`${
+                currentlyEditingMessage
+                  ? '/icons/chat-assets/close.svg'
+                  : '/icons/chat-assets/smile.svg'
+              }`}
               alt='Smile'
               className='m-3 cursor-pointer'
               width={24}
