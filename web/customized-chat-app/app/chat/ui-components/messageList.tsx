@@ -472,7 +472,7 @@ export default function MessageList ({
 
         {messages.map(message => {
           return (
-            !message.deleted && (
+            !message?.deleted && (
               <Message
                 key={message.timetoken}
                 received={currentUser.id !== message.userId}

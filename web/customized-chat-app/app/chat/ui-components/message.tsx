@@ -119,20 +119,23 @@ export default function Message ({
   //  Originally I was not writing the 'lastTimetoken' for messages I was sending myself, however
   //  that caused the Chat SDK's notion of an unread message count inconsistent, so I am removing
   //  readReceipts I set myself in this useCallback
-  const determineReadStatus = useCallback((timetoken, readReceipts) => {
-    if (!readReceipts) return false
-    for (let i = 0; i < Object.keys(readReceipts).length; i++) {
-      const receipt = Object.keys(readReceipts)[i]
-      const findMe = readReceipts[receipt].indexOf(currentUserId)
-      if (findMe > -1) {
-        readReceipts[receipt].splice(findMe, 1)
+  const determineReadStatus = useCallback(
+    (timetoken, readReceipts) => {
+      if (!readReceipts) return false
+      for (let i = 0; i < Object.keys(readReceipts).length; i++) {
+        const receipt = Object.keys(readReceipts)[i]
+        const findMe = readReceipts[receipt].indexOf(currentUserId)
+        if (findMe > -1) {
+          readReceipts[receipt].splice(findMe, 1)
+        }
+        if (readReceipts[receipt].length > 0 && receipt >= timetoken) {
+          return true
+        }
       }
-      if (readReceipts[receipt].length > 0 && receipt >= timetoken) {
-        return true
-      }
-    }
-    return false
-  }, [currentUserId])
+      return false
+    },
+    [currentUserId]
+  )
 
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
@@ -162,8 +165,8 @@ export default function Message ({
         )
       }
       if (messagePart?.type === 'mention') {
-        return (
-          appConfiguration?.mention_user == true ? (<span
+        return appConfiguration?.mention_user == true ? (
+          <span
             key={index}
             onClick={() =>
               userClick(
@@ -174,13 +177,17 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             @{messagePart.content.name}
-          </span>) : <span key={index} className='px-1'>{messagePart.content.name}</span>
+          </span>
+        ) : (
+          <span key={index} className='px-1'>
+            {messagePart.content.name}
+          </span>
         )
       }
 
       if (messagePart?.type === 'channelReference') {
-        return (
-          appConfiguration?.channel_references == true ? (<span
+        return appConfiguration?.channel_references == true ? (
+          <span
             key={index}
             onClick={() =>
               channelClick(
@@ -191,7 +198,11 @@ export default function Message ({
             className='rounded-lg border px-2 py-0.5 line-clamp-1 text-nowrap select-none cursor-pointer border-neutral-300 bg-neutral-50 text-neutral-900 m-1'
           >
             #{messagePart.content.name}
-          </span>) : <span key={index} className='px-1'>{messagePart.content.name}</span>
+          </span>
+        ) : (
+          <span key={index} className='px-1'>
+            {messagePart.content.name}
+          </span>
         )
       }
       return 'error'
@@ -316,34 +327,38 @@ export default function Message ({
                 {message.actions && message.actions.edited && (
                   <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
                 )}
-                {message.files && message.files.length > 0 && appConfiguration?.message_send_file == true && (
-                  <Image
-                    src={`${message.files[0].url}`}
-                    alt='PubNub Logo'
-                    className='absolute right-2 top-2'
-                    width={25}
-                    height={25}
-                  />
-                )}
+                {message.files &&
+                  message.files.length > 0 &&
+                  appConfiguration?.message_send_file == true && (
+                    <Image
+                      src={`${message.files[0].url}`}
+                      alt='PubNub Logo'
+                      className='absolute right-2 top-2'
+                      width={25}
+                      height={25}
+                    />
+                  )}
               </div>
             </div>
-            {!received && showReadIndicator && (appConfiguration?.message_read_receipts == true) && (
-              <Image
-                src={`${
-                  determineReadStatus(message.timetoken, readReceipts)
-                    ? '/icons/chat-assets/read.svg'
-                    : '/icons/chat-assets/sent.svg'
-                }`}
-                alt='Read'
-                className='absolute right-[10px] bottom-[14px]'
-                width={21}
-                height={10}
-                priority
-              />
-            )}
+            {!received &&
+              showReadIndicator &&
+              appConfiguration?.message_read_receipts == true && (
+                <Image
+                  src={`${
+                    determineReadStatus(message.timetoken, readReceipts)
+                      ? '/icons/chat-assets/read.svg'
+                      : '/icons/chat-assets/sent.svg'
+                  }`}
+                  alt='Read'
+                  className='absolute right-[10px] bottom-[14px]'
+                  width={21}
+                  height={10}
+                  priority
+                />
+              )}
             <div className='absolute right-[10px] -bottom-[20px] flex flex-row items-center z-10 select-none'>
               {/*arrayOfEmojiReactions*/}
-              
+
               {appConfiguration?.message_reactions && message.reactions
                 ? Object?.keys(message.reactions)
                     .slice(0, 18)
@@ -357,34 +372,35 @@ export default function Message ({
                       />
                     ))
                 : ''}
-
             </div>
-            {!inThread && message.hasThread && appConfiguration?.message_threads && (
-              <div
-                className='absolute right-[10px] -bottom-[28px] flex flex-row items-center z-0 cursor-pointer select-none'
-                onClick={() => {
-                  messageActionHandler(
-                    MessageActionsTypes.REPLY_IN_THREAD,
-                    message
-                  )
-                }}
-              >
-                {/*Whether or not there is a threaded reply*/}
-                <div className='flex flex-row cursor-pointer'>
-                  <Image
-                    src='/icons/chat-assets/reveal-thread.svg'
-                    alt='Expand'
-                    className=''
-                    width={20}
-                    height={20}
-                    priority
-                  />
-                  <div className='text-sm font-normal text-navy700'>
-                    Replies
+            {!inThread &&
+              message.hasThread &&
+              appConfiguration?.message_threads && (
+                <div
+                  className='absolute right-[10px] -bottom-[28px] flex flex-row items-center z-0 cursor-pointer select-none'
+                  onClick={() => {
+                    messageActionHandler(
+                      MessageActionsTypes.REPLY_IN_THREAD,
+                      message
+                    )
+                  }}
+                >
+                  {/*Whether or not there is a threaded reply*/}
+                  <div className='flex flex-row cursor-pointer'>
+                    <Image
+                      src='/icons/chat-assets/reveal-thread.svg'
+                      alt='Expand'
+                      className=''
+                      width={20}
+                      height={20}
+                      priority
+                    />
+                    <div className='text-sm font-normal text-navy700'>
+                      Replies
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
             {/* actions go here for received */}
             {received && !inThread && !inPinned && (
               <MessageActions
@@ -397,7 +413,9 @@ export default function Message ({
                 messageActionsLeave={() => handleMessageActionsLeave()}
                 emojiClick={
                   appConfiguration?.message_reactions == true
-                    ? (emoji) => {reactionClicked(emoji)}
+                    ? emoji => {
+                        reactionClicked(emoji)
+                      }
                     : null
                 }
                 replyInThreadClick={
@@ -424,10 +442,31 @@ export default function Message ({
                       }
                     : null
                 }
-                forwardMessageClick={appConfiguration?.message_forward == true ? () => console.log('forward') : null}
-                editMessageClick={appConfiguration?.message_editing == true ? () => console.log('edit') : null}
-                deleteMessageClick={appConfiguration?.message_deletion_soft == true ? () => console.log('delete') : null}
-                reportMessageClick={appConfiguration?.message_report == true ? () => console.log('report') : null}
+                forwardMessageClick={
+                  appConfiguration?.message_forward == true
+                    ? () => console.log('forward')
+                    : null
+                }
+                editMessageClick={
+                  appConfiguration?.message_editing == true
+                    ? () => console.log('edit')
+                    : null
+                }
+                deleteMessageClick={
+                  appConfiguration?.message_deletion_soft == true
+                    ? () => console.log('delete')
+                    : null
+                }
+                reportMessageClick={
+                  appConfiguration?.message_report == true
+                    ? () => {
+                        messageActionHandler(
+                          MessageActionsTypes.REPORT,
+                          message
+                        )
+                      }
+                    : null
+                }
               />
             )}
           </div>
@@ -443,7 +482,9 @@ export default function Message ({
               messageActionsLeave={() => handleMessageActionsLeave()}
               emojiClick={
                 appConfiguration?.message_reactions == true
-                  ? emoji => {reactionClicked(emoji)}
+                  ? emoji => {
+                      reactionClicked(emoji)
+                    }
                   : null
               }
               replyInThreadClick={
@@ -470,10 +511,28 @@ export default function Message ({
                     }
                   : null
               }
-              forwardMessageClick={appConfiguration?.message_forward == true ? () => console.log('forward') : null}
-              editMessageClick={appConfiguration?.message_editing == true ? () => console.log('edit') : null}
-              deleteMessageClick={appConfiguration?.message_deletion_soft == true ? () => console.log('delete') : null}
-              reportMessageClick={appConfiguration?.message_report == true ? () => console.log('report') : null}
+              forwardMessageClick={
+                appConfiguration?.message_forward == true
+                  ? () => console.log('forward')
+                  : null
+              }
+              editMessageClick={
+                appConfiguration?.message_editing == true
+                  ? () => console.log('edit')
+                  : null
+              }
+              deleteMessageClick={
+                appConfiguration?.message_deletion_soft == true
+                  ? () => console.log('delete')
+                  : null
+              }
+              reportMessageClick={
+                appConfiguration?.message_report == true
+                  ? () => {
+                      messageActionHandler(MessageActionsTypes.REPORT, message)
+                    }
+                  : null
+              }
             />
           )}
         </div>

@@ -26,6 +26,7 @@ import TypingIndicator from '../ui-components/typingIndicator'
 import ChatSettingsScreen from '../ui-components/chatSettingsScreen'
 import ModalChangeName from '../ui-components/modalChangeName'
 import ModalManageMembers from '../ui-components/modalManageMembers'
+import ModalReportMessage from '../ui-components/modalReportMessage'
 import searchImg from '@/public/icons/chat-assets/search.svg'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -65,6 +66,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     useState(false)
   const [manageMembersModalVisible, setManageMembersModalVisible] =
     useState(false)
+  const [reportedMessage, setReportedMessage] = useState<pnMessage | null>(null)
+  const [reportMessageModalVisible, setReportMessageModalVisible] = useState(true)
 
   const [name, setName] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
@@ -918,6 +921,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           }
         }
         break
+      case MessageActionsTypes.REPORT:
+        setReportedMessage(data)
+        setReportMessageModalVisible(true)
+        break;
       case MessageActionsTypes.COPY:
         showUserMessage('Copied', `${data.text}`, '', ToastType.CHECK)
         break
@@ -1124,6 +1131,20 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           setChangeNameModalVisible={setChangeUserNameModalVisible}
         />
       }
+      {/* Modal to specify the reason for reporting a message */}
+      <ModalReportMessage
+        message={reportedMessage}
+        reportAction={async reportReason => {
+          const reportResult = await reportedMessage?.report(reportReason)
+          showUserMessage(
+            'Message Reported:',
+            'Report successfully sent.  You can see all message reports in the Channel Monitor view of BizOps Workspace',
+            'https://www.pubnub.com/docs/bizops-workspace/channel-monitor',
+            ToastType.INFO
+          )
+        }}
+        reportMessageModalVisible={reportMessageModalVisible}
+        setReportMessageModalVisible={setReportMessageModalVisible}/>
 
       {embeddedDemoConfig == null && (
         <Header
@@ -1175,7 +1196,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
             (chatSettingsScreenVisible &&
               appConfiguration.edit_channel_details) ||
             changeChatNameModalVisible ||
-            manageMembersModalVisible) &&
+            manageMembersModalVisible || 
+            reportMessageModalVisible) &&
           'blur-sm opacity-40'
         }`}
       >

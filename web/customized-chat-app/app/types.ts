@@ -12,6 +12,7 @@ export enum MessageActionsTypes {
   PIN = "pin",
   COPY = "copy",
   SHOW_EMOJI = "show_emoji",
+  REPORT = "report",
 }
 
 export enum ChatHeaderActionIcon {
