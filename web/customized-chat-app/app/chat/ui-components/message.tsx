@@ -137,6 +137,13 @@ export default function Message ({
     [currentUserId]
   )
 
+  const isMessageDeleted = useCallback(
+    message => {
+      return message.actions?.deleted?.deleted?.length > 0
+    },
+    [message]
+  )
+
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
       if (messagePart?.type === 'text') {
@@ -314,31 +321,47 @@ export default function Message ({
                   displayedWithMesageInput={false}
                 />
               )}
-              {/* Will chase with the chat team to see why I need these conditions (get an error about missing 'type' if they are absent) */}
-              <div className='flex flex-row items-center w-full flex-wrap'>
-                {(message.content.text ||
-                  message.content.plainLink ||
-                  message.content.textLink ||
-                  message.content.mention ||
-                  message.content.channelReference) &&
-                  message
-                    .getMessageElements()
-                    .map((msgPart, index) => renderMessagePart(msgPart, index))}
-                {message.actions && message.actions.edited && (
-                  <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
-                )}
-                {message.files &&
-                  message.files.length > 0 &&
-                  appConfiguration?.message_send_file == true && (
-                    <Image
-                      src={`${message.files[0].url}`}
-                      alt='PubNub Logo'
-                      className='absolute right-2 top-2'
-                      width={25}
-                      height={25}
-                    />
+              {isMessageDeleted(message) && (
+                <div className='flex flex-row items-center w-full flex-wrap'>
+                  This message was deleted.
+                  <div
+                    className='cursor-pointer px-2 py-1 mx-2 rounded-xl bg-pubnubbabyblue'
+                    onClick={async () => {
+                      await message.restore()
+                    }}
+                  >
+                    Restore Message
+                  </div>
+                </div>
+              )}
+              {!isMessageDeleted(message) && (
+                <div className='flex flex-row items-center w-full flex-wrap'>
+                  {(message.content.text ||
+                    message.content.plainLink ||
+                    message.content.textLink ||
+                    message.content.mention ||
+                    message.content.channelReference) &&
+                    message
+                      .getMessageElements()
+                      .map((msgPart, index) =>
+                        renderMessagePart(msgPart, index)
+                      )}
+                  {message.actions && message.actions.edited && (
+                    <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
                   )}
-              </div>
+                  {message.files &&
+                    message.files.length > 0 &&
+                    appConfiguration?.message_send_file == true && (
+                      <Image
+                        src={`${message.files[0].url}`}
+                        alt='PubNub Logo'
+                        className='absolute right-2 top-2'
+                        width={25}
+                        height={25}
+                      />
+                    )}
+                </div>
+              )}
             </div>
             {!received &&
               showReadIndicator &&
@@ -402,7 +425,7 @@ export default function Message ({
                 </div>
               )}
             {/* actions go here for received */}
-            {received && !inThread && !inPinned && (
+            {received && !inThread && !inPinned && !isMessageDeleted(message) && (
               <MessageActions
                 received={received}
                 actionsShown={actionsShown}
@@ -456,7 +479,12 @@ export default function Message ({
                 }
                 deleteMessageClick={
                   appConfiguration?.message_deletion_soft == true
-                    ? () => console.log('delete')
+                    ? () => {
+                        messageActionHandler(
+                          MessageActionsTypes.DELETE,
+                          message
+                        )
+                      }
                     : null
                 }
                 reportMessageClick={
@@ -473,7 +501,7 @@ export default function Message ({
             )}
           </div>
           {/* actions go here for sent */}
-          {!received && !inThread && !inPinned && (
+          {!received && !inThread && !inPinned && !isMessageDeleted(message) && (
             <MessageActions
               received={received}
               actionsShown={actionsShown}
@@ -527,7 +555,9 @@ export default function Message ({
               }
               deleteMessageClick={
                 appConfiguration?.message_deletion_soft == true
-                  ? () => console.log('delete')
+                  ? () => {
+                      messageActionHandler(MessageActionsTypes.DELETE, message)
+                    }
                   : null
               }
               reportMessageClick={

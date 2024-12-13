@@ -14,6 +14,7 @@ export enum MessageActionsTypes {
   SHOW_EMOJI = "show_emoji",
   REPORT = "report",
   EDIT = "edit",
+  DELETE = "delete",
 }
 
 export enum ChatHeaderActionIcon {

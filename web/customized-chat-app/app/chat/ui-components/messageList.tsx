@@ -61,7 +61,13 @@ export default function MessageList ({
     if (!groupMembership.channel) return
     //if (messages && messages.length > 0) return
     //  UseEffect to handle initial configuration of the Message List including reading the historical messages
-    setLoadingMessage(`${appConfiguration?.message_history ? 'Fetching History from Server...' : 'Message Persistence Disabled for this Application'}`)
+    setLoadingMessage(
+      `${
+        appConfiguration?.message_history
+          ? 'Fetching History from Server...'
+          : 'Message Persistence Disabled for this Application'
+      }`
+    )
     async function initMessageList () {
       if (activeChannel.id !== groupMembership.channel.id) {
         //console.log('channel IDs did not match, returning')
@@ -98,7 +104,7 @@ export default function MessageList ({
       }
     }
     initMessageList()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, groupMembership, embeddedDemoConfig])
 
   useEffect(() => {
@@ -130,7 +136,7 @@ export default function MessageList ({
         setActiveChannelPinnedMessage(null)
       }
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, embeddedDemoConfig])
 
   useEffect(() => {
@@ -156,9 +162,9 @@ export default function MessageList ({
   useEffect(() => {
     if (!messageListRef.current) return
     if (
-      messageListRef.current.scrollTop != 0 &&
+      /*messageListRef.current.scrollTop != 0 && */
       messageListRef.current.scrollHeight - messageListRef.current.scrollTop >
-        1115
+        900
     ) {
       return //  We aren't scrolled to the bottom
     }
@@ -472,47 +478,44 @@ export default function MessageList ({
 
         {messages.map(message => {
           return (
-            !message?.deleted && (
-              <Message
-                key={message.timetoken}
-                received={currentUser.id !== message.userId}
-                avatarUrl={
-                  message.userId === currentUser.id
-                    ? currentUser.profileUrl
-                    : allUsers?.find(user => user.id === message.userId)
-                        ?.profileUrl
-                }
-                isOnline={
-                  message.userId === currentUser.id
-                    ? currentUser.active
-                    : groupUsers?.find(user => user.id === message.userId)
-                        ?.active
-                }
-                readReceipts={readReceipts}
-                quotedMessageSender={
-                  message.quotedMessage &&
-                  (message.quotedMessage.userId === currentUser.id
-                    ? currentUser.name
-                    : allUsers?.find(
-                        user => user.id === message.quotedMessage.userId
-                      )?.name)
-                }
-                showReadIndicator={activeChannel.type !== 'public'}
-                sender={
-                  message.userId === currentUser.id
-                    ? currentUser.name
-                    : allUsers?.find(user => user.id === message.userId)?.name
-                }
-                pinned={false}
-                messageActionHandler={(action, vars) =>
-                  messageActionHandler(action, vars)
-                }
-                message={message}
-                currentUserId={currentUser.id}
-                showUserMessage={showUserMessage}
-                appConfiguration={appConfiguration}
-              />
-            )
+            <Message
+              key={message.timetoken}
+              received={currentUser.id !== message.userId}
+              avatarUrl={
+                message.userId === currentUser.id
+                  ? currentUser.profileUrl
+                  : allUsers?.find(user => user.id === message.userId)
+                      ?.profileUrl
+              }
+              isOnline={
+                message.userId === currentUser.id
+                  ? currentUser.active
+                  : groupUsers?.find(user => user.id === message.userId)?.active
+              }
+              readReceipts={readReceipts}
+              quotedMessageSender={
+                message.quotedMessage &&
+                (message.quotedMessage.userId === currentUser.id
+                  ? currentUser.name
+                  : allUsers?.find(
+                      user => user.id === message.quotedMessage.userId
+                    )?.name)
+              }
+              showReadIndicator={activeChannel.type !== 'public'}
+              sender={
+                message.userId === currentUser.id
+                  ? currentUser.name
+                  : allUsers?.find(user => user.id === message.userId)?.name
+              }
+              pinned={false}
+              messageActionHandler={(action, vars) =>
+                messageActionHandler(action, vars)
+              }
+              message={message}
+              currentUserId={currentUser.id}
+              showUserMessage={showUserMessage}
+              appConfiguration={appConfiguration}
+            />
           )
         })}
       </div>
