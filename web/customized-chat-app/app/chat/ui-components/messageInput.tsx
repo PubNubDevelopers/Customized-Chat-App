@@ -192,6 +192,7 @@ export default function MessageInput ({
         channelLimit: 6
       })
     )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, currentlyEditingMessage, embeddedDemoConfig])
 
   useEffect(() => {

@@ -2,6 +2,10 @@ import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { roboto } from '@/app/fonts'
 
+import {
+  Channel,
+  User
+} from '@pubnub/chat'
 import Avatar from './avatar'
 import ForwardMessageSearchResult from './forwardMessageSearchResult'
 import ForwardMessagePill from './forwardMessagePill'

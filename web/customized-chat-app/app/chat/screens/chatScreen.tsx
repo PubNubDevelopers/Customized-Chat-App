@@ -1192,8 +1192,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         directChats={directChats}
         directChatsUsers={directChatsUsers}
         forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
-          let newActiveChannel = null
-          if (channelsToForwardTo.length > 0)
+          let newActiveChannel
+          if (forwardMessage && channelsToForwardTo.length > 0)
           {
             //  Forward to specified channels
             for (const channel of channelsToForwardTo) {
@@ -1202,7 +1202,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
             }
 
           }
-          if (usersToForwardTo.length > 0)
+          if (chat && forwardMessage && usersToForwardTo.length > 0)
           {
             //  Forward to specified users
             for (const user of usersToForwardTo) {

@@ -141,7 +141,7 @@ export default function Message ({
     message => {
       return message.actions?.deleted?.deleted?.length > 0
     },
-    [message]
+    []
   )
 
   const renderMessagePart = useCallback(
