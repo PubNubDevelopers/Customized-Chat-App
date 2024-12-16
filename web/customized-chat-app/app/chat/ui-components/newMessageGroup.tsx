@@ -104,10 +104,7 @@ export default function NewMessageGroup ({
       createdChannel = channel
     }
     if (createdChannel) {
-      console.log('created channel')
-      console.log(createdChannel['type'])
       await invokeRefresh(desiredChannelId, createdChannel['type'])
-      console.log('setting active channel 1')
       setActiveChannel(createdChannel)
     }
     console.log('set to false')

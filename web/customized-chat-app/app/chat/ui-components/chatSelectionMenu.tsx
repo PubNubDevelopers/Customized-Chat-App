@@ -9,7 +9,7 @@ import {
   ChatHeaderActionIcon,
   PresenceIcon,
   ToastType,
-  useBreakpoints
+  useBreakpoints, giveUserAvatarUrl, giveGroupAvatarUrl, givePublicAvatarUrl, giveUserName, findIndex
 } from '../../types'
 
 export default function ChatSelectionMenu ({
@@ -61,38 +61,10 @@ export default function ChatSelectionMenu ({
     setShowGroupChat(appConfiguration.group_chat == true)
   }, [appConfiguration])
 
-  function giveUserAvatarUrl (userArray) {
-    if (!userArray) {
-      return '/avatars/placeholder.png'
-    }
-    return userArray?.find(user => user.id !== currentUserId)?.profileUrl
-      ? userArray?.find(user => user.id !== currentUserId)?.profileUrl
-      : '/avatars/placeholder.png'
-  }
-
-  function giveGroupAvatarUrl () {
-    return currentUserProfileUrl ?? '/avatars/placeholder.png'
-  }
-
-  function givePublicAvatarUrl (channel) {
-    return channel?.custom?.profileUrl ?? '/avatars/placeholder.png'
-  }
-
-  function giveUserName (searchArray) {
-    return (
-      searchArray?.find(item => item.id !== currentUserId)?.name ??
-      'User Left Conversation'
-    )
-  }
-
   function giveGroupBubblePrecedent (userArray) {
     return userArray?.map(user => user.id !== currentUserId)
       ? `+${userArray?.map(user => user.id !== currentUserId).length - 1}`
       : ''
-  }
-
-  function findIndex (searchArray, idToSearchFor) {
-    return searchArray.findIndex(item => item.id == idToSearchFor)
   }
 
   function setActiveChannelAction (channel) {
@@ -234,14 +206,14 @@ export default function ChatSelectionMenu ({
                     key={index}
                     avatarUrl={
                       unreadMessage.channel.type === 'group'
-                        ? giveGroupAvatarUrl()
+                        ? giveGroupAvatarUrl(currentUserProfileUrl)
                         : unreadMessage.channel.type == 'public'
                         ? givePublicAvatarUrl(unreadMessage.channel)
                         : unreadMessage.channel.type == 'direct' && directChats
                         ? giveUserAvatarUrl(
                             directChatsUsers[
                               findIndex(directChats, unreadMessage.channel.id)
-                            ]
+                            ], currentUserId
                           )
                         : '/avatars/placeholder.png'
                     }
@@ -259,7 +231,7 @@ export default function ChatSelectionMenu ({
                         ? giveUserName(
                             directChatsUsers[
                               findIndex(directChats, unreadMessage.channel.id)
-                            ]
+                            ], currentUserId
                           )
                         : unreadMessage.channel.name
                     }
@@ -406,7 +378,7 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={giveGroupAvatarUrl()}
+                    avatarUrl={giveGroupAvatarUrl(currentUserProfileUrl)}
                     text={privateGroup.name}
                     present={PresenceIcon.NOT_SHOWN}
                     avatarBubblePrecedent={giveGroupBubblePrecedent(
@@ -449,8 +421,8 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={giveUserAvatarUrl(directChatsUsers[index])}
-                    text={giveUserName(directChatsUsers[index])}
+                    avatarUrl={giveUserAvatarUrl(directChatsUsers[index], currentUserId)}
+                    text={giveUserName(directChatsUsers[index], currentUserId)}
                     present={
                       directChatsUsers[index]?.find(
                         user => user.id !== currentUserId

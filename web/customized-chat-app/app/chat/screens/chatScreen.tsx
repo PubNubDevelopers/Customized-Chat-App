@@ -27,6 +27,7 @@ import ChatSettingsScreen from '../ui-components/chatSettingsScreen'
 import ModalChangeName from '../ui-components/modalChangeName'
 import ModalManageMembers from '../ui-components/modalManageMembers'
 import ModalReportMessage from '../ui-components/modalReportMessage'
+import ModalForwardMessage from '../ui-components/modalForwardMessage'
 import searchImg from '@/public/icons/chat-assets/search.svg'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
@@ -69,7 +70,11 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [reportedMessage, setReportedMessage] = useState<pnMessage | null>(null)
   const [reportMessageModalVisible, setReportMessageModalVisible] =
     useState(false)
-  const [currentlyEditingMessage, setCurrentlyEditingMessage] = useState<pnMessage | null>(null)
+  const [forwardMessage, setForwardMessage] = useState<pnMessage | null>(null)
+  const [forwardMessageModalVisible, setForwardMessageModalVisible] =
+    useState(false)
+  const [currentlyEditingMessage, setCurrentlyEditingMessage] =
+    useState<pnMessage | null>(null)
 
   const [name, setName] = useState('')
   const [profileUrl, setProfileUrl] = useState('')
@@ -935,11 +940,20 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         break
       case MessageActionsTypes.EDIT:
         setCurrentlyEditingMessage(data)
-        break;
+        break
       case MessageActionsTypes.DELETE:
         if (embeddedDemoConfig) return
-        const updatedMessage = await data?.delete({soft: true}, {preserveFiles: true})
-        break;
+        const updatedMessage = await data?.delete(
+          { soft: true },
+          { preserveFiles: true }
+        )
+        break
+      case MessageActionsTypes.FORWARD:
+        if (embeddedDemoConfig) return
+        const forwardedMessage: pnMessage = data
+        setForwardMessage(forwardedMessage)
+        setForwardMessageModalVisible(true)
+        break
       case MessageActionsTypes.COPY:
         showUserMessage('Copied', `${data.text}`, '', ToastType.CHECK)
         break
@@ -1165,6 +1179,44 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         reportMessageModalVisible={reportMessageModalVisible}
         setReportMessageModalVisible={setReportMessageModalVisible}
       />
+      {/* Modal to specify the reason for reporting a message */}
+      <ModalForwardMessage
+        chat={chat}
+        message={forwardMessage}
+        currentUserProfileUrl={profileUrl}
+        currentUserId={
+          chat?.currentUser.id
+        }
+        publicChannels={publicChannels}
+        privateGroups={privateGroups}
+        directChats={directChats}
+        directChatsUsers={directChatsUsers}
+        forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
+          let newActiveChannel = null
+          if (channelsToForwardTo.length > 0)
+          {
+            //  Forward to specified channels
+            for (const channel of channelsToForwardTo) {
+              await forwardMessage.forward(channel.id)
+              newActiveChannel = channel
+            }
+
+          }
+          if (usersToForwardTo.length > 0)
+          {
+            //  Forward to specified users
+            for (const user of usersToForwardTo) {
+              const { channel } = await chat.createDirectConversation({user: user})
+              forwardMessage.forward(channel.id)
+              newActiveChannel = channel
+            }
+            refreshGroups('direct')
+            if (newActiveChannel) {setActiveChannel(newActiveChannel)}
+        }
+        }}
+        forwardMessageModalVisible={forwardMessageModalVisible}
+        setForwardMessageModalVisible={setForwardMessageModalVisible}
+      />
 
       {embeddedDemoConfig == null && (
         <Header
@@ -1217,7 +1269,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               appConfiguration.edit_channel_details) ||
             changeChatNameModalVisible ||
             manageMembersModalVisible ||
-            reportMessageModalVisible) &&
+            reportMessageModalVisible ||
+            forwardMessageModalVisible) &&
           'blur-sm opacity-40'
         }`}
       >

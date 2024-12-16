@@ -349,6 +349,9 @@ export default function Message ({
                   {message.actions && message.actions.edited && (
                     <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
                   )}
+                  {message.meta && message.meta.originalChannelId && (
+                    <span className='text-xs absolute top-0 mt-0.5'>Forwarded Message</span>
+                  )}
                   {message.files &&
                     message.files.length > 0 &&
                     appConfiguration?.message_send_file == true && (
@@ -467,7 +470,9 @@ export default function Message ({
                 }
                 forwardMessageClick={
                   appConfiguration?.message_forward == true
-                    ? () => console.log('forward')
+                    ? () => {
+                      messageActionHandler(MessageActionsTypes.FORWARD, message)
+                    }
                     : null
                 }
                 editMessageClick={
@@ -543,7 +548,9 @@ export default function Message ({
               }
               forwardMessageClick={
                 appConfiguration?.message_forward == true
-                  ? () => console.log('forward')
+                  ? () => {
+                    messageActionHandler(MessageActionsTypes.FORWARD, message)
+                  }
                   : null
               }
               editMessageClick={

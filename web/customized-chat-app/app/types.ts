@@ -15,6 +15,7 @@ export enum MessageActionsTypes {
   REPORT = "report",
   EDIT = "edit",
   DELETE = "delete",
+  FORWARD = "forward",
 }
 
 export enum ChatHeaderActionIcon {
@@ -94,4 +95,32 @@ export function useBreakpoints() {
   return breakpoints;
 }
 
+
+  export function giveUserAvatarUrl (userArray, currentUserId) {
+    if (!userArray) {
+      return '/avatars/placeholder.png'
+    }
+    return userArray?.find(user => user.id !== currentUserId)?.profileUrl
+      ? userArray?.find(user => user.id !== currentUserId)?.profileUrl
+      : '/avatars/placeholder.png'
+  }
+
+  export function giveGroupAvatarUrl (currentUserProfileUrl) {
+    return currentUserProfileUrl ?? '/avatars/placeholder.png'
+  }
+
+  export function givePublicAvatarUrl (channel) {
+    return channel?.custom?.profileUrl ?? '/avatars/placeholder.png'
+  }
+
+  export function giveUserName (searchArray, currentUserId) {
+    return (
+      searchArray?.find(item => item.id !== currentUserId)?.name ??
+      'User Left Conversation'
+    )
+  }
+
+  export function findIndex (searchArray, idToSearchFor) {
+    return searchArray.findIndex(item => item.id == idToSearchFor)
+  }
 
