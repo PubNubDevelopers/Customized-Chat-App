@@ -367,7 +367,7 @@ export default function ChatSelectionMenu ({
             expanded={groupsExpanded}
             expandCollapse={() => setGroupsExpanded(!groupsExpanded)}
             actionIcon={ChatHeaderActionIcon.ADD}
-            action={setCreatingNewMessage}
+            action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
           />
         )}
         {showGroupChat && groupsExpanded && (
@@ -406,7 +406,7 @@ export default function ChatSelectionMenu ({
               setDirectMessagesExpanded(!directMessagesExpanded)
             }
             actionIcon={ChatHeaderActionIcon.ADD}
-            action={setCreatingNewMessage}
+            action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
           />
         )}
         {showGroupChat && directMessagesExpanded && (
