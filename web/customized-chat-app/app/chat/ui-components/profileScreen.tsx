@@ -125,7 +125,7 @@ export default function ProfileScreen ({
 
         <div className={`${isMe ? 'hidden' : 'flex flex-col py-2 px-4'}`}>
           <div className='text-sm text-white'>Last seen online</div>
-          <div className='text-lg text-white font-semibold'>{getLastSeenOnline(user)}</div>
+          <div className='text-lg text-white font-semibold' suppressHydrationWarning>{getLastSeenOnline(user)}</div>
         </div>
 
         <div className='flex flex-col py-2 px-4'>
@@ -137,7 +137,7 @@ export default function ProfileScreen ({
 
         <div className='flex flex-col py-2 px-4'>
           <div className='text-sm text-white'>Local Time</div>
-          <div className='text-lg text-white font-semibold'>
+          <div className='text-lg text-white font-semibold' suppressHydrationWarning>
             {getLocalTime(user?.custom?.timezone)}
           </div>
         </div>

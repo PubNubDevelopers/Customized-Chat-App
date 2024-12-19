@@ -378,7 +378,7 @@ export default function Message ({
               )}
               {!isMessageDeleted(message) && (
                 <div className='flex flex-col items-start w-full flex-wrap'>
-                  <div className='flex flex-row'>
+                  <div className='flex flex-row flex-wrap'>
                   {message.actions && message.actions.edited && (
                     <span className='text-navy500 text-sm mr-1'>(edited)</span>
                   )}
