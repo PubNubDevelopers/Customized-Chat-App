@@ -130,7 +130,7 @@ export default function MessageListThread ({
               messageActionHandler={() => {}}
               message={activeThreadMessage}
               currentUserId={currentUser.id}
-              appConfiguration={null}
+              appConfiguration={appConfiguration}
             />
           )}
           {/* THREAD BUBBLES */}
@@ -157,7 +157,7 @@ export default function MessageListThread ({
                 messageActionHandler={() => {}}
                 message={message}
                 currentUserId={currentUser.id}
-                appConfiguration={null}
+                appConfiguration={appConfiguration}
               />
             )
           })}
@@ -169,9 +169,9 @@ export default function MessageListThread ({
             replyInThread={true}
             quotedMessage={null}
             quotedMessageSender={''}
-            //creatingNewMessage={false}
             currentlyEditingMessage={null}
             setCurrentlyEditingMessage={() => {}}
+            activeChannelRestrictions={null}
             embeddedDemoConfig={embeddedDemoConfig}
             appConfiguration={appConfiguration}
           />

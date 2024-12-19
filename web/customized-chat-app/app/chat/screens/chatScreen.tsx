@@ -38,7 +38,8 @@ import {
   ToastType,
   ChatEventTypes,
   UnreadMessagesOnChannel,
-  PresenceIcon
+  PresenceIcon,
+  Restriction
 } from '../../types'
 import { buildConfig } from '../../configuration'
 
@@ -53,6 +54,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [selectedEmoji, setSelectedEmoji] = useState('')
+  const [selectedUserProfile, setSelectedUserProfile] = useState<User | null>(
+    null
+  )
 
   const [showThread, setShowThread] = useState(false)
   const [profileScreenVisible, setProfileScreenVisible] = useState(false)
@@ -129,19 +133,28 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     useState<ThreadChannel | null>(null)
   const [activeThreadMessage, setActiveThreadMessage] =
     useState<pnMessage | null>(null)
+  const [activeChannelRestrictions, setActiveChannelRestrictions] =
+    useState<Restriction | null>(null)
 
   function updateUnreadMessagesCounts () {
-    chat?.getUnreadMessagesCounts({}).then(result => {
-      const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-      result.forEach((element, index) => {
-        const newUnreadMessage: UnreadMessagesOnChannel = {
-          channel: element.channel,
-          count: element.count
-        }
-        unreadMessagesOnChannel.push(newUnreadMessage)
-      })
-      setUnreadMessages(unreadMessagesOnChannel)
-    })
+    chat?.getUnreadMessagesCounts({}).then(
+      result => {
+        const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
+        result.forEach((element, index) => {
+          const newUnreadMessage: UnreadMessagesOnChannel = {
+            channel: element.channel,
+            count: element.count
+          }
+          unreadMessagesOnChannel.push(newUnreadMessage)
+        })
+        setUnreadMessages(unreadMessagesOnChannel)
+      },
+      error => {
+        console.warn(
+          'Unable to enable unread messages because you do not have "Message Persistence" enabled on your keyset'
+        )
+      }
+    )
   }
 
   useEffect(() => {
@@ -237,72 +250,82 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   useEffect(() => {
     //  Configuration is available, initialize PubNub
     async function init () {
-      const localChat = await Chat.init({
-        publishKey: appConfiguration.publishKey,
-        subscribeKey: appConfiguration.subscribeKey,
-        userId: userId,
-        typingTimeout: 5000,
-        storeUserActivityTimestamps: true,
-        storeUserActivityInterval: 60000 //300000
-      })
-      setChat(localChat)
-      setCurrentUser(localChat.currentUser)
-      if (localChat.currentUser.name) {
-        setName(localChat.currentUser.name)
-      }
-      if (localChat.currentUser.profileUrl) {
-        setProfileUrl(localChat.currentUser.profileUrl)
-      }
-
-      //  Retrieve all users
-      const localAllUsers = await localChat.getUsers()
-      setAllUsers(
-        localAllUsers.users.filter(
-          user =>
-            user.id != 'admin-config' && user.id != 'PUBNUB_INTERNAL_MODERATOR'
-        )
-      )
-
-      //  Join public channels
-      const localPublicChannels = await localChat.getChannels({
-        filter: `type == 'public'`
-      })
-      if (localPublicChannels) {
-        const currentPublicMemberships =
-          await localChat.currentUser.getMemberships({
-            filter: "channel.type == 'public'"
-          })
-        if (
-          currentPublicMemberships &&
-          currentPublicMemberships.total != null &&
-          localPublicChannels.total &&
-          currentPublicMemberships.total < localPublicChannels.total
-        ) {
-          //  There are public channels that we are not a member of, join them all
-          //const localPublicChannelMemberships = []
-          const localPublicChannelMemberships =
-            currentPublicMemberships.memberships
-          for (const publicChannel of localPublicChannels.channels) {
-            if (
-              !currentPublicMemberships.memberships.find(
-                membership => membership.channel.id == publicChannel.id
-              )
-            ) {
-              //  No current membership, join channel
-              const newMembership = await publicChannel.join(message => {
-                //  I have a message listener elsewhere for consistency with private and direct chats
-              })
-              localPublicChannelMemberships.push(newMembership.membership)
-            }
-          }
-          setPublicChannelsMemberships(localPublicChannelMemberships)
-        } else {
-          setPublicChannelsMemberships(currentPublicMemberships.memberships)
+      try {
+        const localChat = await Chat.init({
+          publishKey: appConfiguration.publishKey,
+          subscribeKey: appConfiguration.subscribeKey,
+          userId: userId,
+          typingTimeout: 5000,
+          storeUserActivityTimestamps: true,
+          storeUserActivityInterval: 60000 //300000
+        })
+        setChat(localChat)
+        setCurrentUser(localChat.currentUser)
+        if (localChat.currentUser.name) {
+          setName(localChat.currentUser.name)
         }
-        setPublicChannels(localPublicChannels.channels)
-        setActiveChannel(localPublicChannels.channels[0])
+        if (localChat.currentUser.profileUrl) {
+          setProfileUrl(localChat.currentUser.profileUrl)
+        }
+
+        //  Retrieve all users
+        const localAllUsers = await localChat.getUsers()
+        setAllUsers(
+          localAllUsers.users.filter(
+            user =>
+              user.id != 'admin-config' &&
+              user.id != 'PUBNUB_INTERNAL_MODERATOR'
+          )
+        )
+
+        //  Join public channels
+        console.log('joining public channels')
+        const localPublicChannels = await localChat.getChannels({
+          filter: `type == 'public'`
+        })
+        console.log('got public channels')
+        console.log(localPublicChannels)
+        if (localPublicChannels) {
+          const currentPublicMemberships =
+            await localChat.currentUser.getMemberships({
+              filter: "channel.type == 'public'"
+            })
+          if (
+            currentPublicMemberships &&
+            currentPublicMemberships.total != null &&
+            localPublicChannels.total &&
+            currentPublicMemberships.total < localPublicChannels.total
+          ) {
+            //  There are public channels that we are not a member of, join them all
+            //const localPublicChannelMemberships = []
+            const localPublicChannelMemberships =
+              currentPublicMemberships.memberships
+            for (const publicChannel of localPublicChannels.channels) {
+              if (
+                !currentPublicMemberships.memberships.find(
+                  membership => membership.channel.id == publicChannel.id
+                )
+              ) {
+                //  No current membership, join channel
+                const newMembership = await publicChannel.join(message => {
+                  //  I have a message listener elsewhere for consistency with private and direct chats
+                })
+                localPublicChannelMemberships.push(newMembership.membership)
+              }
+            }
+            setPublicChannelsMemberships(localPublicChannelMemberships)
+          } else {
+            setPublicChannelsMemberships(currentPublicMemberships.memberships)
+          }
+          setPublicChannels(localPublicChannels.channels)
+          setActiveChannel(localPublicChannels.channels[0])
+        }
+        setLoaded(true)
+      } catch {
+        setLoadMessage(
+          "You need to enable 'App Context' on your keyset.  Please also choose a bucket region close to you, enable all events, allow retrieval of all Metadata events, and disable referential integrity.  After enabling, wait a few seconds for it to apply before refreshing this page."
+        )
       }
-      setLoaded(true)
     }
 
     if (chat) return
@@ -398,17 +421,24 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     if (appConfiguration?.message_unread_count == false) return //  message counts turned off at the app level
 
     function updateUnreadMessagesCounts () {
-      chat?.getUnreadMessagesCounts({}).then(result => {
-        const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-        result.forEach((element, index) => {
-          const newUnreadMessage: UnreadMessagesOnChannel = {
-            channel: element.channel,
-            count: element.count
-          }
-          unreadMessagesOnChannel.push(newUnreadMessage)
-        })
-        setUnreadMessages(unreadMessagesOnChannel)
-      })
+      chat?.getUnreadMessagesCounts({}).then(
+        result => {
+          const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
+          result.forEach((element, index) => {
+            const newUnreadMessage: UnreadMessagesOnChannel = {
+              channel: element.channel,
+              count: element.count
+            }
+            unreadMessagesOnChannel.push(newUnreadMessage)
+          })
+          setUnreadMessages(unreadMessagesOnChannel)
+        },
+        error => {
+          console.warn(
+            'Unable to enable unread messages because you do not have "Message Persistence" enabled on your keyset'
+          )
+        }
+      )
     }
 
     const publicHandlers: (() => void)[] = []
@@ -546,6 +576,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         })
     })
 
+    updateActiveChannelRestrictions()
+
     //  Only register typing indicators for non-public channels and if this app has typing indicators enabled
     if (activeChannel.type == 'public') return
     if (appConfiguration?.typing_indicator == false) return
@@ -556,6 +588,19 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chat, activeChannel])
+
+  function updateActiveChannelRestrictions () {
+    //  Update the restrictions of the currently active channel whenever that changes
+    if (!activeChannel || !chat) return
+    activeChannel.getUserRestrictions(chat.currentUser).then(restrictions => {
+      const tempRestrictions: Restriction = {
+        ban: restrictions.ban,
+        mute: restrictions.mute,
+        reason: restrictions.reason
+      }
+      setActiveChannelRestrictions(tempRestrictions)
+    })
+  }
 
   useEffect(() => {
     //  Get updates on the current user's name and profile URL
@@ -645,7 +690,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         updatedUser => updatedUser.id == user.id
       )
       //  I test here whether the updated values are null, this was to accommodate a bug in an earlier
-      //  version of the Chat SDK which has since been fixed (in 0.9.1)
+      //  version of the Chat SDK which has since been fixed (in 0.9.x)
+      //  If a field is NOT listed here this demo will not update that information in real time,
+      //  you can reload the browser or log in / out to get the latest values for any fields not
+      //  updated in real time.
       if (updatedUser.name && updatedUser.name != user.name) {
         madeUpdates = true
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -655,6 +703,21 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         madeUpdates = true
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(user as any).profileUrl = updatedUser.profileUrl
+      }
+      if (updatedUser.email && updatedUser.email != user.email) {
+        madeUpdates = true
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(user as any).email = updatedUser.email
+      }
+      if (
+        updatedUser.custom &&
+        updatedUser.custom.currentMood &&
+        user.custom &&
+        updatedUser.custom.currentMood != user.custom?.currentMood
+      ) {
+        madeUpdates = true
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ;(user as any).custom.currentMood = updatedUser.custom.currentMood
       }
       if (updatedUser.lastActiveTimestamp != user.lastActiveTimestamp) {
         //  User activity has changed (do not update our own user)
@@ -708,7 +771,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       channel: chat.currentUser.id,
       type: 'moderation',
       callback: async evt => {
-        console.log(appConfiguration?.handle_banned)
         if (appConfiguration?.handle_banned == true) {
           let moderationMessage = ''
           let notificationSeverity: ToastType = ToastType.INFO
@@ -722,12 +784,15 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
             moderationMessage = `Your previous restrictions have been LIFTED by the administrator`
             notificationSeverity = ToastType.CHECK
           }
-          showUserMessage(
-            'Moderation Event:',
-            moderationMessage,
-            'https://www.pubnub.com/how-to/monitor-and-moderate-conversations-with-bizops-workspace/',
-            notificationSeverity
-          )
+          //  Rather than show a pop-up each time, the UI now updates to disable the ability
+          //  to send messages (or view messages if banned)
+          updateActiveChannelRestrictions()
+          //showUserMessage(
+          //  'Moderation Event:',
+          //  moderationMessage,
+          //  'https://www.pubnub.com/how-to/monitor-and-moderate-conversations-with-bizops-workspace/',
+          //  notificationSeverity
+          //)
         }
       }
     })
@@ -821,7 +886,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       const tempDirectUsers: User[][] = []
       const directChannelMemberships = await chat.currentUser.getMemberships({
         filter: "channel.type == 'direct'",
-        sort: { updated: 'desc' }
+        sort: { updated: 'desc' } 
       })
       if (
         directChannelMemberships &&
@@ -961,6 +1026,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   }
 
   function logout () {
+    //  On mobile: you should unsubscribe from any Push notifications on logout.
     const configuration = searchParams.get('configuration')
     if (configuration) {
       router.replace(`/?configuration=${configuration}`)
@@ -1055,7 +1121,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               priority
             />
           </div>
-          <div className='text-2xl select-none'>{loadMessage}</div>
+          <div className='text-2xl select-none m-5'>{loadMessage}</div>
         </div>
       </main>
     )
@@ -1071,8 +1137,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         profileScreenVisible={profileScreenVisible}
         setProfileScreenVisible={setProfileScreenVisible}
         changeUserNameScreenVisible={changeUserNameModalVisible}
-        name={name}
-        profileUrl={profileUrl}
+        user={selectedUserProfile}
+        isMe={chat?.currentUser.id == selectedUserProfile?.id}
         logout={() => logout()}
         changeName={() => {
           setChangeUserNameModalVisible(true)
@@ -1107,7 +1173,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           name={name}
           activeChannel={activeChannel}
           modalType={ChatNameModals.CHANNEL}
-          showUserMessage={showUserMessage}
           saveAction={async newName => {
             await activeChannel?.update({
               name: newName
@@ -1155,7 +1220,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               )
             }
           }}
-          showUserMessage={showUserMessage}
           changeNameModalVisible={changeUserNameModalVisible}
           setChangeNameModalVisible={setChangeUserNameModalVisible}
         />
@@ -1184,35 +1248,34 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         chat={chat}
         message={forwardMessage}
         currentUserProfileUrl={profileUrl}
-        currentUserId={
-          chat?.currentUser.id
-        }
+        currentUserId={chat?.currentUser.id}
         publicChannels={publicChannels}
         privateGroups={privateGroups}
         directChats={directChats}
         directChatsUsers={directChatsUsers}
         forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
           let newActiveChannel
-          if (forwardMessage && channelsToForwardTo.length > 0)
-          {
+          if (forwardMessage && channelsToForwardTo.length > 0) {
             //  Forward to specified channels
             for (const channel of channelsToForwardTo) {
               await forwardMessage.forward(channel.id)
               newActiveChannel = channel
             }
-
           }
-          if (chat && forwardMessage && usersToForwardTo.length > 0)
-          {
+          if (chat && forwardMessage && usersToForwardTo.length > 0) {
             //  Forward to specified users
             for (const user of usersToForwardTo) {
-              const { channel } = await chat.createDirectConversation({user: user})
+              const { channel } = await chat.createDirectConversation({
+                user: user
+              })
               forwardMessage.forward(channel.id)
               newActiveChannel = channel
             }
             refreshGroups('direct')
-            if (newActiveChannel) {setActiveChannel(newActiveChannel)}
-        }
+            if (newActiveChannel) {
+              setActiveChannel(newActiveChannel)
+            }
+          }
         }}
         forwardMessageModalVisible={forwardMessageModalVisible}
         setForwardMessageModalVisible={setForwardMessageModalVisible}
@@ -1221,7 +1284,12 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       {embeddedDemoConfig == null && (
         <Header
           currentUser={currentUser}
-          setProfileScreenVisible={setProfileScreenVisible}
+          userProfileClicked={() => {
+            if (chat) {
+              setSelectedUserProfile(chat.currentUser)
+              setProfileScreenVisible(true)
+            }
+          }}
           setCreatingNewMessage={setCreatingNewMessage}
           appConfiguration={appConfiguration}
         />
@@ -1356,7 +1424,18 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 }
                 setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
                 showUserMessage={showUserMessage}
+                showUserProfile={senderId => {
+                  if (embeddedDemoConfig) return
+                  const selectedUser = allUsers?.find(
+                    user => user.id == senderId
+                  )
+                  if (selectedUser) {
+                    setSelectedUserProfile(selectedUser)
+                    setProfileScreenVisible(true)
+                  }
+                }}
                 allUsers={allUsers}
+                activeChannelRestrictions={activeChannelRestrictions}
                 embeddedDemoConfig={embeddedDemoConfig}
                 appConfiguration={appConfiguration}
               />
@@ -1395,6 +1474,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 setSelectedEmoji={setSelectedEmoji}
                 currentlyEditingMessage={currentlyEditingMessage}
                 setCurrentlyEditingMessage={setCurrentlyEditingMessage}
+                activeChannelRestrictions={activeChannelRestrictions}
                 embeddedDemoConfig={embeddedDemoConfig}
                 appConfiguration={appConfiguration}
               />

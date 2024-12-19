@@ -46,6 +46,12 @@ export enum ChatEventTypes {
   JOINED = 3, //  Notify others in a group that you have joined as a new member (for public channels)
 }
 
+export type Restriction = {
+  ban: boolean;
+  mute: boolean;
+  reason: string | number | boolean | undefined;
+};
+
 //  Credit: https://gist.github.com/gabrielmlinassi/234519eacaf73f75812b48ea3e94ee6e
 //  Used to only minimze the chat selection pane if we are running on a small screen
 import { useState, useEffect, useLayoutEffect } from "react";
@@ -68,7 +74,6 @@ export function useMediaQuery(query: string) {
   return matches;
 }
 
-
 // -------------------------
 // useBreakpoints
 
@@ -82,7 +87,7 @@ export function useBreakpoints() {
     isLg: useMediaQuery("(min-width: 1025px)"),
     active: "SSR",
   };
-  
+
   useLayoutEffect(() => {
     if (typeof window !== "undefined") setIsClient(true);
   }, []);
@@ -95,32 +100,30 @@ export function useBreakpoints() {
   return breakpoints;
 }
 
-
-  export function giveUserAvatarUrl (userArray, currentUserId) {
-    if (!userArray) {
-      return '/avatars/placeholder.png'
-    }
-    return userArray?.find(user => user.id !== currentUserId)?.profileUrl
-      ? userArray?.find(user => user.id !== currentUserId)?.profileUrl
-      : '/avatars/placeholder.png'
+export function giveUserAvatarUrl(userArray, currentUserId) {
+  if (!userArray) {
+    return "/avatars/placeholder.png";
   }
+  return userArray?.find((user) => user.id !== currentUserId)?.profileUrl
+    ? userArray?.find((user) => user.id !== currentUserId)?.profileUrl
+    : "/avatars/placeholder.png";
+}
 
-  export function giveGroupAvatarUrl (currentUserProfileUrl) {
-    return currentUserProfileUrl ?? '/avatars/placeholder.png'
-  }
+export function giveGroupAvatarUrl(currentUserProfileUrl) {
+  return currentUserProfileUrl ?? "/avatars/placeholder.png";
+}
 
-  export function givePublicAvatarUrl (channel) {
-    return channel?.custom?.profileUrl ?? '/avatars/placeholder.png'
-  }
+export function givePublicAvatarUrl(channel) {
+  return channel?.custom?.profileUrl ?? "/avatars/placeholder.png";
+}
 
-  export function giveUserName (searchArray, currentUserId) {
-    return (
-      searchArray?.find(item => item.id !== currentUserId)?.name ??
-      'User Left Conversation'
-    )
-  }
+export function giveUserName(searchArray, currentUserId) {
+  return (
+    searchArray?.find((item) => item.id !== currentUserId)?.name ??
+    "User Left Conversation"
+  );
+}
 
-  export function findIndex (searchArray, idToSearchFor) {
-    return searchArray.findIndex(item => item.id == idToSearchFor)
-  }
-
+export function findIndex(searchArray, idToSearchFor) {
+  return searchArray.findIndex((item) => item.id == idToSearchFor);
+}

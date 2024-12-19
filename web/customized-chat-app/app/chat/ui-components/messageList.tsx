@@ -7,7 +7,6 @@ import { PresenceIcon } from '../../types'
 
 import { useState, useEffect, useRef } from 'react'
 import {
-  //  todo I'm missing some logic here surely, such as rendering message parts
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   Channel,
   Message as pnMessage,
@@ -34,6 +33,8 @@ export default function MessageList ({
   //setShowThread,
   allUsers,
   showUserMessage,
+  showUserProfile,
+  activeChannelRestrictions,
   embeddedDemoConfig,
   appConfiguration
 }) {
@@ -79,6 +80,7 @@ export default function MessageList ({
         activeChannel
           .getHistory({ count: 20 })
           .then(async historicalMessagesObj => {
+            //console.log(historicalMessagesObj)
             //  Run through the historical messages and set the most recently received one (that we were not the sender of) as read
             if (historicalMessagesObj.messages) {
               if (historicalMessagesObj.messages.length == 0) {
@@ -100,6 +102,8 @@ export default function MessageList ({
                 }
               }
             }
+          }, () => {
+            setLoadingMessage("Error: You do not have 'Message Persistence' enabled on your keyset.")
           })
       }
     }
@@ -161,8 +165,9 @@ export default function MessageList ({
 
   useEffect(() => {
     if (!messageListRef.current) return
+    //console.log(messageListRef.current.scrollHeight - messageListRef.current.scrollTop)
     if (
-      messageListRef.current.scrollTop != 0 && 
+      messageListRef.current.scrollTop != 0 &&
       messageListRef.current.scrollHeight - messageListRef.current.scrollTop >
         900
     ) {
@@ -208,7 +213,7 @@ export default function MessageList ({
           <div className='text-2xl'>
             {loaded
               ? 'Please create a new message / group or choose a channel'
-              : 'Loading...'}
+              : 'Logging In...'}
           </div>
         </div>
       )
@@ -368,6 +373,21 @@ export default function MessageList ({
             {loadingMessage}
           </div>
         )}
+        {activeChannelRestrictions?.ban == true && (
+          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
+            <Image
+              src='/icons/chat-assets/do_not_disturb.svg'
+              alt='Banned'
+              className=''
+              width={100}
+              height={100}
+              priority
+            />
+            You have been Banned from this Conversation{' '}
+            {activeChannelRestrictions?.reason &&
+              `(${activeChannelRestrictions.reason})`}
+          </div>
+        )}
         {/* Show the pinned message first if there is one */}
         {activeChannelPinnedMessage &&
           !activeChannelPinnedMessage.deleted &&
@@ -403,7 +423,7 @@ export default function MessageList ({
               }
               showReadIndicator={false}
               sender={
-                activeChannelPinnedMessage.userId === currentUser?.id
+                activeChannelPinnedMessage.userId === 'PUBNUB_INTERNAL_MODERATOR' ? 'Moderator' : activeChannelPinnedMessage.userId === currentUser?.id
                   ? currentUser?.name
                   : allUsers?.find(
                       user => user.id === activeChannelPinnedMessage.userId
@@ -416,6 +436,7 @@ export default function MessageList ({
               message={activeChannelPinnedMessage}
               currentUserId={currentUser?.id}
               showUserMessage={showUserMessage}
+              showUserProfile={showUserProfile}
               appConfiguration={appConfiguration}
             />
           )}
@@ -440,6 +461,7 @@ export default function MessageList ({
                 message={message.message}
                 currentUserId={message.currentUserId}
                 showUserMessage={showUserMessage}
+                showUserProfile={showUserProfile}
                 embeddedDemoConfig={embeddedDemoConfig}
                 forceShowActions={message.forceShowActions}
                 appConfiguration={appConfiguration}
@@ -476,48 +498,55 @@ export default function MessageList ({
           )
         })}
 
-        {messages.map(message => {
-          return (
-            <Message
-              key={message.timetoken}
-              received={currentUser.id !== message.userId}
-              avatarUrl={
-                message.userId === currentUser.id
-                  ? currentUser.profileUrl
-                  : allUsers?.find(user => user.id === message.userId)
-                      ?.profileUrl
-              }
-              isOnline={
-                message.userId === currentUser.id
-                  ? currentUser.active
-                  : groupUsers?.find(user => user.id === message.userId)?.active
-              }
-              readReceipts={readReceipts}
-              quotedMessageSender={
-                message.quotedMessage &&
-                (message.quotedMessage.userId === currentUser.id
-                  ? currentUser.name
-                  : allUsers?.find(
-                      user => user.id === message.quotedMessage.userId
-                    )?.name)
-              }
-              showReadIndicator={activeChannel.type !== 'public'}
-              sender={
-                message.userId === currentUser.id
-                  ? currentUser.name
-                  : allUsers?.find(user => user.id === message.userId)?.name
-              }
-              pinned={false}
-              messageActionHandler={(action, vars) =>
-                messageActionHandler(action, vars)
-              }
-              message={message}
-              currentUserId={currentUser.id}
-              showUserMessage={showUserMessage}
-              appConfiguration={appConfiguration}
-            />
-          )
-        })}
+        {!(activeChannelRestrictions?.ban == true) &&
+          messages.map(message => {
+            return (
+              <Message
+                key={message.timetoken}
+                received={currentUser.id !== message.userId}
+                avatarUrl={
+                  message.userId === currentUser.id
+                    ? currentUser.profileUrl
+                    : allUsers?.find(user => user.id === message.userId)
+                        ?.profileUrl
+                }
+                isOnline={
+                  message.userId === currentUser.id
+                    ? currentUser.active
+                    : groupUsers?.find(user => user.id === message.userId)
+                        ?.active
+                }
+                readReceipts={readReceipts}
+                quotedMessageSender={
+                  message.quotedMessage &&
+                  (message.quotedMessage.userId === currentUser.id
+                    ? currentUser.name
+                    : allUsers?.find(
+                        user => user.id === message.quotedMessage.userId
+                      )?.name)
+                }
+                showReadIndicator={activeChannel.type !== 'public'}
+                sender={
+                  message.userId === 'PUBNUB_INTERNAL_MODERATOR' ? 'Moderator' : message.userId === currentUser.id
+                    ? currentUser.name
+                    : allUsers?.find(user => user.id === message.userId)?.name
+                }
+                pinned={false}
+                messageActionHandler={(action, vars) =>
+                  messageActionHandler(action, vars)
+                }
+                message={message}
+                currentUserId={currentUser.id}
+                showUserMessage={showUserMessage}
+                showUserProfile={showUserProfile}
+                mutedOrBanned={
+                  activeChannelRestrictions?.mute ||
+                  activeChannelRestrictions?.ban
+                }
+                appConfiguration={appConfiguration}
+              />
+            )
+          })}
       </div>
     </div>
   )

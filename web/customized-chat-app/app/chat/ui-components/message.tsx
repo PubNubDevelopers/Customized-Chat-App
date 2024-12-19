@@ -27,6 +27,8 @@ export default function Message ({
   currentUserId,
   isOnline = -1,
   showUserMessage = (a, b, c, d) => {},
+  showUserProfile = senderId => {},
+  mutedOrBanned = false,
   embeddedDemoConfig = null,
   forceShowActions = false,
   appConfiguration
@@ -137,12 +139,9 @@ export default function Message ({
     [currentUserId]
   )
 
-  const isMessageDeleted = useCallback(
-    message => {
-      return message.actions?.deleted?.deleted?.length > 0
-    },
-    []
-  )
+  const isMessageDeleted = useCallback(message => {
+    return message.actions?.deleted?.deleted?.length > 0
+  }, [])
 
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
@@ -218,6 +217,41 @@ export default function Message ({
     [appConfiguration?.mention_user, appConfiguration?.channel_references]
   )
 
+  const renderFiles = useCallback(files => {
+    return files.map((file, index) => (
+      <div className='flex flex-col p-1' key={index}>
+        {file.type.indexOf('image') == 0 && (
+          <div
+            className='cursor-pointer select-none'
+            onClick={() => {
+              openLink(`${file.url}`)
+            }}
+          >
+            <Image
+              src={`${file.url}`}
+              alt={`${file.name}`}
+              width={0}
+              height={0}
+              sizes={"100vw"}
+              className={"cursor-pointer w-[250px] h-auto"}
+            />
+            <div className='text-xs'>{file.name} (click to enlarge)</div>
+          </div>
+        )}
+        {file.type.indexOf('image') == -1 && (
+          <div
+            className='text-sm cursor-pointer'
+            onClick={() => {
+              openLink(`${file.url}`)
+            }}
+          >
+            Attached file: {file.name}
+          </div>
+        )}
+      </div>
+    ))
+  }, [])
+
   return (
     <div className='flex flex-col w-full'>
       <div
@@ -226,7 +260,12 @@ export default function Message ({
         } ${!received && !inThread && 'self-end'}`}
       >
         {received && !inThread && !inPinned && (
-          <div className='min-w-11'>
+          <div
+            className='min-w-11 cursor-pointer'
+            onClick={() => {
+              showUserProfile(message.userId)
+            }}
+          >
             {!inThread && (
               <Avatar
                 present={isOnline}
@@ -252,7 +291,10 @@ export default function Message ({
             )}
             {(inThread || inPinned || received) && (
               <div
-                className={`${roboto.className} text-sm font-normal flex text-neutral-600`}
+                className={`${roboto.className} text-sm font-normal flex text-neutral-600 cursor-pointer select-none`}
+                onClick={() => {
+                  showUserProfile(message.userId)
+                }}
               >
                 {sender}
                 {(inThread || inPinned) && !received && ' (you)'}
@@ -335,34 +377,33 @@ export default function Message ({
                 </div>
               )}
               {!isMessageDeleted(message) && (
-                <div className='flex flex-row items-center w-full flex-wrap'>
+                <div className='flex flex-col items-start w-full flex-wrap'>
+                  <div className='flex flex-row'>
+                  {message.actions && message.actions.edited && (
+                    <span className='text-navy500 text-sm mr-1'>(edited)</span>
+                  )}
                   {(message.content.text ||
                     message.content.plainLink ||
                     message.content.textLink ||
                     message.content.mention ||
                     message.content.channelReference) &&
                     message
-                      .getMessageElements()
+                      ?.getMessageElements()
                       .map((msgPart, index) =>
                         renderMessagePart(msgPart, index)
                       )}
-                  {message.actions && message.actions.edited && (
-                    <span className='text-navy500'>&nbsp;&nbsp;(edited)</span>
-                  )}
+                  {/* If the message was blank and subsequently edited */}
+                  {!message.content.text && message.text && message.text}
+                  </div>
                   {message.meta && message.meta.originalChannelId && (
-                    <span className='text-xs absolute top-0 mt-0.5'>Forwarded Message</span>
+                    <span className='text-xs absolute top-0 mt-0.5'>
+                      Forwarded Message
+                    </span>
                   )}
                   {message.files &&
                     message.files.length > 0 &&
-                    appConfiguration?.message_send_file == true && (
-                      <Image
-                        src={`${message.files[0].url}`}
-                        alt='PubNub Logo'
-                        className='absolute right-2 top-2'
-                        width={25}
-                        height={25}
-                      />
-                    )}
+                    appConfiguration?.message_send_file == true &&
+                    renderFiles(message.files)}
                 </div>
               )}
             </div>
@@ -428,7 +469,7 @@ export default function Message ({
                 </div>
               )}
             {/* actions go here for received */}
-            {received && !inThread && !inPinned && !isMessageDeleted(message) && (
+            {received && !inThread && !inPinned && !isMessageDeleted(message) && !mutedOrBanned && (
               <MessageActions
                 received={received}
                 actionsShown={actionsShown}
@@ -471,8 +512,11 @@ export default function Message ({
                 forwardMessageClick={
                   appConfiguration?.message_forward == true
                     ? () => {
-                      messageActionHandler(MessageActionsTypes.FORWARD, message)
-                    }
+                        messageActionHandler(
+                          MessageActionsTypes.FORWARD,
+                          message
+                        )
+                      }
                     : null
                 }
                 editMessageClick={
@@ -506,7 +550,7 @@ export default function Message ({
             )}
           </div>
           {/* actions go here for sent */}
-          {!received && !inThread && !inPinned && !isMessageDeleted(message) && (
+          {!received && !inThread && !inPinned && !isMessageDeleted(message) && !mutedOrBanned && (
             <MessageActions
               received={received}
               actionsShown={actionsShown}
@@ -549,8 +593,8 @@ export default function Message ({
               forwardMessageClick={
                 appConfiguration?.message_forward == true
                   ? () => {
-                    messageActionHandler(MessageActionsTypes.FORWARD, message)
-                  }
+                      messageActionHandler(MessageActionsTypes.FORWARD, message)
+                    }
                   : null
               }
               editMessageClick={

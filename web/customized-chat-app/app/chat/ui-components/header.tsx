@@ -4,7 +4,7 @@ import PersonPicker from './personPicker'
 
 export default function Header ({
   currentUser,
-  setProfileScreenVisible,
+  userProfileClicked,
   setCreatingNewMessage,
   appConfiguration
 }) {
@@ -50,7 +50,7 @@ export default function Header ({
         </div>
         <div
           className='cursor-pointer hover:bg-sky-900 hover:rounded-md min-w-12'
-          onClick={() => setProfileScreenVisible(true)}
+          onClick={() => userProfileClicked()}
         >
           <PersonPicker
             id={currentUser?.id}

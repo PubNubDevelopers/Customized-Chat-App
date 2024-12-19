@@ -2,7 +2,7 @@
 
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Chat } from '@pubnub/chat'
+import { Chat, User } from '@pubnub/chat'
 
 import { buildConfig } from './configuration'
 import { testUsers, testPublicChannels } from './data/testData'
@@ -21,7 +21,7 @@ export default function Home () {
   const [publicChannelsAvailable, setPublicChannelsAvailable] = useState(false) //  Only create public channel data on the keyset if enabled
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
-  const [loggingIn, setLoggingIn]     = useState(false)
+  const [loggingIn, setLoggingIn] = useState(false)
   const userArray = testUsers
 
   useEffect(() => {
@@ -76,21 +76,50 @@ export default function Home () {
           userId: 'admin-config'
         })
 
+        const testUser = await localChat.getUser('user-01')
+
+        if (!testUser) {
           //  Test user did not exist on keyset, create users and, optionally, channels
-          setLoadMessage('Populating keyset with users')
-          userArray.forEach(async user => {
-            let newUser = await localChat.getUser(user.id)
-            if (!newUser)
-            {
-              newUser = await localChat.createUser(user.id, {
-                name: user.name,
-                profileUrl: user.avatar
+          setLoadMessage(
+            'Populating keyset with users (this will take a few seconds)'
+          )
+
+          const promises = [] as Promise<User | null | undefined>[]
+          for (const testUser of userArray) {
+            const tempPromise = localChat
+              .getUser(testUser.id)
+              .then(returnedUser => {
+                if (!returnedUser) {
+                  return localChat.createUser(testUser.id, {
+                    name: testUser.name,
+                    profileUrl: testUser.avatar,
+                    email: testUser.email,
+                    externalId: testUser.externalId,
+                    type: 'member',
+                    custom: {
+                      location: testUser.location,
+                      jobTitle: testUser.jobTitle,
+                      currentMood: testUser.currentMood,
+                      socialHandle: testUser.socialHandle,
+                      timezone: testUser.timezone
+                    }
+                  })
+                }
               })
+            if (tempPromise) {
+              promises.push(tempPromise)
             }
-          })
+          }
+          await Promise.all(promises)
+        }
+
+        const testPublicChannel = await localChat.getChannel(
+          testPublicChannels[0].id
+        )
+        if (!testPublicChannel) {
           if (publicChannelsAvailable) {
             setLoadMessage('Creating Public Channel data')
-            testPublicChannels.forEach(async channel => {
+            for (const channel of testPublicChannels) {
               let newPublicChannel = await localChat.getChannel(channel.id)
               if (!newPublicChannel) {
                 newPublicChannel = await localChat.createPublicConversation({
@@ -103,15 +132,19 @@ export default function Home () {
                     }
                   }
                 })
+              } else {
+                break
               }
-            })
+            }
           }
-          setInitialized(true)
+        }
+
+        setInitialized(true)
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (error) {
+        console.log(error)
         const errorMsg =
           'Unable to initialize PubNub instance: Are the Pub/Sub keys correct?  Are all configuration options enabled (especially App Context)?'
-        //if (error instanceof Error) {errorMsg += `: ${error.message}`}
         console.warn(errorMsg)
         setLoadMessage(errorMsg)
       }
@@ -150,7 +183,7 @@ export default function Home () {
       </div>
         */}
       <div className='flex flex-col gap-3 m-2 items-center'>
-        {(!initialized || loggingIn) ? (
+        {!initialized || loggingIn ? (
           <div className='animate-spin'>
             <Image
               src='/icons/chat-assets/loading.png'
