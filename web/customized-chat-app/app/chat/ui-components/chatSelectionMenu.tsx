@@ -325,6 +325,7 @@ export default function ChatSelectionMenu ({
             }}
             actionIcon={ChatHeaderActionIcon.ADD}
             action={() => {
+              if (embeddedDemoConfig != null) return
               showUserMessage(
                 'Demo Limitation:',
                 'Although not supported by this demo, you can use the Chat SDK to create new Public Channels',
