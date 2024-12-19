@@ -146,7 +146,7 @@ export default function Message ({
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
       if (messagePart?.type === 'text') {
-        return <span key={index}>{messagePart.content.text}</span>
+        return <span key={index} className='self-center'>{messagePart.content.text}</span>
       }
       if (messagePart?.type === 'plainLink') {
         return (
