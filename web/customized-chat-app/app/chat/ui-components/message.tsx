@@ -139,9 +139,9 @@ export default function Message ({
     [currentUserId]
   )
 
-  const isMessageDeleted = useCallback(message => {
-    return message.actions?.deleted?.deleted?.length > 0
-  }, [])
+//  const isMessageDeleted = useCallback(message => {
+//    return message.actions?.deleted?.deleted?.length > 0
+//  }, [])
 
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
@@ -363,20 +363,20 @@ export default function Message ({
                   displayedWithMesageInput={false}
                 />
               )}
-              {isMessageDeleted(message) && (
+              {message.deleted &&  (
                 <div className='flex flex-row items-center w-full flex-wrap'>
                   This message was deleted.
-                  <div
+                  {message.userId == currentUserId && <div
                     className='cursor-pointer px-2 py-1 mx-2 rounded-xl bg-pubnubbabyblue'
                     onClick={async () => {
                       await message.restore()
                     }}
                   >
                     Restore Message
-                  </div>
+                  </div>}
                 </div>
               )}
-              {!isMessageDeleted(message) && (
+              {!message.deleted && (
                 <div className='flex flex-col items-start w-full flex-wrap'>
                   <div className='flex flex-row flex-wrap'>
                   {message.actions && message.actions.edited && (
@@ -469,7 +469,7 @@ export default function Message ({
                 </div>
               )}
             {/* actions go here for received */}
-            {received && !inThread && !inPinned && !isMessageDeleted(message) && !mutedOrBanned && (
+            {received && !inThread && !inPinned && !message.deleted && !mutedOrBanned && (
               <MessageActions
                 received={received}
                 actionsShown={actionsShown}
@@ -527,7 +527,7 @@ export default function Message ({
                     : null
                 }
                 deleteMessageClick={
-                  appConfiguration?.message_deletion_soft == true
+                  (appConfiguration?.message_deletion_soft == true && (message.senderId == currentUserId))
                     ? () => {
                         messageActionHandler(
                           MessageActionsTypes.DELETE,
@@ -550,7 +550,7 @@ export default function Message ({
             )}
           </div>
           {/* actions go here for sent */}
-          {!received && !inThread && !inPinned && !isMessageDeleted(message) && !mutedOrBanned && (
+          {!received && !inThread && !inPinned && !message.deleted && !mutedOrBanned && (
             <MessageActions
               received={received}
               actionsShown={actionsShown}

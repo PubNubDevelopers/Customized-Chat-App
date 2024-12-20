@@ -12,7 +12,7 @@
     "@emoji-mart/data": "^1.2.1",
     "@emoji-mart/react": "^1.1.1",
     "emoji-mart": "^5.6.0",
-    "@pubnub/chat": "^0.8.4",
+    "@pubnub/chat": "^0.9.4",
     "next": "15.0.3",
     "react": "19.0.0-rc-66855b96-20241106",
     "react-dom": "19.0.0-rc-66855b96-20241106"

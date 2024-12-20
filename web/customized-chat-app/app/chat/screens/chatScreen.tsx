@@ -92,10 +92,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   })
   const [userMsgShown, setUserMsgShown] = useState(false)
   const [userMsgTimeoutId, setUserMsgTimeoutId] = useState(0)
-  //const [refreshMembersTimeoutId, setRefreshMembersTimeoutId] =
-  //  useState<ReturnType<typeof setTimeout>>()
-  let refreshMembersTimeoutId
-  //const [initOnce, setInitOnce] = useState(0)
+  const [initOnce, setInitOnce] = useState(0)
   const [loaded, setLoaded] = useState(false)
 
   const [quotedMessage, setQuotedMessage] = useState<pnMessage | null>(null)
@@ -136,7 +133,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   const [activeChannelRestrictions, setActiveChannelRestrictions] =
     useState<Restriction | null>(null)
 
-  function updateUnreadMessagesCounts () {
+  function updateUnreadMessagesCountsTopLevel () {
     chat?.getUnreadMessagesCounts({}).then(
       result => {
         const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
@@ -279,12 +276,9 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         )
 
         //  Join public channels
-        console.log('joining public channels')
         const localPublicChannels = await localChat.getChannels({
           filter: `type == 'public'`
         })
-        console.log('got public channels')
-        console.log(localPublicChannels)
         if (localPublicChannels) {
           const currentPublicMemberships =
             await localChat.currentUser.getMemberships({
@@ -605,135 +599,86 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   useEffect(() => {
     //  Get updates on the current user's name and profile URL
     //  This handles updates made to the current user via BizOps workspace
-    if (!currentUser) return
-    return currentUser.streamUpdates(updatedUser => {
+    if (!chat) return
+    return chat.currentUser.streamUpdates(updatedUser => {
       if (updatedUser.name) {
         setName(updatedUser.name)
       }
       if (updatedUser.profileUrl) {
         setProfileUrl(updatedUser.profileUrl)
       }
+      if (updatedUser) {
+        setCurrentUser(updatedUser)
+      }
     })
-  }, [currentUser])
+  }, [chat])
 
   /* Handle updates to the Public Channels */
   useEffect(() => {
+    if (!activeChannel) return
     if (chat && publicChannels && publicChannels.length > 0) {
       return Channel.streamUpdatesOn(publicChannels, channels => {
-        const updatedPublicChannels = publicChannels.map(
-          (publicChannel, index) => {
-            if (channels[index].name) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ;(publicChannel as any).name = channels[index].name
-            }
-            if (channels[index].custom?.profileUrl) {
-              publicChannel.custom.profileUrl =
-                channels[index].custom.profileUrl
-            }
-            return publicChannel
-          }
+        setPublicChannels(channels)
+        //  The active channel name may have changed
+        const updatedActiveChannel = channels.find(
+          updatedChannel => updatedChannel.id == activeChannel.id
         )
-        setPublicChannels(updatedPublicChannels)
+        if (updatedActiveChannel) {
+          setActiveChannel(updatedActiveChannel)
+        }
       })
     }
-  }, [chat, publicChannels])
+  }, [chat, publicChannels, activeChannel])
 
   /* Handle updates to the Private Groups, e.g. names changed */
   useEffect(() => {
+    if (!activeChannel) return
     if (chat && privateGroups && privateGroups.length > 0) {
       return Channel.streamUpdatesOn(privateGroups, channels => {
-        const updatedPrivateGroups = privateGroups.map(
-          (privateGroup, index) => {
-            if (channels[index].name) {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              ;(privateGroup as any).name = channels[index].name
-            }
-            return privateGroup
-          }
+        setPrivateGroups(channels)
+        //  The active channel name may have changed
+        const updatedActiveChannel = channels.find(
+          updatedChannel => updatedChannel.id == activeChannel.id
         )
-        setPrivateGroups(updatedPrivateGroups)
+        if (updatedActiveChannel) {
+          setActiveChannel(updatedActiveChannel)
+        }
       })
     }
-  }, [chat, privateGroups])
+  }, [chat, privateGroups, activeChannel])
 
   //  Note: We do not need to stream updates on direct chats since we do not use the channel name, only the user info (name, avatar)
 
   /* Handle updates to any of the other users in the system */
+
   useEffect(() => {
-    if (chat && allUsers) {
-      return User.streamUpdatesOn(allUsers, allUsersUpdated => {
-        applyUsersUpdateWithHysteresis(allUsersUpdated)
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chat, allUsers])
-
-  async function applyUsersUpdateWithHysteresis (allUsersUpdated) {
-    if (!chat) return
-    clearTimeout(refreshMembersTimeoutId)
-
-    //  Wait a second to request updates, to avoid making too many requests at once
-    const setTimeoutId: ReturnType<typeof setTimeout> = setTimeout(() => {
-      applyUsersUpdate(allUsersUpdated)
-    }, 1000)
-    refreshMembersTimeoutId = setTimeoutId
-
-    return
-  }
-
-  function applyUsersUpdate (allUsersUpdated) {
-    //console.log(allUsers)
     if (!allUsers) return
-    let madeUpdates = false
-    const newAllUsers = allUsers.map((user, index) => {
-      const updatedUser = allUsersUpdated.find(
-        updatedUser => updatedUser.id == user.id
-      )
-      //  I test here whether the updated values are null, this was to accommodate a bug in an earlier
-      //  version of the Chat SDK which has since been fixed (in 0.9.x)
-      //  If a field is NOT listed here this demo will not update that information in real time,
-      //  you can reload the browser or log in / out to get the latest values for any fields not
-      //  updated in real time.
-      if (updatedUser.name && updatedUser.name != user.name) {
-        madeUpdates = true
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(user as any).name = updatedUser.name
-      }
-      if (updatedUser.profileUrl && updatedUser.profileUrl != user.profileUrl) {
-        madeUpdates = true
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(user as any).profileUrl = updatedUser.profileUrl
-      }
-      if (updatedUser.email && updatedUser.email != user.email) {
-        madeUpdates = true
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(user as any).email = updatedUser.email
-      }
-      if (
-        updatedUser.custom &&
-        updatedUser.custom.currentMood &&
-        user.custom &&
-        updatedUser.custom.currentMood != user.custom?.currentMood
-      ) {
-        madeUpdates = true
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ;(user as any).custom.currentMood = updatedUser.custom.currentMood
-      }
-      if (updatedUser.lastActiveTimestamp != user.lastActiveTimestamp) {
-        //  User activity has changed (do not update our own user)
-        if (updatedUser.id != currentUser?.id) {
-          madeUpdates = true
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ;(user as any).lastActiveTimestamp = updatedUser.lastActiveTimestamp
-        }
-      }
-      return user
+    //  It would be better to re-register update listeners whenever a user changes, but all this function does is maintain the state of allUsers locally
+    if (initOnce > 0) return
+    setInitOnce(1)
+    allUsers.forEach(user => {
+      user.streamUpdates(updatedUser => userHasUpdated(updatedUser))
     })
-    if (madeUpdates) {
-      setAllUsers(newAllUsers)
-    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allUsers, initOnce])
 
-    //  Update direct names on the left-hand side
+  function userHasUpdated (updatedUser) {
+    if (!updatedUser) return
+
+    //  Update the allUsers array
+    setAllUsers(
+      allUsers?.map(user => {
+        if (user.id === updatedUser.id) {
+          return updatedUser
+        } else {
+          return user
+        }
+      })
+    )
+
+    //  Update the groups on the left hand pane to ensure the direct chats have the correct names
+    //  This is a bit lazy, I'm doing a network call to keep the directChatsUsers array updated, but I 
+    //  do have all the information to do this locally.
     refreshGroups('direct', true)
   }
 
@@ -886,7 +831,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       const tempDirectUsers: User[][] = []
       const directChannelMemberships = await chat.currentUser.getMemberships({
         filter: "channel.type == 'direct'",
-        sort: { updated: 'desc' } 
+        sort: { updated: 'desc' }
       })
       if (
         directChannelMemberships &&
@@ -926,7 +871,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         }
       }
     }
-    updateUnreadMessagesCounts()
+    updateUnreadMessagesCountsTopLevel()
   }
 
   function sendChatEvent (
@@ -1012,6 +957,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           { soft: true },
           { preserveFiles: true }
         )
+        setShowThread(false)
         break
       case MessageActionsTypes.FORWARD:
         if (embeddedDemoConfig) return
@@ -1137,7 +1083,11 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         profileScreenVisible={profileScreenVisible}
         setProfileScreenVisible={setProfileScreenVisible}
         changeUserNameScreenVisible={changeUserNameModalVisible}
-        user={selectedUserProfile}
+        user={
+          chat?.currentUser.id == selectedUserProfile?.id
+            ? currentUser
+            : allUsers?.find(user => user.id == selectedUserProfile?.id)
+        }
         isMe={chat?.currentUser.id == selectedUserProfile?.id}
         logout={() => logout()}
         changeName={() => {
@@ -1175,7 +1125,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           modalType={ChatNameModals.CHANNEL}
           saveAction={async newName => {
             await activeChannel?.update({
-              name: newName
+              name: newName,
+              type: activeChannel.type
             })
             showUserMessage(
               'Channel Name Changed',
@@ -1286,7 +1237,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           currentUser={currentUser}
           userProfileClicked={() => {
             if (chat) {
-              setSelectedUserProfile(chat.currentUser)
+              setSelectedUserProfile(currentUser)
               setProfileScreenVisible(true)
             }
           }}
@@ -1367,7 +1318,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           setActiveChannelUsers={setActiveChannelUsers}
           setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
           updateUnreadMessagesCounts={() => {
-            updateUnreadMessagesCounts()
+            updateUnreadMessagesCountsTopLevel()
           }}
           currentUserProfileUrl={profileUrl}
           showUserMessage={showUserMessage}
@@ -1413,7 +1364,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                   messageActionHandler(action, vars)
                 }
                 updateUnreadMessagesCounts={() => {
-                  updateUnreadMessagesCounts()
+                  updateUnreadMessagesCountsTopLevel()
                 }}
                 setChatSettingsScreenVisible={setChatSettingsScreenVisible}
                 quotedMessage={quotedMessage}

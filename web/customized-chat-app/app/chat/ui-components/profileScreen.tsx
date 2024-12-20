@@ -34,9 +34,9 @@ export default function ProfileScreen ({
 
   function getLastSeenOnline(user) {
     let returnVal = "Never"
-    if (user && user.lastActiveTimestamp)
+    if (user && user.custom && user.custom.lastActiveTimestamp)
     {
-      const secondsSinceSeen = Math.floor(((new Date()).getTime() - user.lastActiveTimestamp) / 1000)
+      const secondsSinceSeen = Math.floor(((new Date()).getTime() - user.custom.lastActiveTimestamp) / 1000)
       const hrs = Math.floor(secondsSinceSeen / 3600)
       const mins = Math.floor((secondsSinceSeen - (3600 * hrs)) / 60)
       const secs = secondsSinceSeen % 60

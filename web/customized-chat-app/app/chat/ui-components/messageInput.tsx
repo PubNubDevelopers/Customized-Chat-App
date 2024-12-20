@@ -217,7 +217,7 @@ export default function MessageInput ({
       {currentlyEditingMessage && !(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) &&(
         <div className='text-cherryDark w-full ml-12 pt-2'>Editing Message</div>
       )}
-      {showUploadSpinner && (
+      {showUploadSpinner && attachmentsCount > 0 && (
         <div className='text-cherryDark w-full ml-12 pt-2'>
           Uploading Attachments...
         </div>

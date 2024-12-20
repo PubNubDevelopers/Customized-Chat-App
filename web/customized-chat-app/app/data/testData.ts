@@ -3,13 +3,13 @@ export const testPublicChannels = [
     id: "public-general",
     name: "General Chat",
     description: "Public group for general conversation.",
-    avatar: "/group/general.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/group/general.jpg",
   },
   {
     id: "public-tech",
     name: "Technology Chat",
     description: "Open conversation about any technology topic.",
-    avatar: "/group/technology.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/group/technology.jpg",
   },
 ];
 
@@ -17,7 +17,7 @@ export const testUsers = [
   {
     id: "user-01",
     name: "Darryn Campbell",
-    avatar: "/avatars/m/01.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/01.jpg",
     email: "darryn.campbell@example.com",
     location: "London, UK",
     jobTitle: "Software Engineer",
@@ -29,7 +29,7 @@ export const testUsers = [
   {
     id: "user-02",
     name: "Emily Johnson",
-    avatar: "/avatars/f/01.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/01.jpg",
     email: "emily.johnson@example.com",
     location: "New York, USA",
     jobTitle: "Product Manager",
@@ -41,7 +41,7 @@ export const testUsers = [
   {
     id: "user-03",
     name: "Alex Carter",
-    avatar: "/avatars/m/02.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/02.jpg",
     email: "alex.carter@example.com",
     location: "San Francisco, USA",
     jobTitle: "Data Scientist",
@@ -53,7 +53,7 @@ export const testUsers = [
   {
     id: "user-04",
     name: "Sarah Wilson",
-    avatar: "/avatars/f/02.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/02.jpg",
     email: "sarah.wilson@example.com",
     location: "Toronto, Canada",
     jobTitle: "Marketing Specialist",
@@ -65,7 +65,7 @@ export const testUsers = [
   {
     id: "user-05",
     name: "Chris Johnson",
-    avatar: "/avatars/m/03.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/03.jpg",
     email: "chris.johnson@example.com",
     location: "Sydney, Australia",
     jobTitle: "Designer",
@@ -77,7 +77,7 @@ export const testUsers = [
   {
     id: "user-06",
     name: "Jessica Brown",
-    avatar: "/avatars/f/03.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/03.jpg",
     email: "jessica.brown@example.com",
     location: "Berlin, Germany",
     jobTitle: "HR Manager",
@@ -89,7 +89,7 @@ export const testUsers = [
   {
     id: "user-07",
     name: "Daniel Lee",
-    avatar: "/avatars/m/04.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/04.jpg",
     email: "daniel.lee@example.com",
     location: "Tokyo, Japan",
     jobTitle: "Project Manager",
@@ -101,7 +101,7 @@ export const testUsers = [
   {
     id: "user-08",
     name: "Mia Taylor",
-    avatar: "/avatars/f/04.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/04.jpg",
     email: "mia.taylor@example.com",
     location: "Paris, France",
     jobTitle: "Sales Executive",
@@ -113,7 +113,7 @@ export const testUsers = [
   {
     id: "user-09",
     name: "David Smith",
-    avatar: "/avatars/m/05.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/05.jpg",
     email: "david.smith@example.com",
     location: "Los Angeles, USA",
     jobTitle: "Business Analyst",
@@ -125,7 +125,7 @@ export const testUsers = [
   {
     id: "user-10",
     name: "Olivia Martinez",
-    avatar: "/avatars/f/05.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/05.jpg",
     email: "olivia.martinez@example.com",
     location: "Mexico City, Mexico",
     jobTitle: "Financial Advisor",
@@ -137,7 +137,7 @@ export const testUsers = [
   {
     id: "user-11",
     name: "James Brown",
-    avatar: "/avatars/m/06.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/06.jpg",
     email: "james.brown@example.com",
     location: "Chicago, USA",
     jobTitle: "Network Engineer",
@@ -149,7 +149,7 @@ export const testUsers = [
   {
     id: "user-12",
     name: "Emma Lee",
-    avatar: "/avatars/f/06.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/06.jpg",
     email: "emma.lee@example.com",
     location: "Seoul, South Korea",
     jobTitle: "Content Writer",
@@ -161,7 +161,7 @@ export const testUsers = [
   {
     id: "user-13",
     name: "John Taylor",
-    avatar: "/avatars/m/07.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/07.jpg",
     email: "john.taylor@example.com",
     location: "Toronto, Canada",
     jobTitle: "Operations Manager",
@@ -173,7 +173,7 @@ export const testUsers = [
   {
     id: "user-14",
     name: "Ava Clark",
-    avatar: "/avatars/f/07.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/07.jpg",
     email: "ava.clark@example.com",
     location: "Melbourne, Australia",
     jobTitle: "Research Scientist",
@@ -185,7 +185,7 @@ export const testUsers = [
   {
     id: "user-15",
     name: "Jordan Anderson",
-    avatar: "/avatars/m/08.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/08.jpg",
     email: "jordan.anderson@example.com",
     location: "San Francisco, USA",
     jobTitle: "DevOps Engineer",
@@ -197,7 +197,7 @@ export const testUsers = [
   {
     id: "user-16",
     name: "Sophie Harris",
-    avatar: "/avatars/f/09.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/09.jpg",
     email: "sophie.harris@example.com",
     location: "Dublin, Ireland",
     jobTitle: "Graphic Designer",
@@ -209,7 +209,7 @@ export const testUsers = [
   {
     id: "user-17",
     name: "Kevin Martinez",
-    avatar: "/avatars/m/09.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/09.jpg",
     email: "kevin.martinez@example.com",
     location: "Madrid, Spain",
     jobTitle: "Systems Analyst",
@@ -221,7 +221,7 @@ export const testUsers = [
   {
     id: "user-18",
     name: "Grace Lewis",
-    avatar: "/avatars/f/09.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/09.jpg",
     email: "grace.lewis@example.com",
     location: "Auckland, New Zealand",
     jobTitle: "Quality Assurance",
@@ -233,7 +233,7 @@ export const testUsers = [
   {
     id: "user-19",
     name: "Lee Davis",
-    avatar: "/avatars/m/10.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/10.jpg",
     email: "lee.davis@example.com",
     location: "Singapore, Singapore",
     jobTitle: "IT Consultant",
@@ -245,7 +245,7 @@ export const testUsers = [
   {
     id: "user-20",
     name: "Lily Walker",
-    avatar: "/avatars/f/10.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/10.jpg",
     email: "lily.walker@example.com",
     location: "Cape Town, South Africa",
     jobTitle: "Customer Support",
@@ -257,7 +257,7 @@ export const testUsers = [
   {
     id: "user-21",
     name: "Mark Wilson",
-    avatar: "/avatars/m/11.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/11.jpg",
     email: "mark.wilson@example.com",
     location: "Vancouver, Canada",
     jobTitle: "Full Stack Developer",
@@ -269,7 +269,7 @@ export const testUsers = [
   {
     id: "user-22",
     name: "Ella Hall",
-    avatar: "/avatars/f/11.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/11.jpg",
     email: "ella.hall@example.com",
     location: "Miami, USA",
     jobTitle: "Social Media Manager",
@@ -281,7 +281,7 @@ export const testUsers = [
   {
     id: "user-23",
     name: "Michael Thomas",
-    avatar: "/avatars/m/12.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/12.jpg",
     email: "michael.thomas@example.com",
     location: "Houston, USA",
     jobTitle: "Database Administrator",
@@ -293,7 +293,7 @@ export const testUsers = [
   {
     id: "user-24",
     name: "Chloe King",
-    avatar: "/avatars/f/12.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/12.jpg",
     email: "chloe.king@example.com",
     location: "Dubai, UAE",
     jobTitle: "Event Planner",
@@ -305,7 +305,7 @@ export const testUsers = [
   {
     id: "user-25",
     name: "Nathan White",
-    avatar: "/avatars/m/13.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/13.jpg",
     email: "nathan.white@example.com",
     location: "Los Angeles, USA",
     jobTitle: "Cybersecurity Specialist",
@@ -317,7 +317,7 @@ export const testUsers = [
   {
     id: "user-26",
     name: "Natalie White",
-    avatar: "/avatars/f/13.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/13.jpg",
     email: "natalie.white@example.com",
     location: "London, UK",
     jobTitle: "Legal Advisor",
@@ -329,7 +329,7 @@ export const testUsers = [
   {
     id: "user-27",
     name: "Nick Harris",
-    avatar: "/avatars/m/14.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/14.jpg",
     email: "nick.harris@example.com",
     location: "Berlin, Germany",
     jobTitle: "Technical Writer",
@@ -341,7 +341,7 @@ export const testUsers = [
   {
     id: "user-28",
     name: "Julia Allen",
-    avatar: "/avatars/f/14.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/14.jpg",
     email: "julia.allen@example.com",
     location: "Paris, France",
     jobTitle: "UX Designer",
@@ -353,7 +353,7 @@ export const testUsers = [
   {
     id: "user-29",
     name: "Paul Robinson",
-    avatar: "/avatars/m/15.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/15.jpg",
     email: "paul.robinson@example.com",
     location: "Rome, Italy",
     jobTitle: "Architect",
@@ -365,7 +365,7 @@ export const testUsers = [
   {
     id: "user-30",
     name: "Abigail Scott",
-    avatar: "/avatars/f/15.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/15.jpg",
     email: "abigail.scott@example.com",
     location: "Madrid, Spain",
     jobTitle: "Translator",
@@ -377,7 +377,7 @@ export const testUsers = [
   {
     id: "user-31",
     name: "Peter Clark",
-    avatar: "/avatars/m/16.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/16.jpg",
     email: "peter.clark@example.com",
     location: "Sydney, Australia",
     jobTitle: "Software Tester",
@@ -389,7 +389,7 @@ export const testUsers = [
   {
     id: "user-32",
     name: "Megan Carter",
-    avatar: "/avatars/f/16.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/16.jpg",
     email: "megan.carter@example.com",
     location: "Toronto, Canada",
     jobTitle: "Accountant",
@@ -401,7 +401,7 @@ export const testUsers = [
   {
     id: "user-33",
     name: "Sam Walker",
-    avatar: "/avatars/m/17.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/17.jpg",
     email: "sam.walker@example.com",
     location: "New York, USA",
     jobTitle: "Product Manager",
@@ -413,7 +413,7 @@ export const testUsers = [
   {
     id: "user-34",
     name: "Isabella Adams",
-    avatar: "/avatars/f/17.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/17.jpg",
     email: "isabella.adams@example.com",
     location: "Singapore, Singapore",
     jobTitle: "HR Specialist",
@@ -425,7 +425,7 @@ export const testUsers = [
   {
     id: "user-35",
     name: "Lucas Wright",
-    avatar: "/avatars/m/18.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/18.jpg",
     email: "lucas.wright@example.com",
     location: "San Francisco, USA",
     jobTitle: "AI Researcher",
@@ -437,7 +437,7 @@ export const testUsers = [
   {
     id: "user-36",
     name: "Sophia Green",
-    avatar: "/avatars/f/18.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/18.jpg",
     email: "sophia.green@example.com",
     location: "Dubai, UAE",
     jobTitle: "Marketing Director",
@@ -449,7 +449,7 @@ export const testUsers = [
   {
     id: "user-37",
     name: "Henry Lewis",
-    avatar: "/avatars/m/19.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/19.jpg",
     email: "henry.lewis@example.com",
     location: "Los Angeles, USA",
     jobTitle: "Animator",
@@ -461,7 +461,7 @@ export const testUsers = [
   {
     id: "user-38",
     name: "Emily Young",
-    avatar: "/avatars/f/19.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/19.jpg",
     email: "emily.young@example.com",
     location: "Tokyo, Japan",
     jobTitle: "Data Scientist",
@@ -473,7 +473,7 @@ export const testUsers = [
   {
     id: "user-39",
     name: "Jack Hill",
-    avatar: "/avatars/m/20.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/20.jpg",
     email: "jack.hill@example.com",
     location: "Berlin, Germany",
     jobTitle: "System Administrator",
@@ -485,7 +485,7 @@ export const testUsers = [
   {
     id: "user-40",
     name: "Ava King",
-    avatar: "/avatars/f/20.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/20.jpg",
     email: "ava.king@example.com",
     location: "Moscow, Russia",
     jobTitle: "Financial Analyst",
@@ -497,7 +497,7 @@ export const testUsers = [
   {
     id: "user-41",
     name: "Liam Scott",
-    avatar: "/avatars/m/21.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/21.jpg",
     email: "liam.scott@example.com",
     location: "Chicago, USA",
     jobTitle: "Cloud Engineer",
@@ -509,7 +509,7 @@ export const testUsers = [
   {
     id: "user-42",
     name: "Mia Martinez",
-    avatar: "/avatars/f/21.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/21.jpg",
     email: "mia.martinez@example.com",
     location: "Buenos Aires, Argentina",
     jobTitle: "Graphic Designer",
@@ -521,7 +521,7 @@ export const testUsers = [
   {
     id: "user-43",
     name: "Noah Brown",
-    avatar: "/avatars/m/22.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/22.jpg",
     email: "noah.brown@example.com",
     location: "São Paulo, Brazil",
     jobTitle: "Network Engineer",
@@ -533,7 +533,7 @@ export const testUsers = [
   {
     id: "user-44",
     name: "Charlotte Wilson",
-    avatar: "/avatars/f/22.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/22.jpg",
     email: "charlotte.wilson@example.com",
     location: "Vienna, Austria",
     jobTitle: "Content Strategist",
@@ -545,7 +545,7 @@ export const testUsers = [
   {
     id: "user-45",
     name: "James Thompson",
-    avatar: "/avatars/m/23.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/m/23.jpg",
     email: "james.thompson@example.com",
     location: "Stockholm, Sweden",
     jobTitle: "Mobile Developer",
@@ -557,7 +557,7 @@ export const testUsers = [
   {
     id: "user-46",
     name: "Amelia Anderson",
-    avatar: "/avatars/f/23.jpg",
+    avatar: "https://customized-chat-app-pn.netlify.app/avatars/f/23.jpg",
     email: "amelia.anderson@example.com",
     location: "Hong Kong, China",
     jobTitle: "Operations Manager",
