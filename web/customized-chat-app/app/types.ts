@@ -52,6 +52,54 @@ export type Restriction = {
   reason: string | number | boolean | undefined;
 };
 
+export type ThemeColors = {
+  app_appearance: string;
+  primary: string;
+  primaryDark: string;
+  secondary: string;
+  secondaryDark: string;
+  accent: string;
+  accentDark: string;
+};
+
+export const Backgrounds = [
+  {
+    name: "Chat Icons (Light)",
+    backgroundImage: "url('/backgrounds/chat_icons.png')",
+    backgroundPosition: "initial",
+    url: '/backgrounds/chat_icons.png',
+    color: "#525252"
+  },
+  {
+    name: "Chat Icons (Dark Theme)",
+    backgroundImage: "url('/backgrounds/chat_icons_inverted.png')",
+    backgroundPosition: "initial",
+    url: '/backgrounds/chat_icons_inverted.png',
+    color: "#FFFFFF"
+  },
+  {
+    name: "Plain White",
+    backgroundImage: "url('/backgrounds/default.png')",
+    backgroundPosition: "initial",
+    url: '/backgrounds/default.png',
+    color: "#525252"
+  },
+  {
+    name: "Plain Black",
+    backgroundImage: "url('/backgrounds/black.png')",
+    backgroundPosition: "initial",
+    url: '/backgrounds/black.png',
+    color: "#FFFFFF"
+  },
+  {
+    name: "PubNub Office",
+    backgroundImage: "url('/backgrounds/couch.jpg')",
+    backgroundPosition: "center center",
+    url: '/backgrounds/couch.jpg',
+    color: "#FFFFFF"
+  },
+];
+
 //  Credit: https://gist.github.com/gabrielmlinassi/234519eacaf73f75812b48ea3e94ee6e
 //  Used to only minimze the chat selection pane if we are running on a small screen
 import { useState, useEffect, useLayoutEffect } from "react";

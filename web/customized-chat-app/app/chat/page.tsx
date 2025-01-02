@@ -4,6 +4,6 @@ import ChatScreen from './screens/chatScreen'
 
 export default function Page () {
   return (
-    <ChatScreen embeddedDemoConfig={null} configuration={null}></ChatScreen>
+    <ChatScreen embeddedDemoConfigFromParent={null} configuration={null}></ChatScreen>
   )
 }

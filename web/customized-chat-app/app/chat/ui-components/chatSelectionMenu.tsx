@@ -36,7 +36,8 @@ export default function ChatSelectionMenu ({
   currentUserProfileUrl,
   showUserMessage,
   appConfiguration,
-  embeddedDemoConfig
+  embeddedDemoConfig,
+  colorScheme
 }) {
   const [unreadExpanded, setUnreadExpanded] = useState(true)
   const [publicExpanded, setPublicExpanded] = useState(true)
@@ -109,15 +110,29 @@ export default function ChatSelectionMenu ({
       className={`flex flex-col ${
         !isLg && chatSelectionMenuMinimized
           ? 'w-5 min-w-5'
-          : 'lg:min-w-80 lg:w-80 min-w-60 w-60'
-      } bg-navy50 py-0 overflow-y-auto overscroll-none ${
+          : 'lg:min-w-80 lg:w-80 min-w-60 w-60 '
+      } py-0 overflow-y-auto overscroll-none ${
         embeddedDemoConfig != null ? '' : 'mt-[64px]'
-      } pb-6 select-none border-r border-navy-200`}
+      } pb-6 select-none border-navy-200`}
+      style={{
+        background: `${
+          colorScheme?.app_appearance === 'dark'
+            ? colorScheme?.primaryDark
+            : colorScheme?.primary
+        }`
+      }}
     >
       <div
         className={`${
           !isLg && chatSelectionMenuMinimized ? 'flex flex-row' : 'hidden'
-        } min-h-screen h-screen bg-sky-950`}
+        } min-h-screen h-screen`}
+        style={{
+          background: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.primaryDark
+              : colorScheme?.primary
+          }`
+        }}
       >
         <div
           className='flex cursor-pointer'
@@ -145,7 +160,7 @@ export default function ChatSelectionMenu ({
           <input
             id='chats-search-input'
             value={searchChannels}
-            className='flex w-full rounded-md bg-navy50 border  border-neutral-400 py-[9px] pl-9 px-[13px] text-sm focus:ring-1 focus:ring-inputring outline-none placeholder:text-neutral-500'
+            className='flex w-full rounded-md bg-navy50 border  border-neutral-400 py-[9px] pl-9 px-[13px] text-sm focus:ring-1 focus:ring-black outline-none text-neutral900 placeholder:text-neutral-500'
             placeholder='Search'
             onChange={e => {
               handleChatSearch(e.target.value)
@@ -181,6 +196,7 @@ export default function ChatSelectionMenu ({
                 ToastType.CHECK
               )
             }}
+            colorScheme={colorScheme}
           />
         )}
         {showUnreadMessageCount && unreadExpanded && (
@@ -304,6 +320,7 @@ export default function ChatSelectionMenu ({
                       }
                     }}
                     appConfiguration={appConfiguration}
+                    colorScheme={colorScheme}
                   ></ChatMenuItem>
                 )
             )}
@@ -313,8 +330,15 @@ export default function ChatSelectionMenu ({
         {showUnreadMessageCount == true &&
           unreadMessages &&
           unreadMessages.length > 0 && (
-            <div className='w-full border border-navy200 mt-4'></div>
+            <div className='w-full border mt-4' style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}></div>
           )}
+          
 
         {showPublicChannels && (
           <ChatMenuHeader
@@ -333,6 +357,7 @@ export default function ChatSelectionMenu ({
                 ToastType.INFO
               )
             }}
+            colorScheme={colorScheme}
           />
         )}
         {showPublicChannels && publicExpanded && (
@@ -351,6 +376,7 @@ export default function ChatSelectionMenu ({
                       setActiveChannelAction(publicChannels[index])
                     }}
                     appConfiguration={appConfiguration}
+                    colorScheme={colorScheme}
                   ></ChatMenuItem>
                 )
             )}
@@ -358,7 +384,13 @@ export default function ChatSelectionMenu ({
         )}
 
         {showPublicChannels && (
-          <div className='w-full border border-navy200 mt-4'></div>
+          <div className='w-full border mt-4' style={{
+            borderColor: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.accentDark
+                : colorScheme?.accent
+            }`
+          }}></div>
         )}
 
         {showGroupChat && (
@@ -368,6 +400,7 @@ export default function ChatSelectionMenu ({
             expandCollapse={() => setGroupsExpanded(!groupsExpanded)}
             actionIcon={ChatHeaderActionIcon.ADD}
             action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
+            colorScheme={colorScheme}
           />
         )}
         {showGroupChat && groupsExpanded && (
@@ -389,6 +422,7 @@ export default function ChatSelectionMenu ({
                       setActiveChannelAction(privateGroups[index])
                     }}
                     appConfiguration={appConfiguration}
+                    colorScheme={colorScheme}
                   />
                 )
             )}
@@ -396,7 +430,13 @@ export default function ChatSelectionMenu ({
         )}
 
         {showGroupChat && (
-          <div className='w-full border border-navy200 mt-4'></div>
+          <div className='w-full border mt-4' style={{
+            borderColor: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.accentDark
+                : colorScheme?.accent
+            }`
+          }}></div>
         )}
         {showGroupChat && (
           <ChatMenuHeader
@@ -407,6 +447,7 @@ export default function ChatSelectionMenu ({
             }
             actionIcon={ChatHeaderActionIcon.ADD}
             action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
+            colorScheme={colorScheme}
           />
         )}
         {showGroupChat && directMessagesExpanded && (
@@ -435,6 +476,7 @@ export default function ChatSelectionMenu ({
                       setActiveChannelAction(directChats[index])
                     }}
                     appConfiguration={appConfiguration}
+                    colorScheme={colorScheme}
                   />
                 )
             )}

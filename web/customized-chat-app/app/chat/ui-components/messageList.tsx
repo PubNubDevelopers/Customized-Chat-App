@@ -4,6 +4,8 @@ import Message from './message'
 //import UnreadIndicator from './unreadIndicator'
 import Image from 'next/image'
 import { PresenceIcon } from '../../types'
+import Pin from './icons/pin'
+import Settings from './icons/settings'
 
 import { useState, useEffect, useRef } from 'react'
 import {
@@ -35,8 +37,10 @@ export default function MessageList ({
   showUserMessage,
   showUserProfile,
   activeChannelRestrictions,
+  activeChannelBackground,
   embeddedDemoConfig,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const MAX_AVATARS_SHOWN = 9
   const [messages, setMessages] = useState<pnMessage[]>([])
@@ -77,9 +81,8 @@ export default function MessageList ({
       setMessages([])
       setCurrentMembership(groupMembership)
       if (appConfiguration?.message_history) {
-        activeChannel
-          .getHistory({ count: 20 })
-          .then(async historicalMessagesObj => {
+        activeChannel.getHistory({ count: 20 }).then(
+          async historicalMessagesObj => {
             //console.log(historicalMessagesObj)
             //  Run through the historical messages and set the most recently received one (that we were not the sender of) as read
             if (historicalMessagesObj.messages) {
@@ -102,9 +105,13 @@ export default function MessageList ({
                 }
               }
             }
-          }, () => {
-            setLoadingMessage("Error: You do not have 'Message Persistence' enabled on your keyset.")
-          })
+          },
+          () => {
+            setLoadingMessage(
+              "Error: You do not have 'Message Persistence' enabled on your keyset."
+            )
+          }
+        )
       }
     }
     initMessageList()
@@ -224,10 +231,26 @@ export default function MessageList ({
       className={`flex flex-col ${
         embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
       }`}
+      style={{
+        backgroundImage: activeChannelBackground?.backgroundImage ?? "url('/backgrounds/default.png')",
+        backgroundPosition: activeChannelBackground?.backgroundPosition ?? "initial"
+      }}
     >
       <div
         id='chats-header'
-        className='flex flex-row items-center h-16 min-h-16 border-y border-navy-200 select-none'
+        className='flex flex-row items-center h-16 min-h-16 border select-none'
+        style={{
+          background: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.primaryDark
+              : colorScheme?.primary
+          }`,
+          color: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary
+          }`
+        }}
       >
         <div
           className={`${roboto.className} text-base font-medium flex flex-row grow justify-center items-center gap-3`}
@@ -298,13 +321,9 @@ export default function MessageList ({
           {appConfiguration?.message_pin == true && (
             <div className='flex flex-row'>
               {/* Pin with number of pinned messages */}
-              <div className='flex justify-center items-center rounded min-w-6 px-2 my-2 border text-xs font-normal border-navy50 bg-neutral-100'>
-                {activeChannelPinnedMessage ? '1' : '0'}
-              </div>
               <div
-                className={`p-3 py-3 ${
-                  activeChannelPinnedMessage &&
-                  'cursor-pointer hover:bg-neutral-100 hover:rounded-md'
+                className={`p-2 py-3 ${
+                  activeChannelPinnedMessage && 'cursor-pointer rounded-md  hover:ring-1 ring-black dark:ring-white'
                 } `}
                 onClick={() => {
                   if (!activeChannelPinnedMessage) return
@@ -312,33 +331,64 @@ export default function MessageList ({
                     messageListRef.current.scrollTop = 0
                   }
                 }}
+                style={{
+                  background: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.primaryDark
+                      : colorScheme?.primary
+                  }`
+                }}
               >
-                <Image
-                  src='/icons/chat-assets/pin.svg'
-                  alt='Pin'
+                <Pin
                   className=''
                   width={24}
                   height={24}
-                  priority
+                  fill={
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }
                 />
+              </div>
+              <div
+                className='flex justify-start items-end rounded min-w-2 my-2 text-sm font-normal'
+                style={{
+                  color: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }`
+                }}
+              >
+                {activeChannelPinnedMessage ? '1' : '0'}
               </div>
             </div>
           )}
           {(appConfiguration == null ||
             appConfiguration?.edit_channel_details == true) && (
             <div
-              className='p-3 py-3 cursor-pointer hover:bg-neutral-100 hover:rounded-md'
+              className='mx-1 p-3 py-3 cursor-pointer rounded-md hover:ring-1 ring-black dark:ring-white'
               onClick={() => {
                 setChatSettingsScreenVisible(true)
               }}
+              style={{
+                background: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.primaryDark
+                    : colorScheme?.primary
+                }`
+              }}
+      
             >
-              <Image
-                src='/icons/chat-assets/settings.svg'
-                alt='Settings'
+              <Settings
                 className=''
                 width={24}
                 height={24}
-                priority
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
               />
             </div>
           )}
@@ -361,7 +411,7 @@ export default function MessageList ({
         ref={messageListRef}
       >
         {messages && messages.length == 0 && embeddedDemoConfig == null && (
-          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4'>
+          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4 text-neutral900'>
             <Image
               src='/chat-logo.svg'
               alt='Chat Icon'
@@ -423,7 +473,10 @@ export default function MessageList ({
               }
               showReadIndicator={false}
               sender={
-                activeChannelPinnedMessage.userId === 'PUBNUB_INTERNAL_MODERATOR' ? 'Moderator' : activeChannelPinnedMessage.userId === currentUser?.id
+                activeChannelPinnedMessage.userId ===
+                'PUBNUB_INTERNAL_MODERATOR'
+                  ? 'Moderator'
+                  : activeChannelPinnedMessage.userId === currentUser?.id
                   ? currentUser?.name
                   : allUsers?.find(
                       user => user.id === activeChannelPinnedMessage.userId
@@ -437,7 +490,9 @@ export default function MessageList ({
               currentUserId={currentUser?.id}
               showUserMessage={showUserMessage}
               showUserProfile={showUserProfile}
+              activeChannelBackground={activeChannelBackground}
               appConfiguration={appConfiguration}
+              colorScheme={colorScheme}
             />
           )}
 
@@ -462,9 +517,11 @@ export default function MessageList ({
                 currentUserId={message.currentUserId}
                 showUserMessage={showUserMessage}
                 showUserProfile={showUserProfile}
+                activeChannelBackground={activeChannelBackground}
                 embeddedDemoConfig={embeddedDemoConfig}
                 forceShowActions={message.forceShowActions}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )
           )
@@ -490,9 +547,11 @@ export default function MessageList ({
                 message={message.message}
                 currentUserId={message.currentUserId}
                 showUserMessage={showUserMessage}
+                activeChannelBackground={activeChannelBackground}
                 embeddedDemoConfig={embeddedDemoConfig}
                 forceShowActions={message.forceShowActions}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )
           )
@@ -527,7 +586,9 @@ export default function MessageList ({
                 }
                 showReadIndicator={activeChannel.type !== 'public'}
                 sender={
-                  message.userId === 'PUBNUB_INTERNAL_MODERATOR' ? 'Moderator' : message.userId === currentUser.id
+                  message.userId === 'PUBNUB_INTERNAL_MODERATOR'
+                    ? 'Moderator'
+                    : message.userId === currentUser.id
                     ? currentUser.name
                     : allUsers?.find(user => user.id === message.userId)?.name
                 }
@@ -543,7 +604,9 @@ export default function MessageList ({
                   activeChannelRestrictions?.mute ||
                   activeChannelRestrictions?.ban
                 }
+                activeChannelBackground={activeChannelBackground}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )
           })}

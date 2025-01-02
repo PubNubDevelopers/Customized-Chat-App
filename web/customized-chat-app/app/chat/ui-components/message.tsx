@@ -7,6 +7,8 @@ import MessageActions from './messageActions'
 import PinnedMessagePill from './pinnedMessagePill'
 import QuotedMessage from './quotedMessage'
 import MessageReaction from './messageReaction'
+import Sent from './icons/sent'
+import Read from './icons/read'
 import { MessageActionsTypes, PresenceIcon, ToastType } from '../../types'
 import ToolTip from './toolTip'
 import { Channel, TimetokenUtils, MixedTextTypedElement } from '@pubnub/chat'
@@ -29,9 +31,11 @@ export default function Message ({
   showUserMessage = (a, b, c, d) => {},
   showUserProfile = senderId => {},
   mutedOrBanned = false,
+  activeChannelBackground,
   embeddedDemoConfig = null,
   forceShowActions = false,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
   const [actionsShown, setActionsShown] = useState(forceShowActions)
@@ -139,14 +143,18 @@ export default function Message ({
     [currentUserId]
   )
 
-//  const isMessageDeleted = useCallback(message => {
-//    return message.actions?.deleted?.deleted?.length > 0
-//  }, [])
+  //  const isMessageDeleted = useCallback(message => {
+  //    return message.actions?.deleted?.deleted?.length > 0
+  //  }, [])
 
   const renderMessagePart = useCallback(
     (messagePart: MixedTextTypedElement, index: number) => {
       if (messagePart?.type === 'text') {
-        return <span key={index} className='self-center'>{messagePart.content.text}</span>
+        return (
+          <span key={index} className='self-center'>
+            {messagePart.content.text}
+          </span>
+        )
       }
       if (messagePart?.type === 'plainLink') {
         return (
@@ -220,7 +228,7 @@ export default function Message ({
   const renderFiles = useCallback(files => {
     return files.map((file, index) => (
       <div className='flex flex-col p-1' key={index}>
-        {file.type.indexOf('image') == 0 && (
+        {file.type?.indexOf('image') == 0 && (
           <div
             className='cursor-pointer select-none'
             onClick={() => {
@@ -232,13 +240,13 @@ export default function Message ({
               alt={`${file.name}`}
               width={0}
               height={0}
-              sizes={"100vw"}
-              className={"cursor-pointer w-[250px] h-auto"}
+              sizes={'100vw'}
+              className={'cursor-pointer w-[250px] h-auto'}
             />
             <div className='text-xs'>{file.name} (click to enlarge)</div>
           </div>
         )}
-        {file.type.indexOf('image') == -1 && (
+        {file.type?.indexOf('image') == -1 && (
           <div
             className='text-sm cursor-pointer'
             onClick={() => {
@@ -271,6 +279,7 @@ export default function Message ({
                 present={isOnline}
                 avatarUrl={avatarUrl ? avatarUrl : '/avatars/placeholder.png'}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )}
           </div>
@@ -286,23 +295,29 @@ export default function Message ({
           >
             {pinned && !received && (
               <div className='flex justify-start grow select-none'>
-                <PinnedMessagePill />
+                <PinnedMessagePill colorScheme={colorScheme} />
               </div>
             )}
             {(inThread || inPinned || received) && (
               <div
-                className={`${roboto.className} text-sm font-normal flex text-neutral-600 cursor-pointer select-none`}
+                className={`${roboto.className} text-sm font-normal flex cursor-pointer select-none`}
+                style={{
+                  color: activeChannelBackground?.color ?? "#525252"
+                }}  
                 onClick={() => {
                   showUserProfile(message.userId)
                 }}
               >
                 {sender}
                 {(inThread || inPinned) && !received && ' (you)'}
-                {pinned && <PinnedMessagePill />}
+                {pinned && <PinnedMessagePill colorScheme={colorScheme} />}
               </div>
             )}
             <div
-              className={`${roboto.className} text-sm font-normal flex text-neutral-600`}
+              className={`${roboto.className} text-sm font-normal flex`}
+              style={{
+                color: activeChannelBackground?.color ?? "#525252"
+              }}
             >
               {determineUserReadableDate(message.timetoken)}
             </div>
@@ -312,13 +327,29 @@ export default function Message ({
             className={`${
               roboto.className
             } relative text-base font-normal flex text-black ${
-              received ? 'bg-neutral-50' : 'bg-[#e3f1fd]'
+              received ? 'bg-neutral-50' : ''
             } p-4 rounded-b-lg ${
               received ? 'rounded-tr-lg' : 'rounded-tl-lg'
             } pb-[${!received ? '40px' : '0px'}]`}
             onMouseEnter={handleMessageMouseEnter}
             onMouseMove={handleMessageMouseEnter}
             onMouseLeave={handleMessageMouseLeave}
+            style={{
+              background: `${
+                received
+                  ? ''
+                  : colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`,
+              color: `${
+                received
+                  ? ''
+                  : colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.secondaryDark
+                  : colorScheme?.secondary
+              }`
+            }}
           >
             {inPinned && (
               <div
@@ -363,37 +394,54 @@ export default function Message ({
                   displayedWithMesageInput={false}
                 />
               )}
-              {message.deleted &&  (
+              {message.deleted && (
                 <div className='flex flex-row items-center w-full flex-wrap'>
                   This message was deleted.
-                  {message.userId == currentUserId && <div
-                    className='cursor-pointer px-2 py-1 mx-2 rounded-xl bg-pubnubbabyblue'
-                    onClick={async () => {
-                      await message.restore()
-                    }}
-                  >
-                    Restore Message
-                  </div>}
+                  {message.userId == currentUserId && (
+                    <div
+                      className='cursor-pointer px-2 py-1 mx-2 rounded-xl'
+                      onClick={async () => {
+                        await message.restore()
+                      }}
+                      style={{
+                        background: `${
+                          colorScheme?.app_appearance === 'dark'
+                            ? colorScheme?.primaryDark
+                            : colorScheme?.primary
+                        }`,
+                        color: `${
+                          colorScheme?.app_appearance === 'dark'
+                            ? colorScheme?.secondaryDark
+                            : colorScheme?.secondary
+                        }`
+                      }}
+                
+                    >
+                      Restore Message
+                    </div>
+                  )}
                 </div>
               )}
               {!message.deleted && (
                 <div className='flex flex-col items-start w-full flex-wrap'>
                   <div className='flex flex-row flex-wrap'>
-                  {message.actions && message.actions.edited && (
-                    <span className='text-navy500 text-sm mr-1'>(edited)</span>
-                  )}
-                  {(message.content.text ||
-                    message.content.plainLink ||
-                    message.content.textLink ||
-                    message.content.mention ||
-                    message.content.channelReference) &&
-                    message
-                      ?.getMessageElements()
-                      .map((msgPart, index) =>
-                        renderMessagePart(msgPart, index)
-                      )}
-                  {/* If the message was blank and subsequently edited */}
-                  {!message.content.text && message.text && message.text}
+                    {message.actions && message.actions.edited && (
+                      <span className='text-navy500 text-sm mr-1'>
+                        (edited)
+                      </span>
+                    )}
+                    {(message.content.text ||
+                      message.content.plainLink ||
+                      message.content.textLink ||
+                      message.content.mention ||
+                      message.content.channelReference) &&
+                      message
+                        ?.getMessageElements()
+                        .map((msgPart, index) =>
+                          renderMessagePart(msgPart, index)
+                        )}
+                    {/* If the message was blank and subsequently edited */}
+                    {!message.content.text && message.text && message.text}
                   </div>
                   {message.meta && message.meta.originalChannelId && (
                     <span className='text-xs absolute top-0 mt-0.5'>
@@ -409,20 +457,31 @@ export default function Message ({
             </div>
             {!received &&
               showReadIndicator &&
-              appConfiguration?.message_read_receipts == true && (
-                <Image
-                  src={`${
-                    determineReadStatus(message.timetoken, readReceipts)
-                      ? '/icons/chat-assets/read.svg'
-                      : '/icons/chat-assets/sent.svg'
-                  }`}
-                  alt='Read'
+              appConfiguration?.message_read_receipts == true &&
+              (determineReadStatus(message.timetoken, readReceipts) ? (
+                <Read
+                  className='absolute right-[10px] bottom-[14px]'
+                  width={23}
+                  height={12}
+                  stroke={
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }
+                />
+              ) : (
+                <Sent
                   className='absolute right-[10px] bottom-[14px]'
                   width={21}
-                  height={10}
-                  priority
+                  height={12}
+                  stroke={
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }
                 />
-              )}
+              ))}
+
             <div className='absolute right-[10px] -bottom-[20px] flex flex-row items-center z-10 select-none'>
               {/*arrayOfEmojiReactions*/}
 
@@ -435,6 +494,7 @@ export default function Message ({
                         messageTimetoken={message.timetoken}
                         count={message.reactions[emoji].length}
                         reactionClicked={reactionClicked}
+                        colorScheme={colorScheme}
                         key={index}
                       />
                     ))
@@ -469,7 +529,103 @@ export default function Message ({
                 </div>
               )}
             {/* actions go here for received */}
-            {received && !inThread && !inPinned && !message.deleted && !mutedOrBanned && (
+            {received &&
+              !inThread &&
+              !inPinned &&
+              !message.deleted &&
+              !mutedOrBanned && (
+                <MessageActions
+                  received={received}
+                  actionsShown={actionsShown}
+                  emojiPickerShown={emojiPickerShown}
+                  setEmojiPickerShown={setEmojiPickerShown}
+                  isPinned={pinned}
+                  messageActionsEnter={() => handleMessageActionsEnter()}
+                  messageActionsLeave={() => handleMessageActionsLeave()}
+                  emojiClick={
+                    appConfiguration?.message_reactions == true
+                      ? emoji => {
+                          reactionClicked(emoji)
+                        }
+                      : null
+                  }
+                  replyInThreadClick={
+                    appConfiguration?.message_threads == true
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.REPLY_IN_THREAD,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                  quoteMessageClick={
+                    appConfiguration?.message_quote == true
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.QUOTE,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                  pinMessageClick={
+                    appConfiguration?.message_pin == true
+                      ? () => {
+                          messageActionHandler(MessageActionsTypes.PIN, message)
+                        }
+                      : null
+                  }
+                  forwardMessageClick={
+                    appConfiguration?.message_forward == true
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.FORWARD,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                  editMessageClick={
+                    appConfiguration?.message_editing == true
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.EDIT,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                  deleteMessageClick={
+                    appConfiguration?.message_deletion_soft == true &&
+                    message.senderId == currentUserId
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.DELETE,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                  reportMessageClick={
+                    appConfiguration?.message_report == true
+                      ? () => {
+                          messageActionHandler(
+                            MessageActionsTypes.REPORT,
+                            message
+                          )
+                        }
+                      : null
+                  }
+                />
+              )}
+          </div>
+          {/* actions go here for sent */}
+          {!received &&
+            !inThread &&
+            !inPinned &&
+            !message.deleted &&
+            !mutedOrBanned && (
               <MessageActions
                 received={received}
                 actionsShown={actionsShown}
@@ -527,7 +683,7 @@ export default function Message ({
                     : null
                 }
                 deleteMessageClick={
-                  (appConfiguration?.message_deletion_soft == true && (message.senderId == currentUserId))
+                  appConfiguration?.message_deletion_soft == true
                     ? () => {
                         messageActionHandler(
                           MessageActionsTypes.DELETE,
@@ -548,78 +704,6 @@ export default function Message ({
                 }
               />
             )}
-          </div>
-          {/* actions go here for sent */}
-          {!received && !inThread && !inPinned && !message.deleted && !mutedOrBanned && (
-            <MessageActions
-              received={received}
-              actionsShown={actionsShown}
-              emojiPickerShown={emojiPickerShown}
-              setEmojiPickerShown={setEmojiPickerShown}
-              isPinned={pinned}
-              messageActionsEnter={() => handleMessageActionsEnter()}
-              messageActionsLeave={() => handleMessageActionsLeave()}
-              emojiClick={
-                appConfiguration?.message_reactions == true
-                  ? emoji => {
-                      reactionClicked(emoji)
-                    }
-                  : null
-              }
-              replyInThreadClick={
-                appConfiguration?.message_threads == true
-                  ? () => {
-                      messageActionHandler(
-                        MessageActionsTypes.REPLY_IN_THREAD,
-                        message
-                      )
-                    }
-                  : null
-              }
-              quoteMessageClick={
-                appConfiguration?.message_quote == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.QUOTE, message)
-                    }
-                  : null
-              }
-              pinMessageClick={
-                appConfiguration?.message_pin == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.PIN, message)
-                    }
-                  : null
-              }
-              forwardMessageClick={
-                appConfiguration?.message_forward == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.FORWARD, message)
-                    }
-                  : null
-              }
-              editMessageClick={
-                appConfiguration?.message_editing == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.EDIT, message)
-                    }
-                  : null
-              }
-              deleteMessageClick={
-                appConfiguration?.message_deletion_soft == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.DELETE, message)
-                    }
-                  : null
-              }
-              reportMessageClick={
-                appConfiguration?.message_report == true
-                  ? () => {
-                      messageActionHandler(MessageActionsTypes.REPORT, message)
-                    }
-                  : null
-              }
-            />
-          )}
         </div>
       </div>
       {inPinned && (

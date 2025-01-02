@@ -2,6 +2,7 @@ import Avatar from './avatar'
 import UnreadIndicator from './unreadIndicator'
 import { useState } from 'react'
 import ToolTip from './toolTip'
+import MarkAsRead from './icons/markAsRead'
 
 export default function ChatMenuItem ({
   avatarUrl,
@@ -11,9 +12,10 @@ export default function ChatMenuItem ({
   count = '',
   markAsRead = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  markAsReadAction = (e) => {},
+  markAsReadAction = e => {},
   setActiveChannel = () => {},
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const [showToolTip, setShowToolTip] = useState(false)
 
@@ -32,17 +34,27 @@ export default function ChatMenuItem ({
       }}
     >
       <div className='flex flex-row justify-between items-center w-full pl-4'>
-        <div className='flex flex-row py-2 gap-3 h-12 text-sm items-center text-neutral900'>
+        <div
+          className='flex flex-row py-2 gap-3 h-12 text-sm items-center'
+          style={{
+            color: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }`
+          }}
+        >
           <Avatar
             present={present}
             bubblePrecedent={avatarBubblePrecedent}
             avatarUrl={avatarUrl}
             appConfiguration={appConfiguration}
+            colorScheme={colorScheme}
           />
           {text}
         </div>
         <div className='flex flex-row items-center'>
-          <UnreadIndicator count={count} />
+          <UnreadIndicator count={count} colorScheme={colorScheme} />
           {markAsRead && (
             <div
               className={`cursor-pointer w-4 h-4 m-3 fill-current ${
@@ -61,9 +73,14 @@ export default function ChatMenuItem ({
                   messageActionsTip={false}
                 />
               </div>
-              <svg viewBox='0 0 18 14'>
-                <path d='M5.79508 10.8749L1.62508 6.70492L0.205078 8.11492L5.79508 13.7049L17.7951 1.70492L16.3851 0.294922L5.79508 10.8749Z' />
-              </svg>
+
+              <MarkAsRead
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
+              />
             </div>
           )}
         </div>

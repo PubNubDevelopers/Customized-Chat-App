@@ -6,6 +6,7 @@ import Image from 'next/image'
 import NewMessageUserRow from './newMessageUserRow'
 import NewMessageUserPill from './newMessageUserPill'
 import { ToastType, PresenceIcon } from '../../types'
+import West from './icons/west'
 
 export default function NewMessageGroup ({
   chat,
@@ -14,7 +15,8 @@ export default function NewMessageGroup ({
   showUserMessage,
   //sendChatEvent,
   invokeRefresh,
-  setActiveChannel
+  setActiveChannel,
+  colorScheme
 }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [searchResults, setSearchResults] = useState<User[]>([])
@@ -32,7 +34,13 @@ export default function NewMessageGroup ({
         filter: `name LIKE "*${term}*" || id LIKE "*${term}*"`
       }) //  Could also filter by Profile URL:  || profileUrl LIKE "*${term}*"
       .then(userResults => {
-        setSearchResults(userResults.users.filter((user) => (user.id != 'admin-config' && user.id != 'PUBNUB_INTERNAL_MODERATOR')))
+        setSearchResults(
+          userResults.users.filter(
+            user =>
+              user.id != 'admin-config' &&
+              user.id != 'PUBNUB_INTERNAL_MODERATOR'
+          )
+        )
       })
   }
 
@@ -90,7 +98,6 @@ export default function NewMessageGroup ({
       desiredChannelId = channel.id
       createdChannel = channel
     } else {
-
       //  Creating a group conversation
       const randomNewChannelName = 'Group ' + Math.floor(Math.random() * 1000)
       const others = newDraftGroupUsers.filter(
@@ -112,8 +119,22 @@ export default function NewMessageGroup ({
   }
 
   return (
-    <div className='flex flex-col max-h-screen select-none'>
-      <div className='flex flex-col border border-navy-200 min-w-full'>
+    <div
+      className='flex flex-col max-h-screen select-none'
+      style={{
+        background: `${
+          colorScheme?.app_appearance === 'dark'
+            ? colorScheme?.primaryDark
+            : colorScheme?.primary
+        }`,
+        color: `${
+          colorScheme?.app_appearance === 'dark'
+            ? colorScheme?.secondaryDark
+            : colorScheme?.secondary
+        }`
+      }}
+    >
+      <div className='flex flex-col border min-w-full'>
         <div className='flex flex-row gap-4 py-2'>
           <div
             className={`${roboto.className} flex flex-row items-center px-3 font-medium text-base`}
@@ -122,19 +143,21 @@ export default function NewMessageGroup ({
               className='cursor-pointer'
               onClick={() => setCreatingNewMessage(false)}
             >
-              <Image
-                src='/icons/chat-assets/west.svg'
-                alt='Send'
+              <West
                 className='m-3'
                 width={24}
                 height={24}
-                priority
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
               />
             </div>
             New Message / Group
           </div>
           <div
-            className={`${roboto.className} flex flex-row items-center justify-center grow gap-4 min-h-10 font-medium text-base text-[#101729]`}
+            className={`${roboto.className} flex flex-row items-center justify-center grow gap-4 min-h-10 font-medium text-base`}
           >
             <div className='flex flex-row -space-x-2.5'>
               {newDraftGroupUsers?.map((user, index) => (
@@ -165,7 +188,7 @@ export default function NewMessageGroup ({
 
         <div className='px-6 py-2 w-2/3'>
           <input
-            className='flex w-full rounded-md bg-white border h-12 px-6 border-neutral-300 shadow-sm text-sm focus:ring-1 focus:ring-inputring outline-none placeholder:text-neutral-600'
+            className='flex w-full rounded-md bg-neutral50 text-neutral900 border h-12 px-6 border-neutral-300 shadow-sm text-sm focus:ring-1 focus:ring-black outline-none'
             placeholder='Search by name'
             value={searchTerm}
             onChange={e => {
@@ -175,10 +198,17 @@ export default function NewMessageGroup ({
         </div>
 
         {/* Search Results */}
-        {searchTerm.length > 0 && (
+        {searchTerm.length > 0 && searchResults.length > 0 && (
           <div className='px-6 w-full'>
             <div className='relative px-6 w-full'>
-              <div className='flex flex-col absolute w-2/5 bg-white rounded-lg border border-neutral-100 shadow-lg left-[0px] top-[0px] z-10'>
+              <div className='flex flex-col absolute w-2/5 rounded-lg border shadow-lg left-[0px] top-[0px] z-10'
+                            style={{
+                              background: `${
+                                colorScheme?.app_appearance === 'dark'
+                                  ? colorScheme?.primaryDark
+                                  : colorScheme?.primary
+                              }`,
+                            }}>
                 {/* Search Results */}
 
                 {searchResults?.map((user, index) => (
@@ -189,6 +219,7 @@ export default function NewMessageGroup ({
                       user.active ? PresenceIcon.ONLINE : PresenceIcon.OFFLINE
                     }
                     clickAction={user => onSearchResultClicked(user)}
+                    colorScheme={colorScheme}
                   />
                 ))}
               </div>
@@ -196,7 +227,7 @@ export default function NewMessageGroup ({
           </div>
         )}
 
-        <div className='flex flex-wrap px-6 mb-2 w-full bg-white '>
+        <div className='flex flex-wrap px-6 mb-2 w-full'>
           {newDraftGroupUsers?.map((user, index) => (
             <NewMessageUserPill
               key={index}
@@ -219,7 +250,20 @@ export default function NewMessageGroup ({
           <div
             className={`${
               creationInProgress && 'hidden'
-            } flex justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
+            } flex justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg`
+            }
+            style={{
+              background: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`,
+              color: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.secondaryDark
+                  : colorScheme?.secondary
+              }`
+            }}
           >
             Create
           </div>

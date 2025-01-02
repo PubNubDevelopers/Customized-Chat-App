@@ -1,17 +1,13 @@
-import Image from 'next/image'
 import { useState, useRef, useEffect } from 'react'
 import { roboto } from '@/app/fonts'
+import Close from './icons/close'
 
-import {
-  Channel,
-  User
-} from '@pubnub/chat'
+import { Channel, User } from '@pubnub/chat'
 import Avatar from './avatar'
 import ForwardMessageSearchResult from './forwardMessageSearchResult'
 import ForwardMessagePill from './forwardMessagePill'
 import {
   PresenceIcon,
-  giveUserAvatarUrl,
   giveGroupAvatarUrl,
   givePublicAvatarUrl,
   giveUserName,
@@ -27,9 +23,11 @@ export default function ModalForwardMessage ({
   privateGroups,
   directChats,
   directChatsUsers,
+  allUsers,
   forwardAction,
   forwardMessageModalVisible,
-  setForwardMessageModalVisible
+  setForwardMessageModalVisible,
+  colorScheme
 }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [searchTerm, setSearchTerm] = useState('')
@@ -59,7 +57,7 @@ export default function ModalForwardMessage ({
     setSearchResultsChannels([])
     if (publicChannels) {
       for (const publicChannel of publicChannels) {
-        if (publicChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1) {
+        if (publicChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 && message.channelId !== publicChannel.id) {
           setSearchResultsChannels(searchResultsChannels => [
             ...searchResultsChannels,
             publicChannel
@@ -69,7 +67,9 @@ export default function ModalForwardMessage ({
     }
     if (privateGroups) {
       for (const privateChannel of privateGroups) {
-        if (privateChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1) {
+        if (
+          privateChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 && message.channelId !== privateChannel.id
+        ) {
           setSearchResultsChannels(searchResultsChannels => [
             ...searchResultsChannels,
             privateChannel
@@ -88,7 +88,8 @@ export default function ModalForwardMessage ({
             user =>
               user.id != 'admin-config' &&
               user.id != 'PUBNUB_INTERNAL_MODERATOR' &&
-              user.id != currentUserId
+              user.id != currentUserId &&
+              user.id != message.userId
           )
         )
       })
@@ -147,7 +148,21 @@ export default function ModalForwardMessage ({
         !forwardMessageModalVisible && 'hidden'
       } fixed mx-auto inset-0 flex justify-center items-center z-40 select-none`}
     >
-      <div className='flex flex-col lg:w-1/2 md:w-2/3 sm:w-2/3 shadow-xl rounded-xl bg-white border border-neutral-300'>
+      <div
+        className='flex flex-col lg:w-1/2 md:w-2/3 sm:w-2/3 shadow-xl rounded-xl border'
+        style={{
+          background: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.primaryDark
+              : colorScheme?.primary
+          }`,
+          color: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary
+          }`
+        }}
+      >
         <div className='flex flex-row justify-end'>
           <div
             className=' cursor-pointer'
@@ -155,27 +170,29 @@ export default function ModalForwardMessage ({
               closeModal()
             }}
           >
-            <Image
-              src='/icons/chat-assets/close.svg'
-              alt='Close'
+            <Close
               className='m-3'
               width={24}
               height={24}
-              priority
+              fill={
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.secondaryDark
+                  : colorScheme?.secondary
+              }
             />
           </div>
         </div>
         <div className='flex flex-col px-12 pb-12 gap-3'>
-          <div className='flex font-semibold text-lg justify-center text-neutral-900 mb-2'>
+          <div className='flex font-semibold text-lg justify-center mb-2'>
             Forward Message
           </div>
 
           <div className='flex flex-col gap-1 my-4'>
-            <div className='flex font-normal text-sm text-neutral-900'></div>
+            <div className='flex font-normal text-sm'></div>
             <div className='flex flex-col'>
               {' '}
               <input
-                className='flex w-full rounded-md bg-white border h-12 px-6 border-neutral-300 shadow-sm text-sm focus:ring-1 focus:ring-inputring outline-none placeholder:text-neutral-600'
+                className='flex w-full rounded-md bg-neutral50 text-neutral900 border h-12 px-6 border-neutral-300 shadow-sm text-sm focus:ring-1 focus:ring-black outline-none placeholder-neutral-500'
                 placeholder='Where would you like to forward it?'
                 value={searchTerm}
                 ref={inputRef}
@@ -184,43 +201,56 @@ export default function ModalForwardMessage ({
                 }}
               />
               {/* Search Results */}
-              {searchTerm.length > 0 && (
-                <div className='px-6 w-full'>
-                  <div className='relative px-6 w-full'>
-                    <div className='flex flex-col absolute w-2/5 bg-white rounded-lg border border-neutral-100 shadow-lg left-[0px] top-[0px] z-10'>
-                      {/* Search Results */}
+              {searchTerm.length > 0 &&
+                (searchResultsChannels.length > 0 ||
+                  searchResultsUsers?.length > 0) && (
+                  <div className='px-6 w-full'>
+                    <div className='relative px-6 w-full'>
+                      <div
+                        className='flex flex-col absolute w-2/5 rounded-lg border shadow-lg left-[0px] top-[0px] z-10'
+                        style={{
+                          background: `${
+                            colorScheme?.app_appearance === 'dark'
+                              ? colorScheme?.primaryDark
+                              : colorScheme?.primary
+                          }`
+                        }}
+                      >
+                        {/* Search Results */}
 
-                      {searchResultsChannels?.map((channel, index) => (
-                        <ForwardMessageSearchResult
-                          key={index}
-                          avatarUrl={
-                            channel?.type === 'group'
-                              ? giveGroupAvatarUrl(currentUserProfileUrl)
-                              : channel?.type == 'public'
-                              ? givePublicAvatarUrl(channel)
-                              : '/avatars/placeholder.png'
-                          }
-                          text={channel.name}
-                          clickAction={() =>
-                            onSearchResultClickedChannel(channel)
-                          }
-                        ></ForwardMessageSearchResult>
-                      ))}
-                      {searchResultsUsers?.map((user, index) => (
-                        <ForwardMessageSearchResult
-                          key={index}
-                          avatarUrl={
-                            user.profileUrl ?? '/avatars/placeholder.png'
-                          }
-                          text={user.name}
-                          clickAction={() => onSearchResultClickedUser(user)}
-                        ></ForwardMessageSearchResult>
-                      ))}
+                        {searchResultsChannels?.map((channel, index) => (
+                          <ForwardMessageSearchResult
+                            key={index}
+                            avatarUrl={
+                              channel?.type === 'group'
+                                ? giveGroupAvatarUrl(currentUserProfileUrl)
+                                : channel?.type == 'public'
+                                ? givePublicAvatarUrl(channel)
+                                : '/avatars/placeholder.png'
+                            }
+                            text={channel.name}
+                            clickAction={() =>
+                              onSearchResultClickedChannel(channel)
+                            }
+                            colorScheme={colorScheme}
+                          ></ForwardMessageSearchResult>
+                        ))}
+                        {searchResultsUsers?.map((user, index) => (
+                          <ForwardMessageSearchResult
+                            key={index}
+                            avatarUrl={
+                              user.profileUrl ?? '/avatars/placeholder.png'
+                            }
+                            text={user.name}
+                            clickAction={() => onSearchResultClickedUser(user)}
+                            colorScheme={colorScheme}
+                          ></ForwardMessageSearchResult>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-              <div className='flex flex-wrap my-2 w-full bg-white '>
+                )}
+              <div className='flex flex-wrap my-2 w-full '>
                 {messageRecipientUsers?.map((user, index) => (
                   <ForwardMessagePill
                     key={index}
@@ -244,23 +274,21 @@ export default function ModalForwardMessage ({
             </div>
           </div>
 
-          <div className='flex flex-col font-normal text-base justify-start border-l-2 border-sky-950 p-2.5 text-neutral-600'>
+          <div
+            className='flex flex-col font-normal text-base justify-start border-l-2 p-2.5'
+            style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}
+          >
             <div className='flex flex-row gap-1.5 items-center mb-2'>
               <Avatar
                 present={PresenceIcon.NOT_SHOWN}
                 avatarUrl={
-                  forwardMessageChannel?.type === 'group'
-                    ? giveGroupAvatarUrl(currentUserProfileUrl)
-                    : forwardMessageChannel?.type == 'public'
-                    ? givePublicAvatarUrl(forwardMessageChannel)
-                    : forwardMessageChannel?.type == 'direct' && directChats
-                    ? giveUserAvatarUrl(
-                        directChatsUsers[
-                          findIndex(directChats, forwardMessageChannel?.id)
-                        ],
-                        currentUserId
-                      )
-                    : '/avatars/placeholder.png'
+                  allUsers?.find((user) => user.id == message?.userId)?.profileUrl ?? '/avatars/placeholder.png'
                 }
                 width={25}
                 height={25}
@@ -283,15 +311,27 @@ export default function ModalForwardMessage ({
 
           <div className='flex flex-row justify-between'>
             <div
-              className={`${roboto.className} flex flex-row justify-center items-center text-navy700 font-normal text-base w-1/3 h-12 cursor-pointer border border-neutral-300 rounded-lg bg-white`}
+              className={`${roboto.className} flex flex-row justify-center items-center text-navy700 font-normal text-base w-1/3 h-12 cursor-pointer border rounded-lg `}
               onClick={() => {
                 closeModal()
+              }}
+              style={{
+                background: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.primaryDark
+                    : colorScheme?.primary
+                }`,
+                color: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }`
               }}
             >
               Cancel
             </div>
             <div
-              className={`${roboto.className} flex flex-row justify-center items-center text-neutral-50 font-normal text-base w-1/3 h-12 cursor-pointer shadow-sm rounded-lg bg-navy900`}
+              className={`${roboto.className} flex flex-row justify-center items-center font-normal text-base w-1/3 h-12 cursor-pointer shadow-sm rounded-lg`}
               onClick={() => {
                 if (
                   messageRecipientUsers.length > 0 ||
@@ -302,6 +342,18 @@ export default function ModalForwardMessage ({
                 } else {
                   inputRef.current?.focus()
                 }
+              }}
+              style={{
+                background: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.accentDark
+                    : colorScheme?.accent
+                }`,
+                color: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }`
               }}
             >
               Forward

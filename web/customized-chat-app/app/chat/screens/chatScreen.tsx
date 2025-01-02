@@ -39,15 +39,29 @@ import {
   ChatEventTypes,
   UnreadMessagesOnChannel,
   PresenceIcon,
-  Restriction
+  Restriction,
+  ThemeColors,
+  Backgrounds
 } from '../../types'
 import { buildConfig } from '../../configuration'
 
-export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
+export default function ChatScreen ({
+  embeddedDemoConfigFromParent,
+  configuration
+}) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [appConfiguration, setAppConfiguration] = useState<any | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [embeddedDemoConfig, setEmbeddedDemoConfig] = useState<any | null>(null)
+  const [colorScheme, setColorScheme] = useState<ThemeColors | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activeChannelBackground, setActiveChannelBackground] = useState<
+    any | null
+  >(null)
+  const DEFAULT_CHAT_BACKGROUND = 2
   const searchParams = useSearchParams()
   const router = useRouter()
+  const [shouldBlurScreen, setShouldBlurScreen] = useState(false)
   const [userId, setUserId] = useState<string | null>('')
   const [chat, setChat] = useState<Chat | null>(null)
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -155,6 +169,12 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   }
 
   useEffect(() => {
+    if (embeddedDemoConfigFromParent && !embeddedDemoConfig) {
+      setEmbeddedDemoConfig(embeddedDemoConfigFromParent)
+    }
+  }, [embeddedDemoConfigFromParent, embeddedDemoConfig])
+
+  useEffect(() => {
     //  Configuration passed to this component has been updated
     if (configuration != null && appConfiguration != null) {
       notifyUserConfigurationChanged(
@@ -187,7 +207,8 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       )
     }
 
-    setAppConfiguration(configuration)
+    //console.log('calling set app configuration')
+    //setAppConfiguration(configuration)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration])
 
@@ -237,7 +258,6 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       setAppConfiguration(jsonConfig)
     } else if (configuration != null) {
       console.log('Found configuration passed to this component')
-      console.log(configuration)
       setAppConfiguration(configuration)
     } else {
       console.log('Failed to find configuration')
@@ -254,7 +274,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           userId: userId,
           typingTimeout: 5000,
           storeUserActivityTimestamps: true,
-          storeUserActivityInterval: 60000 //300000
+          storeUserActivityInterval: 600000
         })
         setChat(localChat)
         setCurrentUser(localChat.currentUser)
@@ -324,6 +344,39 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
 
     if (chat) return
     if (!appConfiguration) return
+
+    if (appConfiguration?.app_appearance) {
+      document
+        .getElementById('appRoot')
+        ?.classList.toggle('dark', appConfiguration?.app_appearance === 'dark')
+    }
+
+    const startUpColorScheme: ThemeColors = {
+      app_appearance: appConfiguration?.app_appearance
+        ? appConfiguration.app_appearance
+        : 'light',
+      primary: appConfiguration?.color_primary
+        ? appConfiguration?.color_primary
+        : '#F8FAFC',
+      primaryDark: appConfiguration?.color_primary_dark
+        ? appConfiguration?.color_primary_dark
+        : '#082f49',
+      secondary: appConfiguration?.color_secondary
+        ? appConfiguration?.color_secondary
+        : '#171717',
+      secondaryDark: appConfiguration?.color_secondary_dark
+        ? appConfiguration?.color_secondary_dark
+        : '#fafafa',
+      accent: appConfiguration?.color_accent
+        ? appConfiguration?.color_accent
+        : '#E3F1FD',
+      accentDark: appConfiguration?.color_accent_dark
+        ? appConfiguration?.color_accent_dark
+        : '#b91c1c'
+    }
+    setColorScheme(startUpColorScheme)
+    //console.log(startUpColorScheme)
+
     if (embeddedDemoConfig != null) {
       //  Any special initialization when we are running within the embedded demo?
       setPublicChannels(
@@ -351,6 +404,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       )
       setDirectChatsUsers(tempDirectUsers)
       setProfileUrl(embeddedDemoConfig.users[0].profileUrl)
+      setCurrentUser(embeddedDemoConfig.users[0])
       setTypingData([embeddedDemoConfig.users[1].id])
       setQuotedMessageSender('<<Sender of the Quoted Message>>')
       if (
@@ -557,6 +611,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
   ])
 
   /**  Set the typing indicator listener and pinned messages */
+  //  Active Channel has Changed
   useEffect(() => {
     if (!chat) return
     if (!activeChannel) return
@@ -581,6 +636,44 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
       setTypingData(value)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat, activeChannel])
+
+  /* Update the current channel's background (if specified on server) */
+
+  useEffect(() => {
+    if (!chat) return
+    if (!activeChannel) return
+
+    function updateBackground (channel) {
+      const channelThemeFromServer = channel.custom?.themeId
+      if (
+        channelThemeFromServer == null ||
+        typeof channelThemeFromServer == 'undefined'
+      ) {
+        console.log('no server theme')
+        setActiveChannelBackground(Backgrounds[DEFAULT_CHAT_BACKGROUND])
+        return
+      }
+      const backgroundId = parseInt(channel.custom?.themeId)
+      if (
+        isNaN(backgroundId) ||
+        backgroundId < 0 ||
+        backgroundId >= Backgrounds.length
+      ) {
+        console.log('nan')
+        setActiveChannelBackground(Backgrounds[DEFAULT_CHAT_BACKGROUND])
+        return
+      }
+      setActiveChannelBackground(Backgrounds[backgroundId])
+    }
+    //  Active channel has changed, what is its current background?
+    updateBackground(activeChannel)
+
+    if (activeChannel.type == 'direct') {
+      return activeChannel.streamUpdates(channel => {
+        updateBackground(channel)
+      })
+    }
   }, [chat, activeChannel])
 
   function updateActiveChannelRestrictions () {
@@ -659,7 +752,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     allUsers.forEach(user => {
       user.streamUpdates(updatedUser => userHasUpdated(updatedUser))
     })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [allUsers, initOnce])
 
   function userHasUpdated (updatedUser) {
@@ -677,7 +770,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     )
 
     //  Update the groups on the left hand pane to ensure the direct chats have the correct names
-    //  This is a bit lazy, I'm doing a network call to keep the directChatsUsers array updated, but I 
+    //  This is a bit lazy, I'm doing a network call to keep the directChatsUsers array updated, but I
     //  do have all the information to do this locally.
     refreshGroups('direct', true)
   }
@@ -945,6 +1038,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         }
         break
       case MessageActionsTypes.REPORT:
+        if (embeddedDemoConfig) return
         setReportedMessage(data)
         setReportMessageModalVisible(true)
         break
@@ -1043,11 +1137,31 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
     }
   }
 
+  useEffect(() => {
+    //  Blur the screen if a modal window is shown
+    setShouldBlurScreen(
+      profileScreenVisible ||
+        (chatSettingsScreenVisible && appConfiguration?.edit_channel_details) ||
+        changeChatNameModalVisible ||
+        manageMembersModalVisible ||
+        reportMessageModalVisible ||
+        forwardMessageModalVisible
+    )
+  }, [
+    appConfiguration?.edit_channel_details,
+    changeChatNameModalVisible,
+    chatSettingsScreenVisible,
+    forwardMessageModalVisible,
+    manageMembersModalVisible,
+    profileScreenVisible,
+    reportMessageModalVisible
+  ])
+
   if (embeddedDemoConfig == null && !chat) {
     return (
       <main>
         <div className='flex flex-col w-full h-screen justify-center items-center'>
-          <div className='max-w-96 max-h-96 '>
+          <div className='max-w-96 max-h-96'>
             <Image
               src='/chat-logo.svg'
               alt='Chat Icon'
@@ -1079,6 +1193,16 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         embeddedDemoConfig != null && ''
       }`}
     >
+      <div
+        className={`fixed top-0 right-0 bottom-0 left-0 z-[15] ${
+          !shouldBlurScreen && 'hidden'
+        }`}
+        onClick={() => {
+          setProfileScreenVisible(false)
+          setChatSettingsScreenVisible(false)
+        }}
+      ></div>
+
       <ProfileScreen
         profileScreenVisible={profileScreenVisible}
         setProfileScreenVisible={setProfileScreenVisible}
@@ -1094,6 +1218,18 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           setChangeUserNameModalVisible(true)
         }}
         showUserMessage={showUserMessage}
+        colorScheme={colorScheme}
+        setAppDarkMode={isDarkMode => {
+          if (colorScheme) {
+            const darkProp = isDarkMode ? 'dark' : 'light'
+            const newColorScheme: ThemeColors = { ...colorScheme }
+            newColorScheme.app_appearance = darkProp
+            setColorScheme(newColorScheme)
+            document
+              .getElementById('appRoot')
+              ?.classList.toggle('dark', isDarkMode)
+          }
+        }}
       />
       <ChatSettingsScreen
         chatSettingsScreenVisible={
@@ -1114,8 +1250,23 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         manageMembershipsAction={() => {
           setManageMembersModalVisible(true)
         }}
+        setBackgroundAction={async (background, index) => {
+          if (embeddedDemoConfig == null) {
+            //  todo This code works around a bug where updating a channel loses data
+            await activeChannel?.update({
+              type: activeChannel.type,
+              custom: {
+                themeId: index,
+                profileUrl: activeChannel.custom?.profileUrl ?? ''
+              }
+            })
+          } else {
+            setActiveChannelBackground(Backgrounds[index])
+          }
+        }}
         embeddedDemoConfig={embeddedDemoConfig}
         appConfiguration={appConfiguration}
+        colorScheme={colorScheme}
       />
       {/* Modal to change the Chat group name*/}
       {
@@ -1137,6 +1288,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           }}
           changeNameModalVisible={changeChatNameModalVisible}
           setChangeNameModalVisible={setChangeChatNameModalVisible}
+          colorScheme={colorScheme}
         />
       }
       {
@@ -1148,6 +1300,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           manageMembersModalVisible={manageMembersModalVisible}
           setManageMembersModalVisible={setManageMembersModalVisible}
           appConfiguration={appConfiguration}
+          colorScheme={colorScheme}
         />
       }
       {/* Modal to change the user name */}
@@ -1173,6 +1326,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           }}
           changeNameModalVisible={changeUserNameModalVisible}
           setChangeNameModalVisible={setChangeUserNameModalVisible}
+          colorScheme={colorScheme}
         />
       }
       {/* Modal to specify the reason for reporting a message */}
@@ -1193,6 +1347,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         }}
         reportMessageModalVisible={reportMessageModalVisible}
         setReportMessageModalVisible={setReportMessageModalVisible}
+        colorScheme={colorScheme}
       />
       {/* Modal to specify the reason for reporting a message */}
       <ModalForwardMessage
@@ -1204,13 +1359,19 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         privateGroups={privateGroups}
         directChats={directChats}
         directChatsUsers={directChatsUsers}
+        allUsers={allUsers}
         forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
           let newActiveChannel
           if (forwardMessage && channelsToForwardTo.length > 0) {
             //  Forward to specified channels
             for (const channel of channelsToForwardTo) {
-              await forwardMessage.forward(channel.id)
-              newActiveChannel = channel
+              if (forwardMessage.channelId != channel.id) {
+                await forwardMessage.forward(channel.id)
+                newActiveChannel = channel
+              } else {
+                //  Should never happen as you can't select the channel from the UI dropdown
+                console.log('You cannot forward a message to the same channel')
+              }
             }
           }
           if (chat && forwardMessage && usersToForwardTo.length > 0) {
@@ -1219,8 +1380,20 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
               const { channel } = await chat.createDirectConversation({
                 user: user
               })
-              forwardMessage.forward(channel.id)
-              newActiveChannel = channel
+              if (forwardMessage.channelId != channel.id) {
+                forwardMessage.forward(channel.id)
+                newActiveChannel = channel
+              } else {
+                //  Will only happen if try to forward a message in a DM to somebody
+                //  we already sent it to
+                console.log('You cannot forward a message to the same channel')
+                showUserMessage(
+                  'Unable to Forward',
+                  'You cannot forward a message to a channel that already contains it',
+                  '',
+                  ToastType.ERROR
+                )
+              }
             }
             refreshGroups('direct')
             if (newActiveChannel) {
@@ -1230,21 +1403,23 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         }}
         forwardMessageModalVisible={forwardMessageModalVisible}
         setForwardMessageModalVisible={setForwardMessageModalVisible}
+        colorScheme={colorScheme}
       />
 
-      {embeddedDemoConfig == null && (
-        <Header
-          currentUser={currentUser}
-          userProfileClicked={() => {
-            if (chat) {
-              setSelectedUserProfile(currentUser)
-              setProfileScreenVisible(true)
-            }
-          }}
-          setCreatingNewMessage={setCreatingNewMessage}
-          appConfiguration={appConfiguration}
-        />
-      )}
+      <Header
+        currentUser={currentUser}
+        userProfileClicked={() => {
+          if (chat) {
+            setSelectedUserProfile(currentUser)
+            setProfileScreenVisible(true)
+          }
+        }}
+        setCreatingNewMessage={setCreatingNewMessage}
+        shouldBlurScreen={shouldBlurScreen}
+        appConfiguration={appConfiguration}
+        embeddedDemoConfig={embeddedDemoConfig}
+        colorScheme={colorScheme}
+      />
       <UserMessage
         userMsgShown={userMsgShown}
         title={userMsg.title}
@@ -1282,16 +1457,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
         id='chat-main'
         className={`flex flex-row ${
           embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
-        } overscroll-none  ${
-          (profileScreenVisible ||
-            (chatSettingsScreenVisible &&
-              appConfiguration.edit_channel_details) ||
-            changeChatNameModalVisible ||
-            manageMembersModalVisible ||
-            reportMessageModalVisible ||
-            forwardMessageModalVisible) &&
-          'blur-sm opacity-40'
-        }`}
+        } overscroll-none ${shouldBlurScreen && 'blur-sm opacity-40'}`}
       >
         <ChatSelectionMenu
           chatSelectionMenuMinimized={chatSelectionMenuMinimized}
@@ -1324,8 +1490,18 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           showUserMessage={showUserMessage}
           appConfiguration={appConfiguration}
           embeddedDemoConfig={embeddedDemoConfig}
+          colorScheme={colorScheme}
         />
-        <div className='relative w-full bg-white'>
+        <div
+          className='relative w-full'
+          style={{
+            background: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.primaryDark
+                : colorScheme?.primary
+            }`
+          }}
+        >
           <div
             id='chats-main'
             className={`flex flex-col grow w-full max-h-screen py-0 ${
@@ -1344,6 +1520,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                   refreshGroups(createdType)
                 }}
                 setActiveChannel={setActiveChannel}
+                colorScheme={colorScheme}
               />
             ) : (
               <MessageList
@@ -1387,8 +1564,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 }}
                 allUsers={allUsers}
                 activeChannelRestrictions={activeChannelRestrictions}
+                activeChannelBackground={activeChannelBackground}
                 embeddedDemoConfig={embeddedDemoConfig}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )}
             {!quotedMessage &&
@@ -1406,7 +1585,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
             <div
               className={`${
                 embeddedDemoConfig == null && creatingNewMessage && 'hidden'
-              } absolute bottom-0 left-0 right-0 bg-white`}
+              } absolute bottom-0 left-0 right-0`}
             >
               <MessageInput
                 activeChannel={activeChannel}
@@ -1428,6 +1607,7 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
                 activeChannelRestrictions={activeChannelRestrictions}
                 embeddedDemoConfig={embeddedDemoConfig}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             </div>
           </div>
@@ -1444,8 +1624,10 @@ export default function ChatScreen ({ embeddedDemoConfig, configuration }) {
           activeThreadMessage={activeThreadMessage}
           currentUser={chat?.currentUser}
           groupUsers={activeChannelUsers}
+          activeChannelBackground={activeChannelBackground}
           embeddedDemoConfig={embeddedDemoConfig}
           appConfiguration={appConfiguration}
+          colorScheme={colorScheme}
         />
       </div>
     </main>

@@ -5,7 +5,8 @@ export default function ManagedMember ({
   user,
   name,
   lastElement = false,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   return (
     <div
@@ -19,7 +20,14 @@ export default function ManagedMember ({
           avatarUrl={user.profileUrl}
           appConfiguration={appConfiguration}
         />
-        <div className='flex pl-3 text-sm font-normal text-neutral-900'>
+        <div className='flex pl-3 text-sm font-normal'
+                      style={{
+                        color: `${
+                          colorScheme?.app_appearance === 'dark'
+                            ? colorScheme?.secondaryDark
+                            : colorScheme?.secondary
+                        }`
+                      }}>
           {name}
         </div>
       </div>

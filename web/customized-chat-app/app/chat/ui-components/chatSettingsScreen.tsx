@@ -1,7 +1,10 @@
-import Image from 'next/image'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
+import Image from 'next/image'
 import { useEffect } from 'react'
+import CloseRooms from './icons/closeRooms'
+import Logout from './icons/logout'
+import { Backgrounds } from '../../types'
 
 export default function ChatSettingsScreen ({
   chatSettingsScreenVisible,
@@ -14,8 +17,10 @@ export default function ChatSettingsScreen ({
   buttonAction,
   changeChatNameAction = () => {},
   manageMembershipsAction = () => {},
+  setBackgroundAction,
   embeddedDemoConfig = null,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const MAX_AVATARS_SHOWN = 13
 
@@ -27,25 +32,41 @@ export default function ChatSettingsScreen ({
     <div
       className={`${
         !chatSettingsScreenVisible && 'hidden'
-      } flex flex-col h-full flex-wrap p-3 rounded-l-lg bg-sky-950 select-none ${embeddedDemoConfig == null ? 'fixed' : 'absolute'} right-0 w-96 z-20`}
+      } flex flex-col h-full p-3 rounded-l-lg select-none overflow-y-auto border ${
+        embeddedDemoConfig == null ? 'fixed' : 'absolute'
+      } right-0 w-96 z-20`}
+      style={{
+        background: `${
+          colorScheme?.app_appearance === 'dark'
+            ? colorScheme?.primaryDark
+            : colorScheme?.primary
+        }`,
+        color: `${
+          colorScheme?.app_appearance === 'dark'
+            ? colorScheme?.secondaryDark
+            : colorScheme?.secondary
+        }`
+      }}
     >
-      <div
+    <div
         className={`${roboto.className} ${
           (changeChatNameScreenVisible || manageMembersModalVisible) &&
           'opacity-40'
-        }  text-sm font-medium flex flex-row text-white py-3 items-center`}
+        }  text-sm font-medium flex flex-row py-3 items-center`}
       >
         <div
           className={`flex cursor-pointer`}
           onClick={() => setChatSettingsScreenVisible(false)}
         >
-          <Image
-            src='/icons/chat-assets/close-rooms.svg'
-            alt='Close Settings'
+          <CloseRooms
             className='p-3'
             width={36}
             height={36}
-            priority
+            fill={
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }
           />
         </div>
         Chat settings
@@ -58,7 +79,7 @@ export default function ChatSettingsScreen ({
         } `}
       >
         <div
-          className={`${roboto.className} text-sm font-medium flex flex flex-row text-white p-4 justify-between items-center`}
+          className={`${roboto.className} text-sm font-medium flex flex-row p-4 justify-between items-center`}
         >
           Settings
         </div>
@@ -76,6 +97,7 @@ export default function ChatSettingsScreen ({
                       width={88}
                       height={88}
                       appConfiguration={appConfiguration}
+                      colorScheme={colorScheme}
                     />
                   )
               )}
@@ -86,9 +108,9 @@ export default function ChatSettingsScreen ({
           {isDirectChat ? (
             <div className='flex flex-row justify-between items-center py-4 px-4'>
               <div className='flex flex-col'>
-                <div className='text-lg text-white'>Chat members</div>
+                <div className='text-lg'>Chat members</div>
                 {activeChannelUsers?.map((member, index) => (
-                  <div className='text-lg text-white font-semibold' key={index}>
+                  <div className='text-lg font-semibold' key={index}>
                     {member.name}
                   </div>
                 ))}
@@ -97,52 +119,147 @@ export default function ChatSettingsScreen ({
           ) : (
             <div className='flex flex-row justify-between items-center py-4 px-4'>
               <div className='flex flex-col'>
-                <div className='text-lg text-white font-normal'>Chat name</div>
-                <div className='text-lg text-white font-semibold'>
+                <div className='text-lg font-normal'>Chat name</div>
+                <div className='text-lg font-semibold'>
                   {activeChannel?.name}
                 </div>
               </div>
               <div
-                className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
-                onClick={() => {if (embeddedDemoConfig != null) return;changeChatNameAction()}}
+                className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg `}
+                onClick={() => {
+                  if (embeddedDemoConfig != null) return
+                  changeChatNameAction()
+                }}
+                style={{
+                  background: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.accentDark
+                      : colorScheme?.accent
+                  }`,
+                  color: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }`
+                }}
               >
                 Change
               </div>
             </div>
           )}
 
-          <div className='border border-navy600'></div>
+          <div
+            className='border'
+            style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}
+          ></div>
 
           {!isDirectChat && (
             <div>
               {' '}
               <div className='flex flex-row justify-between items-center py-6 px-4'>
-                <div className='text-lg text-white'>Members</div>
+                <div className='text-lg'>Members</div>
                 <div
-                  className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg bg-pubnubbabyblue`}
-                  onClick={() => {if (embeddedDemoConfig != null) return;manageMembershipsAction()}}
+                  className={`${roboto.className} flex flex-row justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg`}
+                  onClick={() => {
+                    if (embeddedDemoConfig != null) return
+                    manageMembershipsAction()
+                  }}
+                  style={{
+                    background: `${
+                      colorScheme?.app_appearance === 'dark'
+                        ? colorScheme?.accentDark
+                        : colorScheme?.accent
+                    }`,
+                    color: `${
+                      colorScheme?.app_appearance === 'dark'
+                        ? colorScheme?.secondaryDark
+                        : colorScheme?.secondary
+                    }`
+                  }}
                 >
                   View
                 </div>
               </div>
-              <div className='border border-navy600'></div>
+              <div
+                className='border'
+                style={{
+                  borderColor: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.accentDark
+                      : colorScheme?.accent
+                  }`
+                }}
+              ></div>
             </div>
           )}
 
-
+          <div className='flex flex-col justify-between items-start py-6 px-4 gap-2'>
+            <div className='text-lg'>Choose Background</div>
+            <div className='text-xs'>Will update for all participants</div>
+            {Backgrounds?.map((background, index) => (
+              <div key={index} className='cursor-pointer place-items-end'
+              onClick={() => {
+                setBackgroundAction(background, index)
+                setChatSettingsScreenVisible(false)
+              }}>
+                <Image
+                  src={background.url}
+                  alt='Background'
+                  height={400}
+                  width={400}
+                  sizes={'300px'}
+                  style={{
+                    objectFit: 'cover',
+                    height: '100px'
+                  }}
+                />
+                  <div className='text-xs my-1 self-end'>{background.name}</div>
+              </div>
+            ))}
+          </div>
+          <div
+            className='border'
+            style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}
+          ></div>
 
           {isDirectChat ? (
             <div
-              className={`${roboto.className} flex flex-row justify-center my-6 items-center text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
+              className={`${roboto.className} flex flex-row justify-center my-6 items-center font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer rounded-lg`}
+              style={{
+                background: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.accentDark
+                    : colorScheme?.accent
+                }`,
+                color: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }`
+              }}
               onClick={() => buttonAction()}
             >
-              <Image
-                src='/icons/chat-assets/logout.svg'
-                alt='Leave Conversation'
-                className='p-2'
-                width={36}
-                height={36}
-                priority
+              <Logout
+                className='p-3'
+                width={40}
+                height={40}
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
               />
               Leave this 1:1 chat
             </div>
@@ -150,16 +267,32 @@ export default function ChatSettingsScreen ({
             activeChannel?.type !==
               'public' /* To simplify the logic of the demo, do not allow to leave from public channels */ && (
               <div
-                className={`${roboto.className} flex flex-row justify-center my-6 items-center text-white font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer border border-[#938F99] rounded-lg bg-sky-950`}
-                onClick={() => {buttonAction()}}
+                className={`${roboto.className} flex flex-row justify-center my-6 items-center  font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer rounded-lg`}
+                style={{
+                  background: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.accentDark
+                      : colorScheme?.accent
+                  }`,
+                  color: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }`
+                }}
+                onClick={() => {
+                  buttonAction()
+                }}
               >
-                <Image
-                  src='/icons/chat-assets/logout.svg'
-                  alt='Logout'
+                <Logout
                   className='p-3'
-                  width={36}
-                  height={36}
-                  priority
+                  width={40}
+                  height={40}
+                  fill={
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.secondaryDark
+                      : colorScheme?.secondary
+                  }
                 />
                 Leave conversation
               </div>

@@ -28,7 +28,8 @@ export default function MessageInput ({
   setCurrentlyEditingMessage,
   activeChannelRestrictions,
   embeddedDemoConfig = null,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const [text, setText] = useState('')
   const [newMessageDraft, setNewMessageDraft] = useState<MessageDraft | null>()
@@ -215,10 +216,29 @@ export default function MessageInput ({
       } pr-6`}
     >
       {currentlyEditingMessage && !(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) &&(
-        <div className='text-cherryDark w-full ml-12 pt-2'>Editing Message</div>
+        <div className='flex ml-12 py-1 px-3 justify-center rounded-lg' style={{
+          background: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.accentDark
+              : colorScheme?.accent
+          }`,
+          color: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary
+          }`
+        }}>Editing Message</div>
       )}
       {showUploadSpinner && attachmentsCount > 0 && (
-        <div className='text-cherryDark w-full ml-12 pt-2'>
+        <div className='w-full ml-12 pt-2'
+        style={{
+          color: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.accentDark
+              : colorScheme?.accent
+          }`
+        }}
+>
           Uploading Attachments...
         </div>
       )}
@@ -256,7 +276,7 @@ export default function MessageInput ({
           <input
             className={`flex grow rounded-md border border-neutral-300 h-[50px] mr-1 ${
               quotedMessage ? '' : 'my-8'
-            } ml-6 px-6 text-sm focus:ring-1 focus:ring-inputring outline-none placeholder:text-neutral-500`}
+            } ml-6 px-6 text-sm focus:ring-1 bg-neutral50 text-neutral900 focus:ring-black outline-none`}
             ref={inputRef}
             placeholder={`${activeChannelRestrictions?.mute ? 'You are Muted in this Conversation' : activeChannelRestrictions?.ban ? `You are Banned from this Conversation ${activeChannelRestrictions.reason && `(${activeChannelRestrictions.reason})`}` : 'Type message'}`}
             value={text}
@@ -321,7 +341,7 @@ export default function MessageInput ({
             <input type='file' className='hidden' />
             {attachmentsCount > 0 && (
               <div className='absolute right-0 top-0'>
-                <UnreadIndicator count={attachmentsCount} />
+                <UnreadIndicator count={attachmentsCount} colorScheme={colorScheme} />
               </div>
             )}
             <Image

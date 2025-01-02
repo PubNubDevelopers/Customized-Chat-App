@@ -59,12 +59,20 @@ export default function Home () {
     if (buildConfiguration?.public_channels != null) {
       setPublicChannelsAvailable(buildConfiguration.public_channels)
     }
+    if (buildConfiguration?.app_appearance != null) {
+      console.log(buildConfiguration?.app_appearance)
+      const isDarkMode = buildConfiguration?.app_appearance == 'dark'
+      document
+      .getElementById('appRoot')
+      ?.classList.toggle('dark', isDarkMode)
+    }
   }, [
     searchParams,
     router,
     buildConfiguration.publishKey,
     buildConfiguration.subscribeKey,
-    buildConfiguration.public_channels
+    buildConfiguration.public_channels,
+    buildConfiguration.app_appearance
   ])
 
   useEffect(() => {
@@ -198,7 +206,7 @@ export default function Home () {
           <Image
             src='/chat-logo.svg'
             alt='Chat Icon'
-            className='self-center'
+            className='self-center dark:invert'
             width={75}
             height={75}
             priority
@@ -209,14 +217,14 @@ export default function Home () {
         )}
         {initialized && (
           <div className='flex flex-col text-center gap-2'>
-            <div className='text-center text-lg text-neutral900 font-bold'>
+            <div className='text-center text-lg font-bold'>
               Log in: Customizable Chat Application
             </div>
             <div className='text-center text-base text-pubnub font-normal'>
               Built with the PubNub Chat SDK for JavaScript and TypeScript.
             </div>
 
-            <div className='text-xs'>Select a user to log in as</div>
+            <div className='text-xs'>Select a user to log in as.  The next page will render with your requested color scheme</div>
 
             <div className='grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2'>
               {userArray.slice(0, 21).map((user, index) => {

@@ -1,16 +1,16 @@
 import Message from './message'
 import { roboto } from '@/app/fonts'
-import Image from 'next/image'
 import MessageInput from './messageInput'
 import { useState, useEffect, useRef } from 'react'
 import {
   //Channel,
   //User,
-  Message as pnMessage,
+  Message as pnMessage
   //Membership,
   //MixedTextTypedElement,
   //TimetokenUtils
 } from '@pubnub/chat'
+import Close from './icons/close'
 
 export default function MessageListThread ({
   showThread,
@@ -20,8 +20,10 @@ export default function MessageListThread ({
   currentUser,
   groupUsers,
   setChatSelectionMenuMinimized,
+  activeChannelBackground,
   embeddedDemoConfig = null,
-  appConfiguration
+  appConfiguration,
+  colorScheme
 }) {
   const [messages, setMessages] = useState<pnMessage[]>([])
   const messageListRef = useRef<HTMLDivElement>(null)
@@ -75,11 +77,29 @@ export default function MessageListThread ({
       <div
         className={`${
           !showThread && 'hidden'
-        } flex flex-col min-w-80 max-w-80 max-h-screen py-0 ${embeddedDemoConfig == null ? 'mt-[64px]' : ''} bg-white`}
-      >
+        } flex flex-col min-w-80 max-w-80 max-h-screen py-0 ${
+          embeddedDemoConfig == null ? 'mt-[64px]' : ''
+        }`}
+        style={{
+          backgroundImage: activeChannelBackground?.backgroundImage ?? "url('/backgrounds/default.png')",
+          backgroundPosition: activeChannelBackground?.backgroundPosition ?? "initial"
+        }}
+        >
         <div
           id='threads-header'
-          className='flex flex-row items-center w-full h-16 min-h-16 border border-navy-200'
+          className='flex flex-row items-center w-full h-16 border min-h-16 border-l border-navy-200'
+          style={{
+            background: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.primaryDark
+                : colorScheme?.primary
+            }`,
+            color: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }`
+          }}
         >
           <div
             className={`${roboto.className} text-base font-bold flex grow pl-6 pr-3 justify-between items-center`}
@@ -87,21 +107,28 @@ export default function MessageListThread ({
             Reply in thread
             <div
               className='flex cursor-pointer p-3'
-              onClick={() => {setShowThread(false);setChatSelectionMenuMinimized(false)}}
+              onClick={() => {
+                setShowThread(false)
+                setChatSelectionMenuMinimized(false)
+              }}
             >
-              <Image
-                src='/icons/chat-assets/close.svg'
-                alt='Close Thread'
+              <Close
                 className=''
                 width={24}
                 height={24}
-                priority
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
               />
             </div>
           </div>
         </div>
         <div
-          className={`flex flex-col border-x border-navy-200 h-screen overflow-y-auto pb-6 ${embeddedDemoConfig == null ? 'mb-[178px]' : 'mb-[114px]'}`}
+          className={`flex flex-col border-x border-navy-200 h-screen overflow-y-auto pb-6 ${
+            embeddedDemoConfig == null ? 'mb-[178px]' : 'mb-[114px]'
+          }`}
           ref={messageListRef}
         >
           {/* ORIGINAL MESSAGE */}
@@ -130,11 +157,13 @@ export default function MessageListThread ({
               messageActionHandler={() => {}}
               message={activeThreadMessage}
               currentUserId={currentUser.id}
+              activeChannelBackground={activeChannelBackground}
               appConfiguration={appConfiguration}
+              colorScheme={colorScheme}
             />
           )}
           {/* THREAD BUBBLES */}
-          {messages.map((message) => {
+          {messages.map(message => {
             return (
               <Message
                 key={message.timetoken}
@@ -157,7 +186,9 @@ export default function MessageListThread ({
                 messageActionHandler={() => {}}
                 message={message}
                 currentUserId={currentUser.id}
+                activeChannelBackground={activeChannelBackground}
                 appConfiguration={appConfiguration}
+                colorScheme={colorScheme}
               />
             )
           })}
@@ -174,6 +205,7 @@ export default function MessageListThread ({
             activeChannelRestrictions={null}
             embeddedDemoConfig={embeddedDemoConfig}
             appConfiguration={appConfiguration}
+            colorScheme={colorScheme}
           />
         </div>
       </div>
