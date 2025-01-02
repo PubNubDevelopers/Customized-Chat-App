@@ -55,9 +55,7 @@ export default function ChatScreen ({
   const [embeddedDemoConfig, setEmbeddedDemoConfig] = useState<any | null>(null)
   const [colorScheme, setColorScheme] = useState<ThemeColors | null>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [activeChannelBackground, setActiveChannelBackground] = useState<
-    any | null
-  >(null)
+  const [activeChannelBackground, setActiveChannelBackground] = useState<any | null>(null)
   const DEFAULT_CHAT_BACKGROUND = 2
   const searchParams = useSearchParams()
   const router = useRouter()
