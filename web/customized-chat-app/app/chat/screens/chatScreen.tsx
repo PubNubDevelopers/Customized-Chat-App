@@ -1188,7 +1188,7 @@ export default function ChatScreen ({
   return (
     <main
       className={`overscroll-none overflow-y-hidden ${
-        embeddedDemoConfig != null && ''
+        embeddedDemoConfig != null && 'border-b-1'
       }`}
     >
       <div
@@ -1250,7 +1250,6 @@ export default function ChatScreen ({
         }}
         setBackgroundAction={async (background, index) => {
           if (embeddedDemoConfig == null) {
-            //  todo This code works around a bug where updating a channel loses data
             await activeChannel?.update({
               type: activeChannel.type,
               custom: {

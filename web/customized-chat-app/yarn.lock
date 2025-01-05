@@ -1378,10 +1378,10 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
-"@pubnub/chat@^0.9.4":
-  version "0.9.4"
-  resolved "https://registry.yarnpkg.com/@pubnub/chat/-/chat-0.9.4.tgz#b79b7ad3bf614290363bfaec4f83df1d9ed6c53b"
-  integrity sha512-DJD2MmZp00t6zWwfHl2JnWjDmS5ZryyXPIbwno4KqitbVqWHP+e3qTtvJ4NNHNGJZE4bO2kPnHmR4GXBSGfrHQ==
+"@pubnub/chat@^0.9.6":
+  version "0.9.6"
+  resolved "https://registry.yarnpkg.com/@pubnub/chat/-/chat-0.9.6.tgz#b9c73a2c96280904844a16efc50732de5cf17601"
+  integrity sha512-ZfrK/RqUBVffWVWKZwGCk6IPVPGwgpX+g5twm08z1r2lu3KXXJF3WdPVBi4HJs+3/5sEKPc2R7ZMkaartbvQZQ==
   dependencies:
     format-util "^1.0.5"
     pubnub "8.3.1"
