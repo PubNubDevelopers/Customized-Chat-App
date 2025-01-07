@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import ChatMenuHeader from './chatMenuHeader'
 import ChatMenuItem from './chatMenuItem'
+import CloseRooms from './icons/closeRooms'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   ChatHeaderActionIcon,
@@ -125,7 +126,7 @@ export default function ChatSelectionMenu ({
       <div
         className={`${
           !isLg && chatSelectionMenuMinimized ? 'flex flex-row' : 'hidden'
-        } min-h-screen h-screen`}
+        } min-h-screen h-screen items-center`}
         style={{
           background: `${
             colorScheme?.app_appearance === 'dark'
@@ -141,13 +142,13 @@ export default function ChatSelectionMenu ({
             setShowThread(false)
           }}
         >
-          <Image
-            src='/icons/chat-assets/close-rooms.svg'
-            alt='Expand Chats'
-            className='p-1 mb-7 rotate-180'
+        <CloseRooms
+            className=''
             width={36}
             height={36}
-            priority
+            fill={colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary}
           />
         </div>
       </div>

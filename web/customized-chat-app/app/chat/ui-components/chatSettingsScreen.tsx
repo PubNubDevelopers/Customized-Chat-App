@@ -59,14 +59,12 @@ export default function ChatSettingsScreen ({
           onClick={() => setChatSettingsScreenVisible(false)}
         >
           <CloseRooms
-            className='p-3'
+            className=''
             width={36}
             height={36}
-            fill={
-              colorScheme?.app_appearance === 'dark'
-                ? colorScheme?.secondaryDark
-                : colorScheme?.secondary
-            }
+            fill={colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary}
           />
         </div>
         Chat settings

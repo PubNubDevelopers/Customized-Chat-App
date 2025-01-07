@@ -1186,447 +1186,479 @@ export default function ChatScreen ({
   }
 
   return (
-    <main
-      className={`overscroll-none overflow-y-hidden ${
-        embeddedDemoConfig != null && 'border-b-1'
-      }`}
-    >
-      <div
-        className={`fixed top-0 right-0 bottom-0 left-0 z-[15] ${
-          !shouldBlurScreen && 'hidden'
+    <div className=''>
+      <div className='sm:hidden'>
+        <div className='flex flex-col w-full h-screen justify-start items-center my-6 gap-2'>
+          <div className='max-w-96 max-h-96'>
+            <Image
+              src='/chat-logo.svg'
+              alt='Chat Icon'
+              className=''
+              width={200}
+              height={200}
+              priority
+            />
+          </div>
+          <div className='text-2xl select-none'>Mobile chat app</div>
+          <div className='select-none text-center'>
+            The mobile version of this application is still under development
+          </div>
+          {appConfiguration && <div className='self-start m-3'>
+            <div className='select-none text-xs'>Your Configuration:</div>
+            <pre className='text-xs select-none'>
+              {JSON.stringify(appConfiguration, null, 2)}
+            </pre>
+          </div>}
+        </div>
+      </div>
+      <main
+        className={`hidden sm:block overscroll-none overflow-y-hidden ${
+          embeddedDemoConfig != null && 'border-b-1'
         }`}
-        onClick={() => {
-          setProfileScreenVisible(false)
-          setChatSettingsScreenVisible(false)
-        }}
-      ></div>
+      >
+        <div
+          className={`fixed top-0 right-0 bottom-0 left-0 z-[15] ${
+            !shouldBlurScreen && 'hidden'
+          }`}
+          onClick={() => {
+            setProfileScreenVisible(false)
+            setChatSettingsScreenVisible(false)
+          }}
+        ></div>
 
-      <ProfileScreen
-        profileScreenVisible={profileScreenVisible}
-        setProfileScreenVisible={setProfileScreenVisible}
-        changeUserNameScreenVisible={changeUserNameModalVisible}
-        user={
-          chat?.currentUser.id == selectedUserProfile?.id
-            ? currentUser
-            : allUsers?.find(user => user.id == selectedUserProfile?.id)
-        }
-        isMe={chat?.currentUser.id == selectedUserProfile?.id}
-        logout={() => logout()}
-        changeName={() => {
-          setChangeUserNameModalVisible(true)
-        }}
-        showUserMessage={showUserMessage}
-        colorScheme={colorScheme}
-        setAppDarkMode={isDarkMode => {
-          if (colorScheme) {
-            const darkProp = isDarkMode ? 'dark' : 'light'
-            const newColorScheme: ThemeColors = { ...colorScheme }
-            newColorScheme.app_appearance = darkProp
-            setColorScheme(newColorScheme)
-            document
-              .getElementById('appRoot')
-              ?.classList.toggle('dark', isDarkMode)
+        <ProfileScreen
+          profileScreenVisible={profileScreenVisible}
+          setProfileScreenVisible={setProfileScreenVisible}
+          changeUserNameScreenVisible={changeUserNameModalVisible}
+          user={
+            chat?.currentUser.id == selectedUserProfile?.id
+              ? currentUser
+              : allUsers?.find(user => user.id == selectedUserProfile?.id)
           }
-        }}
-      />
-      <ChatSettingsScreen
-        chatSettingsScreenVisible={
-          chatSettingsScreenVisible && appConfiguration?.edit_channel_details
-        }
-        setChatSettingsScreenVisible={setChatSettingsScreenVisible}
-        changeChatNameScreenVisible={changeChatNameModalVisible}
-        manageMembersModalVisible={manageMembersModalVisible}
-        isDirectChat={activeChannel?.type == 'direct'}
-        activeChannel={activeChannel}
-        activeChannelUsers={activeChannelUsers}
-        buttonAction={async () => {
-          chatSettingsLeaveButtonClick()
-        }}
-        changeChatNameAction={() => {
-          setChangeChatNameModalVisible(true)
-        }}
-        manageMembershipsAction={() => {
-          setManageMembersModalVisible(true)
-        }}
-        setBackgroundAction={async (background, index) => {
-          if (embeddedDemoConfig == null) {
-            await activeChannel?.update({
-              type: activeChannel.type,
-              custom: {
-                themeId: index,
-                profileUrl: activeChannel.custom?.profileUrl ?? ''
-              }
-            })
-          } else {
-            setActiveChannelBackground(Backgrounds[index])
-          }
-        }}
-        embeddedDemoConfig={embeddedDemoConfig}
-        appConfiguration={appConfiguration}
-        colorScheme={colorScheme}
-      />
-      {/* Modal to change the Chat group name*/}
-      {
-        <ModalChangeName
-          name={name}
-          activeChannel={activeChannel}
-          modalType={ChatNameModals.CHANNEL}
-          saveAction={async newName => {
-            await activeChannel?.update({
-              name: newName,
-              type: activeChannel.type
-            })
-            showUserMessage(
-              'Channel Name Changed',
-              'The channel name has been successfully updated',
-              'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details',
-              ToastType.CHECK
-            )
+          isMe={chat?.currentUser.id == selectedUserProfile?.id}
+          logout={() => logout()}
+          changeName={() => {
+            setChangeUserNameModalVisible(true)
           }}
-          changeNameModalVisible={changeChatNameModalVisible}
-          setChangeNameModalVisible={setChangeChatNameModalVisible}
+          showUserMessage={showUserMessage}
           colorScheme={colorScheme}
-        />
-      }
-      {
-        <ModalManageMembers
-          activeChannelUsers={activeChannelUsers}
-          saveAction={() => {
-            setManageMembersModalVisible(false)
+          setAppDarkMode={isDarkMode => {
+            if (colorScheme) {
+              const darkProp = isDarkMode ? 'dark' : 'light'
+              const newColorScheme: ThemeColors = { ...colorScheme }
+              newColorScheme.app_appearance = darkProp
+              setColorScheme(newColorScheme)
+              document
+                .getElementById('appRoot')
+                ?.classList.toggle('dark', isDarkMode)
+            }
           }}
+        />
+        <ChatSettingsScreen
+          chatSettingsScreenVisible={
+            chatSettingsScreenVisible && appConfiguration?.edit_channel_details
+          }
+          setChatSettingsScreenVisible={setChatSettingsScreenVisible}
+          changeChatNameScreenVisible={changeChatNameModalVisible}
           manageMembersModalVisible={manageMembersModalVisible}
-          setManageMembersModalVisible={setManageMembersModalVisible}
+          isDirectChat={activeChannel?.type == 'direct'}
+          activeChannel={activeChannel}
+          activeChannelUsers={activeChannelUsers}
+          buttonAction={async () => {
+            chatSettingsLeaveButtonClick()
+          }}
+          changeChatNameAction={() => {
+            setChangeChatNameModalVisible(true)
+          }}
+          manageMembershipsAction={() => {
+            setManageMembersModalVisible(true)
+          }}
+          setBackgroundAction={async (background, index) => {
+            if (embeddedDemoConfig == null) {
+              await activeChannel?.update({
+                type: activeChannel.type,
+                custom: {
+                  themeId: index,
+                  profileUrl: activeChannel.custom?.profileUrl ?? ''
+                }
+              })
+            } else {
+              setActiveChannelBackground(Backgrounds[index])
+            }
+          }}
+          embeddedDemoConfig={embeddedDemoConfig}
           appConfiguration={appConfiguration}
           colorScheme={colorScheme}
         />
-      }
-      {/* Modal to change the user name */}
-      {
-        <ModalChangeName
-          name={name}
-          activeChannel={null}
-          modalType={ChatNameModals.USER}
-          saveAction={async newName => {
-            if (chat) {
-              const newUser = await chat.currentUser.update({
-                name: newName
+        {/* Modal to change the Chat group name*/}
+        {
+          <ModalChangeName
+            name={name}
+            activeChannel={activeChannel}
+            modalType={ChatNameModals.CHANNEL}
+            saveAction={async newName => {
+              await activeChannel?.update({
+                name: newName,
+                type: activeChannel.type
               })
-              setCurrentUser(newUser)
-              setName(newName)
               showUserMessage(
-                'Name Changed',
-                'Your name has been successfully updated',
-                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/users/updates#update-user-details',
+                'Channel Name Changed',
+                'The channel name has been successfully updated',
+                'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details',
                 ToastType.CHECK
               )
-            }
-          }}
-          changeNameModalVisible={changeUserNameModalVisible}
-          setChangeNameModalVisible={setChangeUserNameModalVisible}
-          colorScheme={colorScheme}
-        />
-      }
-      {/* Modal to specify the reason for reporting a message */}
-      <ModalReportMessage
-        message={reportedMessage}
-        reportAction={async reportReason => {
-          if (embeddedDemoConfig != null) {
-            setReportMessageModalVisible(false)
-            return
-          }
-          const reportResult = await reportedMessage?.report(reportReason)
-          showUserMessage(
-            'Message Reported:',
-            'Report successfully sent.  You can see all message reports in the Channel Monitor view of BizOps Workspace',
-            'https://www.pubnub.com/docs/bizops-workspace/channel-monitor',
-            ToastType.INFO
-          )
-        }}
-        reportMessageModalVisible={reportMessageModalVisible}
-        setReportMessageModalVisible={setReportMessageModalVisible}
-        colorScheme={colorScheme}
-      />
-      {/* Modal to specify the reason for reporting a message */}
-      <ModalForwardMessage
-        chat={chat}
-        message={forwardMessage}
-        currentUserProfileUrl={profileUrl}
-        currentUserId={chat?.currentUser.id}
-        publicChannels={publicChannels}
-        privateGroups={privateGroups}
-        directChats={directChats}
-        directChatsUsers={directChatsUsers}
-        allUsers={allUsers}
-        forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
-          let newActiveChannel
-          if (forwardMessage && channelsToForwardTo.length > 0) {
-            //  Forward to specified channels
-            for (const channel of channelsToForwardTo) {
-              if (forwardMessage.channelId != channel.id) {
-                await forwardMessage.forward(channel.id)
-                newActiveChannel = channel
-              } else {
-                //  Should never happen as you can't select the channel from the UI dropdown
-                console.log('You cannot forward a message to the same channel')
-              }
-            }
-          }
-          if (chat && forwardMessage && usersToForwardTo.length > 0) {
-            //  Forward to specified users
-            for (const user of usersToForwardTo) {
-              const { channel } = await chat.createDirectConversation({
-                user: user
-              })
-              if (forwardMessage.channelId != channel.id) {
-                forwardMessage.forward(channel.id)
-                newActiveChannel = channel
-              } else {
-                //  Will only happen if try to forward a message in a DM to somebody
-                //  we already sent it to
-                console.log('You cannot forward a message to the same channel')
+            }}
+            changeNameModalVisible={changeChatNameModalVisible}
+            setChangeNameModalVisible={setChangeChatNameModalVisible}
+            colorScheme={colorScheme}
+          />
+        }
+        {
+          <ModalManageMembers
+            activeChannelUsers={activeChannelUsers}
+            saveAction={() => {
+              setManageMembersModalVisible(false)
+            }}
+            manageMembersModalVisible={manageMembersModalVisible}
+            setManageMembersModalVisible={setManageMembersModalVisible}
+            appConfiguration={appConfiguration}
+            colorScheme={colorScheme}
+          />
+        }
+        {/* Modal to change the user name */}
+        {
+          <ModalChangeName
+            name={name}
+            activeChannel={null}
+            modalType={ChatNameModals.USER}
+            saveAction={async newName => {
+              if (chat) {
+                const newUser = await chat.currentUser.update({
+                  name: newName
+                })
+                setCurrentUser(newUser)
+                setName(newName)
                 showUserMessage(
-                  'Unable to Forward',
-                  'You cannot forward a message to a channel that already contains it',
-                  '',
-                  ToastType.ERROR
+                  'Name Changed',
+                  'Your name has been successfully updated',
+                  'https://www.pubnub.com/docs/chat/chat-sdk/build/features/users/updates#update-user-details',
+                  ToastType.CHECK
                 )
               }
-            }
-            refreshGroups('direct')
-            if (newActiveChannel) {
-              setActiveChannel(newActiveChannel)
-            }
-          }
-        }}
-        forwardMessageModalVisible={forwardMessageModalVisible}
-        setForwardMessageModalVisible={setForwardMessageModalVisible}
-        colorScheme={colorScheme}
-      />
-
-      <Header
-        currentUser={currentUser}
-        userProfileClicked={() => {
-          if (chat) {
-            setSelectedUserProfile(currentUser)
-            setProfileScreenVisible(true)
-          }
-        }}
-        setCreatingNewMessage={setCreatingNewMessage}
-        shouldBlurScreen={shouldBlurScreen}
-        appConfiguration={appConfiguration}
-        embeddedDemoConfig={embeddedDemoConfig}
-        colorScheme={colorScheme}
-      />
-      <UserMessage
-        userMsgShown={userMsgShown}
-        title={userMsg.title}
-        message={userMsg.message}
-        href={userMsg.href}
-        type={userMsg.type}
-        closeToastAction={() => {
-          closeUserMessage()
-        }}
-      />
-      {
-        <div
-          className={`${
-            !showEmojiPicker && 'hidden'
-          } absolute right-4 bottom-28 z-50 bg-white border-2 rounded-lg shadow-md`}
-        >
-          <Picker
-            data={data}
-            sheetRows={3}
-            previewPosition={'none'}
-            navPosition={'top'}
-            searchPosition={'top'}
-            maxFrequentRows={0}
-            onEmojiSelect={data => {
-              setSelectedEmoji(data.native)
-              setShowEmojiPicker(false)
             }}
-            onClickOutside={() => {
-              setShowEmojiPicker(false)
-            }}
+            changeNameModalVisible={changeUserNameModalVisible}
+            setChangeNameModalVisible={setChangeUserNameModalVisible}
+            colorScheme={colorScheme}
           />
-        </div>
-      }
-      <div
-        id='chat-main'
-        className={`flex flex-row ${
-          embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
-        } overscroll-none ${shouldBlurScreen && 'blur-sm opacity-40'}`}
-      >
-        <ChatSelectionMenu
-          chatSelectionMenuMinimized={chatSelectionMenuMinimized}
-          setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
-          setShowThread={setShowThread}
+        }
+        {/* Modal to specify the reason for reporting a message */}
+        <ModalReportMessage
+          message={reportedMessage}
+          reportAction={async reportReason => {
+            if (embeddedDemoConfig != null) {
+              setReportMessageModalVisible(false)
+              return
+            }
+            const reportResult = await reportedMessage?.report(reportReason)
+            showUserMessage(
+              'Message Reported:',
+              'Report successfully sent.  You can see all message reports in the Channel Monitor view of BizOps Workspace',
+              'https://www.pubnub.com/docs/bizops-workspace/channel-monitor',
+              ToastType.INFO
+            )
+          }}
+          reportMessageModalVisible={reportMessageModalVisible}
+          setReportMessageModalVisible={setReportMessageModalVisible}
+          colorScheme={colorScheme}
+        />
+        {/* Modal to specify the reason for reporting a message */}
+        <ModalForwardMessage
           chat={chat}
-          currentUserId={
-            embeddedDemoConfig
-              ? embeddedDemoConfig.users[0].id
-              : chat?.currentUser.id
-          }
-          setCreatingNewMessage={setCreatingNewMessage}
-          unreadMessages={unreadMessages}
+          message={forwardMessage}
+          currentUserProfileUrl={profileUrl}
+          currentUserId={chat?.currentUser.id}
           publicChannels={publicChannels}
-          publicChannelsMemberships={publicChannelsMemberships}
           privateGroups={privateGroups}
-          privateGroupsUsers={privateGroupsUsers}
-          privateGroupsMemberships={privateGroupsMemberships}
           directChats={directChats}
           directChatsUsers={directChatsUsers}
-          directChatsMemberships={directChatsMemberships}
-          activeChannel={activeChannel}
-          setActiveChannel={setActiveChannel}
-          setActiveChannelUsers={setActiveChannelUsers}
-          setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
-          updateUnreadMessagesCounts={() => {
-            updateUnreadMessagesCountsTopLevel()
+          allUsers={allUsers}
+          forwardAction={async (channelsToForwardTo, usersToForwardTo) => {
+            let newActiveChannel
+            if (forwardMessage && channelsToForwardTo.length > 0) {
+              //  Forward to specified channels
+              for (const channel of channelsToForwardTo) {
+                if (forwardMessage.channelId != channel.id) {
+                  await forwardMessage.forward(channel.id)
+                  newActiveChannel = channel
+                } else {
+                  //  Should never happen as you can't select the channel from the UI dropdown
+                  console.log(
+                    'You cannot forward a message to the same channel'
+                  )
+                }
+              }
+            }
+            if (chat && forwardMessage && usersToForwardTo.length > 0) {
+              //  Forward to specified users
+              for (const user of usersToForwardTo) {
+                const { channel } = await chat.createDirectConversation({
+                  user: user
+                })
+                if (forwardMessage.channelId != channel.id) {
+                  forwardMessage.forward(channel.id)
+                  newActiveChannel = channel
+                } else {
+                  //  Will only happen if try to forward a message in a DM to somebody
+                  //  we already sent it to
+                  console.log(
+                    'You cannot forward a message to the same channel'
+                  )
+                  showUserMessage(
+                    'Unable to Forward',
+                    'You cannot forward a message to a channel that already contains it',
+                    '',
+                    ToastType.ERROR
+                  )
+                }
+              }
+              refreshGroups('direct')
+              if (newActiveChannel) {
+                setActiveChannel(newActiveChannel)
+              }
+            }
           }}
-          currentUserProfileUrl={profileUrl}
-          showUserMessage={showUserMessage}
+          forwardMessageModalVisible={forwardMessageModalVisible}
+          setForwardMessageModalVisible={setForwardMessageModalVisible}
+          colorScheme={colorScheme}
+        />
+
+        <Header
+          currentUser={currentUser}
+          userProfileClicked={() => {
+            if (chat) {
+              setSelectedUserProfile(currentUser)
+              setProfileScreenVisible(true)
+            }
+          }}
+          setCreatingNewMessage={setCreatingNewMessage}
+          shouldBlurScreen={shouldBlurScreen}
           appConfiguration={appConfiguration}
           embeddedDemoConfig={embeddedDemoConfig}
           colorScheme={colorScheme}
         />
-        <div
-          className='relative w-full'
-          style={{
-            background: `${
-              colorScheme?.app_appearance === 'dark'
-                ? colorScheme?.primaryDark
-                : colorScheme?.primary
-            }`
+        <UserMessage
+          userMsgShown={userMsgShown}
+          title={userMsg.title}
+          message={userMsg.message}
+          href={userMsg.href}
+          type={userMsg.type}
+          closeToastAction={() => {
+            closeUserMessage()
           }}
-        >
+        />
+        {
           <div
-            id='chats-main'
-            className={`flex flex-col grow w-full max-h-screen py-0 ${
-              embeddedDemoConfig == null ? 'mt-[64px]' : ''
-            } bg-white`}
+            className={`${
+              !showEmojiPicker && 'hidden'
+            } absolute right-4 bottom-28 z-50 bg-white border-2 rounded-lg shadow-md`}
           >
-            {embeddedDemoConfig == null &&
-            appConfiguration?.group_chat &&
-            creatingNewMessage ? (
-              <NewMessageGroup
-                chat={chat}
-                currentUser={currentUser}
-                setCreatingNewMessage={setCreatingNewMessage}
-                showUserMessage={showUserMessage}
-                invokeRefresh={(desiredChannelId, createdType) => {
-                  refreshGroups(createdType)
-                }}
-                setActiveChannel={setActiveChannel}
-                colorScheme={colorScheme}
-              />
-            ) : (
-              <MessageList
-                loaded={loaded}
-                activeChannel={activeChannel}
-                currentUser={
-                  embeddedDemoConfig != null
-                    ? embeddedDemoConfig.users[0]
-                    : chat?.currentUser
-                }
-                groupUsers={
-                  activeChannel?.type == 'public'
-                    ? allUsers
-                    : activeChannelUsers
-                }
-                groupMembership={activeChannelGroupMembership}
-                messageActionHandler={(action, vars) =>
-                  messageActionHandler(action, vars)
-                }
-                updateUnreadMessagesCounts={() => {
-                  updateUnreadMessagesCountsTopLevel()
-                }}
-                setChatSettingsScreenVisible={setChatSettingsScreenVisible}
-                quotedMessage={quotedMessage}
-                activeChannelPinnedMessage={
-                  embeddedDemoConfig != null
-                    ? embeddedDemoConfig.pinnedMessage.message
-                    : activeChannelPinnedMessage
-                }
-                setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
-                showUserMessage={showUserMessage}
-                showUserProfile={senderId => {
-                  if (embeddedDemoConfig) return
-                  const selectedUser = allUsers?.find(
-                    user => user.id == senderId
-                  )
-                  if (selectedUser) {
-                    setSelectedUserProfile(selectedUser)
-                    setProfileScreenVisible(true)
+            <Picker
+              data={data}
+              sheetRows={3}
+              previewPosition={'none'}
+              navPosition={'top'}
+              searchPosition={'top'}
+              maxFrequentRows={0}
+              onEmojiSelect={data => {
+                setSelectedEmoji(data.native)
+                setShowEmojiPicker(false)
+              }}
+              onClickOutside={() => {
+                setShowEmojiPicker(false)
+              }}
+            />
+          </div>
+        }
+        <div
+          id='chat-main'
+          className={`flex flex-row ${
+            embeddedDemoConfig != null
+              ? 'max-h-[750px]'
+              : 'min-h-screen h-screen'
+          } overscroll-none ${shouldBlurScreen && 'blur-sm opacity-40'}`}
+        >
+          <ChatSelectionMenu
+            chatSelectionMenuMinimized={chatSelectionMenuMinimized}
+            setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
+            setShowThread={setShowThread}
+            chat={chat}
+            currentUserId={
+              embeddedDemoConfig
+                ? embeddedDemoConfig.users[0].id
+                : chat?.currentUser.id
+            }
+            setCreatingNewMessage={setCreatingNewMessage}
+            unreadMessages={unreadMessages}
+            publicChannels={publicChannels}
+            publicChannelsMemberships={publicChannelsMemberships}
+            privateGroups={privateGroups}
+            privateGroupsUsers={privateGroupsUsers}
+            privateGroupsMemberships={privateGroupsMemberships}
+            directChats={directChats}
+            directChatsUsers={directChatsUsers}
+            directChatsMemberships={directChatsMemberships}
+            activeChannel={activeChannel}
+            setActiveChannel={setActiveChannel}
+            setActiveChannelUsers={setActiveChannelUsers}
+            setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
+            updateUnreadMessagesCounts={() => {
+              updateUnreadMessagesCountsTopLevel()
+            }}
+            currentUserProfileUrl={profileUrl}
+            showUserMessage={showUserMessage}
+            appConfiguration={appConfiguration}
+            embeddedDemoConfig={embeddedDemoConfig}
+            colorScheme={colorScheme}
+          />
+          <div
+            className='relative w-full'
+            style={{
+              background: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.primaryDark
+                  : colorScheme?.primary
+              }`
+            }}
+          >
+            <div
+              id='chats-main'
+              className={`flex flex-col grow w-full max-h-screen py-0 ${
+                embeddedDemoConfig == null ? 'mt-[64px]' : ''
+              } bg-white`}
+            >
+              {embeddedDemoConfig == null &&
+              appConfiguration?.group_chat &&
+              creatingNewMessage ? (
+                <NewMessageGroup
+                  chat={chat}
+                  currentUser={currentUser}
+                  setCreatingNewMessage={setCreatingNewMessage}
+                  showUserMessage={showUserMessage}
+                  invokeRefresh={(desiredChannelId, createdType) => {
+                    refreshGroups(createdType)
+                  }}
+                  setActiveChannel={setActiveChannel}
+                  colorScheme={colorScheme}
+                />
+              ) : (
+                <MessageList
+                  loaded={loaded}
+                  activeChannel={activeChannel}
+                  currentUser={
+                    embeddedDemoConfig != null
+                      ? embeddedDemoConfig.users[0]
+                      : chat?.currentUser
                   }
-                }}
-                allUsers={allUsers}
-                activeChannelRestrictions={activeChannelRestrictions}
-                activeChannelBackground={activeChannelBackground}
-                embeddedDemoConfig={embeddedDemoConfig}
-                appConfiguration={appConfiguration}
-                colorScheme={colorScheme}
-              />
-            )}
-            {!quotedMessage &&
-              typingData &&
-              typingData.length > 0 &&
-              appConfiguration?.typing_indicator == true &&
-              activeChannel?.type !== 'public' && (
-                <TypingIndicator
-                  typers={typingData}
-                  users={activeChannelUsers}
+                  groupUsers={
+                    activeChannel?.type == 'public'
+                      ? allUsers
+                      : activeChannelUsers
+                  }
+                  groupMembership={activeChannelGroupMembership}
+                  messageActionHandler={(action, vars) =>
+                    messageActionHandler(action, vars)
+                  }
+                  updateUnreadMessagesCounts={() => {
+                    updateUnreadMessagesCountsTopLevel()
+                  }}
+                  setChatSettingsScreenVisible={setChatSettingsScreenVisible}
+                  quotedMessage={quotedMessage}
+                  activeChannelPinnedMessage={
+                    embeddedDemoConfig != null
+                      ? embeddedDemoConfig.pinnedMessage.message
+                      : activeChannelPinnedMessage
+                  }
+                  setActiveChannelPinnedMessage={setActiveChannelPinnedMessage}
+                  showUserMessage={showUserMessage}
+                  showUserProfile={senderId => {
+                    if (embeddedDemoConfig) return
+                    const selectedUser = allUsers?.find(
+                      user => user.id == senderId
+                    )
+                    if (selectedUser) {
+                      setSelectedUserProfile(selectedUser)
+                      setProfileScreenVisible(true)
+                    }
+                  }}
+                  allUsers={allUsers}
+                  activeChannelRestrictions={activeChannelRestrictions}
+                  activeChannelBackground={activeChannelBackground}
+                  embeddedDemoConfig={embeddedDemoConfig}
                   appConfiguration={appConfiguration}
+                  colorScheme={colorScheme}
                 />
               )}
+              {!quotedMessage &&
+                typingData &&
+                typingData.length > 0 &&
+                appConfiguration?.typing_indicator == true &&
+                activeChannel?.type !== 'public' && (
+                  <TypingIndicator
+                    typers={typingData}
+                    users={activeChannelUsers}
+                    appConfiguration={appConfiguration}
+                  />
+                )}
 
-            <div
-              className={`${
-                embeddedDemoConfig == null && creatingNewMessage && 'hidden'
-              } absolute bottom-0 left-0 right-0`}
-            >
-              <MessageInput
-                activeChannel={activeChannel}
-                replyInThread={false}
-                quotedMessage={quotedMessage}
-                quotedMessageSender={quotedMessageSender}
-                setQuotedMessage={setQuotedMessage}
-                //creatingNewMessage={creatingNewMessage}
-                showUserMessage={showUserMessage}
-                setShowEmojiPicker={() => {
-                  setTimeout(function () {
-                    setShowEmojiPicker(!showEmojiPicker)
-                  }, 50)
-                }}
-                selectedEmoji={selectedEmoji}
-                setSelectedEmoji={setSelectedEmoji}
-                currentlyEditingMessage={currentlyEditingMessage}
-                setCurrentlyEditingMessage={setCurrentlyEditingMessage}
-                activeChannelRestrictions={activeChannelRestrictions}
-                embeddedDemoConfig={embeddedDemoConfig}
-                appConfiguration={appConfiguration}
-                colorScheme={colorScheme}
-              />
+              <div
+                className={`${
+                  embeddedDemoConfig == null && creatingNewMessage && 'hidden'
+                } absolute bottom-0 left-0 right-0`}
+              >
+                <MessageInput
+                  activeChannel={activeChannel}
+                  replyInThread={false}
+                  quotedMessage={quotedMessage}
+                  quotedMessageSender={quotedMessageSender}
+                  setQuotedMessage={setQuotedMessage}
+                  //creatingNewMessage={creatingNewMessage}
+                  showUserMessage={showUserMessage}
+                  setShowEmojiPicker={() => {
+                    setTimeout(function () {
+                      setShowEmojiPicker(!showEmojiPicker)
+                    }, 50)
+                  }}
+                  selectedEmoji={selectedEmoji}
+                  setSelectedEmoji={setSelectedEmoji}
+                  currentlyEditingMessage={currentlyEditingMessage}
+                  setCurrentlyEditingMessage={setCurrentlyEditingMessage}
+                  activeChannelRestrictions={activeChannelRestrictions}
+                  embeddedDemoConfig={embeddedDemoConfig}
+                  appConfiguration={appConfiguration}
+                  colorScheme={colorScheme}
+                />
+              </div>
             </div>
           </div>
+          <MessageListThread
+            showThread={
+              showThread &&
+              !creatingNewMessage &&
+              appConfiguration?.message_threads == true
+            }
+            setShowThread={setShowThread}
+            setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
+            activeThreadChannel={activeThreadChannel}
+            activeThreadMessage={activeThreadMessage}
+            currentUser={chat?.currentUser}
+            groupUsers={activeChannelUsers}
+            activeChannelBackground={activeChannelBackground}
+            embeddedDemoConfig={embeddedDemoConfig}
+            appConfiguration={appConfiguration}
+            colorScheme={colorScheme}
+          />
         </div>
-        <MessageListThread
-          showThread={
-            showThread &&
-            !creatingNewMessage &&
-            appConfiguration?.message_threads == true
-          }
-          setShowThread={setShowThread}
-          setChatSelectionMenuMinimized={setChatSelectionMenuMinimized}
-          activeThreadChannel={activeThreadChannel}
-          activeThreadMessage={activeThreadMessage}
-          currentUser={chat?.currentUser}
-          groupUsers={activeChannelUsers}
-          activeChannelBackground={activeChannelBackground}
-          embeddedDemoConfig={embeddedDemoConfig}
-          appConfiguration={appConfiguration}
-          colorScheme={colorScheme}
-        />
-      </div>
-    </main>
+      </main>
+    </div>
   )
 }
