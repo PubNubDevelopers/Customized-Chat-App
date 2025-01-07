@@ -47,7 +47,8 @@ import { buildConfig } from '../../configuration'
 
 export default function ChatScreen ({
   embeddedDemoConfigFromParent,
-  configuration
+  configuration,
+  isMobilePreview
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [appConfiguration, setAppConfiguration] = useState<any | null>(null)
@@ -1155,6 +1156,37 @@ export default function ChatScreen ({
     reportMessageModalVisible
   ])
 
+  if (isMobilePreview) {
+    return (
+      <main>
+        <div className='flex flex-col w-full h-screen justify-start items-center my-6 gap-2 text-navy900 bg-neutral-50'>
+          <div className=''>
+            <Image
+              src='/chat-logo.svg'
+              alt='Chat Icon'
+              className=''
+              width={50}
+              height={50}
+              priority
+            />
+          </div>
+          <div className='text-2xl select-none'>Mobile chat app</div>
+          <div className='select-none text-center mx-2'>
+            The mobile version of this application is still under development
+          </div>
+          {appConfiguration && (
+            <div className='self-start m-2'>
+              <div className='select-none text-xs'>Your Configuration:</div>
+              <pre className='text-xs select-none'>
+                {JSON.stringify(appConfiguration, null, 2)}
+              </pre>
+            </div>
+          )}
+        </div>
+      </main>
+    )
+  }
+
   if (embeddedDemoConfig == null && !chat) {
     return (
       <main>
@@ -1187,30 +1219,6 @@ export default function ChatScreen ({
 
   return (
     <div className=''>
-      <div className='sm:hidden'>
-        <div className='flex flex-col w-full h-screen justify-start items-center my-6 gap-2'>
-          <div className='max-w-96 max-h-96'>
-            <Image
-              src='/chat-logo.svg'
-              alt='Chat Icon'
-              className=''
-              width={200}
-              height={200}
-              priority
-            />
-          </div>
-          <div className='text-2xl select-none'>Mobile chat app</div>
-          <div className='select-none text-center'>
-            The mobile version of this application is still under development
-          </div>
-          {appConfiguration && <div className='self-start m-3'>
-            <div className='select-none text-xs'>Your Configuration:</div>
-            <pre className='text-xs select-none'>
-              {JSON.stringify(appConfiguration, null, 2)}
-            </pre>
-          </div>}
-        </div>
-      </div>
       <main
         className={`hidden sm:block overscroll-none overflow-y-hidden ${
           embeddedDemoConfig != null && 'border-b-1'
