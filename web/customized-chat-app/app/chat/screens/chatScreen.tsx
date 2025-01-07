@@ -1219,6 +1219,8 @@ export default function ChatScreen ({
 
   return (
     <div className=''>
+      <div className='sm:hidden flex flex-col mt-10 h-screen justify-center w-full text-center gap-16 text-4xl'>This app is not designed for mobile
+      </div>
       <main
         className={`hidden sm:block overscroll-none overflow-y-hidden ${
           embeddedDemoConfig != null && 'border-b-1'
