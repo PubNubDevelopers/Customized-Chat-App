@@ -66,7 +66,7 @@ export default function MessageInput ({
       setText('')
     } else {
       if (quotedMessage) {
-        newMessageDraft.addQuote(quotedMessage)
+        newMessageDraft.quotedMessage = quotedMessage
       }
       setShowUploadSpinner(true)
       try {
