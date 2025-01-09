@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import UnreadIndicator from './unreadIndicator'
-import { MessageDraft, User, Channel } from '@pubnub/chat'
+import { MessageDraftV2, SuggestedMention } from '@pubnub/chat'
 import QuotedMessage from './quotedMessage'
 import MentionSuggestions from './mentionSuggestions'
 import { useState, useEffect, useRef } from 'react'
@@ -32,12 +32,11 @@ export default function MessageInput ({
   colorScheme
 }) {
   const [text, setText] = useState('')
-  const [newMessageDraft, setNewMessageDraft] = useState<MessageDraft | null>()
-  const [suggestedUsers, setSuggestedUsers] = useState<User[]>([])
-  const [nameOccurrenceIndex, setNameOccurrenceIndex] = useState<number>(-1)
-  const [suggestedChannels, setSuggestedChannels] = useState<Channel[]>([])
-  const [channelOccurrenceIndex, setChannelOccurrenceIndex] =
-    useState<number>(-1)
+  const [newMessageDraft, setNewMessageDraft] =
+    useState<MessageDraftV2 | null>()
+  const [suggestedMentions, setSuggestedMentions] = useState<
+    SuggestedMention[]
+  >([])
   const inputRef = useRef<HTMLInputElement>(null)
   const [attachmentsCount, setAttachmentsCount] = useState(0)
   const [showUploadSpinner, setShowUploadSpinner] = useState(false)
@@ -81,14 +80,14 @@ export default function MessageInput ({
         )
       }
       setShowUploadSpinner(false)
-      setNewMessageDraft(
-        activeChannel?.createMessageDraft({
-          userSuggestionSource: 'channel',
-          isTypingIndicatorTriggered: activeChannel.type !== 'public',
-          userLimit: 6,
-          channelLimit: 6
-        })
-      )
+      const messageDraft = activeChannel?.createMessageDraftV2({
+        userSuggestionSource: 'channel',
+        isTypingIndicatorTriggered: activeChannel.type !== 'public',
+        userLimit: 6,
+        channelLimit: 6
+      })
+      messageDraft.addChangeListener(messageDraftChangeListener)
+      setNewMessageDraft(messageDraft)
       setAttachmentsCount(0)
       setQuotedMessage(false)
       setText('')
@@ -105,25 +104,7 @@ export default function MessageInput ({
       activeChannel.startTyping()
     }
 
-    const response = await newMessageDraft?.onChange(e.target.value)
-    if ((response?.users.suggestedUsers.length ?? 0) > 0) {
-      if (appConfiguration?.mention_user) {
-        setSuggestedUsers(response!.users.suggestedUsers)
-        setNameOccurrenceIndex(response!.users.nameOccurrenceIndex)
-      }
-    } else {
-      setSuggestedUsers([])
-      setNameOccurrenceIndex(-1)
-    }
-    if ((response?.channels.suggestedChannels.length ?? 0) > 0) {
-      if (appConfiguration?.channel_references) {
-        setSuggestedChannels(response!.channels.suggestedChannels)
-        setChannelOccurrenceIndex(response!.channels.channelOccurrenceIndex)
-      }
-    } else {
-      setSuggestedChannels([])
-      setChannelOccurrenceIndex(-1)
-    }
+    newMessageDraft.update(e.target.value)
   }
 
   async function addAttachment () {
@@ -154,22 +135,29 @@ export default function MessageInput ({
     setShowEmojiPicker(true)
   }
 
-  function pickSuggestedUser (user: User) {
+  function pickSuggestedMention (mention: SuggestedMention) {
     if (!newMessageDraft) return
-    newMessageDraft.addMentionedUser(user, nameOccurrenceIndex)
+    newMessageDraft.insertSuggestedMention(mention, mention.replaceWith)
     setText(newMessageDraft.value)
-    setSuggestedUsers([])
-    setNameOccurrenceIndex(-1)
+    setSuggestedMentions([])
     inputRef.current?.focus()
   }
 
-  function pickSuggestedChannel (channel: Channel) {
-    if (!newMessageDraft) return
-    newMessageDraft.addReferencedChannel(channel, channelOccurrenceIndex)
-    setText(newMessageDraft.value)
-    setSuggestedChannels([])
-    setChannelOccurrenceIndex(-1)
-    inputRef.current?.focus()
+  async function messageDraftChangeListener (state) {
+    let mentions = await state.suggestedMentions
+    if (!appConfiguration?.mention_user)
+    {
+      mentions = mentions.filter((mention) => mention.type != 'mention')
+    }
+    if (!appConfiguration?.channel_references)
+    {
+      mentions = mentions.filter((mention) => mention.type != 'channelReference')
+    }
+    if (mentions) {
+      setSuggestedMentions(mentions)
+    } else {
+      setSugggestedMentions([])
+    }
   }
 
   useEffect(() => {
@@ -189,14 +177,15 @@ export default function MessageInput ({
       return
     }
     if (embeddedDemoConfig != null) return
-    setNewMessageDraft(
-      activeChannel.createMessageDraft({
-        userSuggestionSource: 'channel',
-        isTypingIndicatorTriggered: activeChannel.type !== 'public',
-        userLimit: 6,
-        channelLimit: 6
-      })
-    )
+
+    const messageDraft = activeChannel.createMessageDraftV2({
+      userSuggestionSource: 'channel',
+      isTypingIndicatorTriggered: activeChannel.type !== 'public',
+      userLimit: 6,
+      channelLimit: 6
+    })
+    messageDraft.addChangeListener(messageDraftChangeListener)
+    setNewMessageDraft(messageDraft)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeChannel, currentlyEditingMessage, embeddedDemoConfig])
 
@@ -204,7 +193,7 @@ export default function MessageInput ({
     if (!selectedEmoji) return
     if (selectedEmoji === '') return
     setText(text + selectedEmoji)
-    newMessageDraft?.onChange(text + selectedEmoji)
+    newMessageDraft.update(text + selectedEmoji)
     setSelectedEmoji('')
     inputRef.current?.focus()
   }, [newMessageDraft, selectedEmoji, setSelectedEmoji, text])
@@ -215,43 +204,47 @@ export default function MessageInput ({
         quotedMessage ? 'h-[170px]' : ''
       } pr-6`}
     >
-      {currentlyEditingMessage && !(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) &&(
-        <div className='flex ml-12 py-1 px-3 justify-center rounded-lg' style={{
-          background: `${
-            colorScheme?.app_appearance === 'dark'
-              ? colorScheme?.accentDark
-              : colorScheme?.accent
-          }`,
-          color: `${
-            colorScheme?.app_appearance === 'dark'
-              ? colorScheme?.secondaryDark
-              : colorScheme?.secondary
-          }`
-        }}>Editing Message</div>
-      )}
+      {currentlyEditingMessage &&
+        !(
+          activeChannelRestrictions?.mute || activeChannelRestrictions?.ban
+        ) && (
+          <div
+            className='flex ml-12 py-1 px-3 justify-center rounded-lg'
+            style={{
+              background: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`,
+              color: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.secondaryDark
+                  : colorScheme?.secondary
+              }`
+            }}
+          >
+            Editing Message
+          </div>
+        )}
       {showUploadSpinner && attachmentsCount > 0 && (
-        <div className='w-full ml-12 pt-2'
-        style={{
-          color: `${
-            colorScheme?.app_appearance === 'dark'
-              ? colorScheme?.accentDark
-              : colorScheme?.accent
-          }`
-        }}
->
+        <div
+          className='w-full ml-12 pt-2'
+          style={{
+            color: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.accentDark
+                : colorScheme?.accent
+            }`
+          }}
+        >
           Uploading Attachments...
         </div>
       )}
-      {((suggestedUsers && suggestedUsers.length > 0) ||
-        (suggestedChannels && suggestedChannels.length > 0)) && (
+      {(suggestedMentions && suggestedMentions.length > 0) && (
         <MentionSuggestions
-          suggestedUsers={suggestedUsers}
-          suggestedChannels={suggestedChannels}
-          pickSuggestedUser={user => {
-            pickSuggestedUser(user)
-          }}
-          pickSuggestedChannel={channel => {
-            pickSuggestedChannel(channel)
+          suggestedMentions={suggestedMentions}
+          pickSuggestedMention={mention => {
+            pickSuggestedMention(mention)
           }}
         />
       )}
@@ -278,9 +271,20 @@ export default function MessageInput ({
               quotedMessage ? '' : 'my-8'
             } ml-6 px-6 text-sm focus:ring-1 bg-neutral50 text-neutral900 focus:ring-black outline-none`}
             ref={inputRef}
-            placeholder={`${activeChannelRestrictions?.mute ? 'You are Muted in this Conversation' : activeChannelRestrictions?.ban ? `You are Banned from this Conversation ${activeChannelRestrictions.reason && `(${activeChannelRestrictions.reason})`}` : 'Type message'}`}
+            placeholder={`${
+              activeChannelRestrictions?.mute
+                ? 'You are Muted in this Conversation'
+                : activeChannelRestrictions?.ban
+                ? `You are Banned from this Conversation ${
+                    activeChannelRestrictions.reason &&
+                    `(${activeChannelRestrictions.reason})`
+                  }`
+                : 'Type message'
+            }`}
             value={text}
-            disabled={activeChannelRestrictions?.mute || activeChannelRestrictions?.ban}
+            disabled={
+              activeChannelRestrictions?.mute || activeChannelRestrictions?.ban
+            }
             onChange={e => {
               handleTyping(e)
             }}
@@ -288,12 +292,19 @@ export default function MessageInput ({
         </form>
         {!replyInThread && (
           <div
-            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md ${(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) && 'pointer-events-none'}`}
-            onClick={e => handleSend(e) } 
+            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md ${
+              (activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban) &&
+              'pointer-events-none'
+            }`}
+            onClick={e => handleSend(e)}
           >
             <Image
               src={`${
-                (activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) ? '/icons/chat-assets/do_not_disturb.svg' : currentlyEditingMessage
+                activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban
+                  ? '/icons/chat-assets/do_not_disturb.svg'
+                  : currentlyEditingMessage
                   ? '/icons/chat-assets/save.svg'
                   : '/icons/chat-assets/send.svg'
               }`}
@@ -307,7 +318,11 @@ export default function MessageInput ({
         )}
         {!replyInThread && (
           <div
-            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md ${(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) && 'pointer-events-none'}`}
+            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md ${
+              (activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban) &&
+              'pointer-events-none'
+            }`}
             onClick={() => {
               if (currentlyEditingMessage) {
                 setText('')
@@ -315,11 +330,14 @@ export default function MessageInput ({
               } else {
                 addEmoji()
               }
-            }} 
+            }}
           >
             <Image
               src={`${
-                (activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) ? '/icons/chat-assets/do_not_disturb.svg' : currentlyEditingMessage
+                activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban
+                  ? '/icons/chat-assets/do_not_disturb.svg'
+                  : currentlyEditingMessage
                   ? '/icons/chat-assets/close.svg'
                   : '/icons/chat-assets/smile.svg'
               }`}
@@ -333,7 +351,11 @@ export default function MessageInput ({
         )}
         {!replyInThread && appConfiguration?.message_send_file == true && (
           <div
-            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md relative ${(activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) && 'pointer-events-none'}`}
+            className={`cursor-pointer hover:bg-neutral-100 hover:rounded-md relative ${
+              (activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban) &&
+              'pointer-events-none'
+            }`}
             onClick={() => {
               addAttachment()
             }}
@@ -341,12 +363,18 @@ export default function MessageInput ({
             <input type='file' className='hidden' />
             {attachmentsCount > 0 && (
               <div className='absolute right-0 top-0'>
-                <UnreadIndicator count={attachmentsCount} colorScheme={colorScheme} />
+                <UnreadIndicator
+                  count={attachmentsCount}
+                  colorScheme={colorScheme}
+                />
               </div>
             )}
             <Image
               src={`${
-                (activeChannelRestrictions?.mute || activeChannelRestrictions?.ban) ? '/icons/chat-assets/do_not_disturb.svg' : showUploadSpinner
+                activeChannelRestrictions?.mute ||
+                activeChannelRestrictions?.ban
+                  ? '/icons/chat-assets/do_not_disturb.svg'
+                  : showUploadSpinner
                   ? '/icons/chat-assets/loading.png'
                   : '/icons/chat-assets/attachment.svg'
               }`}
