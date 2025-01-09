@@ -193,7 +193,7 @@ export default function Message ({
             @{messagePart.content.name}
           </span>
         ) : (
-          <span key={index} className='px-1'>
+          <span key={index} className='px-1 content-center'>
             {messagePart.content.name}
           </span>
         )
@@ -214,7 +214,7 @@ export default function Message ({
             #{messagePart.content.name}
           </span>
         ) : (
-          <span key={index} className='px-1'>
+          <span key={index} className='px-1  content-center'>
             {messagePart.content.name}
           </span>
         )
