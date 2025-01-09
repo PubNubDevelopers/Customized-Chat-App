@@ -104,7 +104,7 @@ export default function MessageInput ({
       activeChannel.startTyping()
     }
 
-    newMessageDraft.update(e.target.value)
+    newMessageDraft?.update(e.target.value)
   }
 
   async function addAttachment () {
@@ -156,7 +156,7 @@ export default function MessageInput ({
     if (mentions) {
       setSuggestedMentions(mentions)
     } else {
-      setSugggestedMentions([])
+      setSuggestedMentions([])
     }
   }
 
@@ -193,7 +193,7 @@ export default function MessageInput ({
     if (!selectedEmoji) return
     if (selectedEmoji === '') return
     setText(text + selectedEmoji)
-    newMessageDraft.update(text + selectedEmoji)
+    newMessageDraft?.update(text + selectedEmoji)
     setSelectedEmoji('')
     inputRef.current?.focus()
   }, [newMessageDraft, selectedEmoji, setSelectedEmoji, text])

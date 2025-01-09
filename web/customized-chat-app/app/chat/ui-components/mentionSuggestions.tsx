@@ -1,4 +1,5 @@
 import { roboto } from '@/app/fonts'
+import { SuggestedMention } from '@pubnub/chat'
 
 export default function MentionSuggestions ({
   suggestedMentions,
