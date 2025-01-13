@@ -60,7 +60,10 @@ export default function Home () {
       setPublicChannelsAvailable(buildConfiguration.public_channels)
     }
     if (buildConfiguration?.app_appearance != null) {
-      console.log(buildConfiguration?.app_appearance)
+      //  This application was originally written to support custom light and dark
+      //  modes, but now only supports a single customizable colour scheme.  I retained
+      //  all the logic to switch between light and dark in case we want to add this again
+      //  in the future.
       const isDarkMode = buildConfiguration?.app_appearance == 'dark'
       document
       .getElementById('appRoot')

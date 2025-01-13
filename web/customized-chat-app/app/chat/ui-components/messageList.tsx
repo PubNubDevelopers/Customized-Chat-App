@@ -232,8 +232,11 @@ export default function MessageList ({
         embeddedDemoConfig != null ? 'max-h-[750px]' : 'min-h-screen h-screen'
       }`}
       style={{
-        backgroundImage: activeChannelBackground?.backgroundImage ?? "url('/backgrounds/default.png')",
-        backgroundPosition: activeChannelBackground?.backgroundPosition ?? "initial"
+        backgroundImage:
+          activeChannelBackground?.backgroundImage ??
+          "url('/backgrounds/default.png')",
+        backgroundPosition:
+          activeChannelBackground?.backgroundPosition ?? 'initial'
       }}
     >
       <div
@@ -323,7 +326,8 @@ export default function MessageList ({
               {/* Pin with number of pinned messages */}
               <div
                 className={`p-2 py-3 ${
-                  activeChannelPinnedMessage && 'cursor-pointer rounded-md  hover:ring-1 ring-black dark:ring-white'
+                  activeChannelPinnedMessage &&
+                  'cursor-pointer rounded-md  hover:ring-1 ring-black dark:ring-white'
                 } `}
                 onClick={() => {
                   if (!activeChannelPinnedMessage) return
@@ -378,7 +382,6 @@ export default function MessageList ({
                     : colorScheme?.primary
                 }`
               }}
-      
             >
               <Settings
                 className=''
@@ -411,7 +414,12 @@ export default function MessageList ({
         ref={messageListRef}
       >
         {messages && messages.length == 0 && embeddedDemoConfig == null && (
-          <div className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4 text-neutral900'>
+          <div
+            className='flex flex-col items-center justify-center w-full h-screen text-xl select-none gap-4 text-neutral900'
+            style={{
+              color: activeChannelBackground?.color ?? '#525252'
+            }}
+          >
             <Image
               src='/chat-logo.svg'
               alt='Chat Icon'

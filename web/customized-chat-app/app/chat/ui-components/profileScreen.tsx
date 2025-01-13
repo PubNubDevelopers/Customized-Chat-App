@@ -1,9 +1,12 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Switch } from '@nextui-org/switch'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
 import { ToastType } from '../../types'
 import { useState, useEffect } from 'react'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { MoonIcon } from './icons/moonIcon'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { SunIcon } from './icons/sunIcon'
 import CloseRooms from './icons/closeRooms'
 import Logout from './icons/logout'
@@ -22,6 +25,7 @@ export default function ProfileScreen ({
   setAppDarkMode
 }) {
   const [logoutButtonText, setLogoutButtonText] = useState('Log Out')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [darkMode, setDarkMode] = useState(false) //  Light mode by default
 
   function getLocalTime (timezone) {
@@ -57,6 +61,7 @@ export default function ProfileScreen ({
     return returnVal
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleSetDarkMode(isDarkMode)
   {
     setDarkMode(isDarkMode)
@@ -111,6 +116,10 @@ export default function ProfileScreen ({
           changeUserNameScreenVisible && 'opacity-40'
         }  overflow-y-auto`}
       >
+        {
+          //  The ability to switch between light and dark modes in this app has
+          //  been removed
+          /* 
         <div className=''>
           <Switch
           color='default'
@@ -132,6 +141,7 @@ export default function ProfileScreen ({
         }}>{darkMode ? 'Dark Mode' : 'Light Mode'}</div>
             </Switch>
         </div>
+        */}
         <div
           className={`${roboto.className} text-sm font-medium flex flex-row p-3 justify-between items-center`}
         >

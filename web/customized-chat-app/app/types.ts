@@ -53,7 +53,11 @@ export type Restriction = {
 };
 
 export type ThemeColors = {
-  app_appearance: string;
+  //  This app was originally written to support customizable colours for both
+  //  light and dark mode.  The current implementation only uses a single colour
+  //  scheme however (assumed to be 'light' mode, but customizable to any colours)
+  //  App does not respond to system settings.
+  app_appearance: string;   //  'light' or 'dark' (but see note above)
   primary: string;
   primaryDark: string;
   secondary: string;
