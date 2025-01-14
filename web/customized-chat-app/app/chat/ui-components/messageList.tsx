@@ -193,7 +193,7 @@ export default function MessageList ({
         <div
           className={`flex flex-col  ${
             embeddedDemoConfig != null
-              ? 'max-h-[750px]'
+              ? 'max-h-[750px] h-[750px]'
               : 'min-h-screen h-screen'
           } justify-center items-center w-full`}
         >
