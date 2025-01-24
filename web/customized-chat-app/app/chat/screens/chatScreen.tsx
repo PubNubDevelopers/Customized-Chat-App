@@ -444,7 +444,7 @@ export default function ChatScreen ({
 
     if (appConfiguration?.support_push) {
       console.log(
-        'Mobile Push: This web application does not support push messaging.  Native Kotlin for Android will use GCM and Native Swift for iOS will use APNS.'
+        'Mobile Push: This web application does not support push messaging.  Native Kotlin for Android will use FCM and Native Swift for iOS will use APNS.'
       )
     }
 
