@@ -33,3 +33,6 @@ export const buildConfig = {
 1. yarn install
 1. yarn dev
 1. You can now navigate to `localhost:3000` in your browser.  The first time you run the application on a new keyset it will have to first do some initialization, which will take a few seconds.
+
+### More information on App Context configuration used by this app
+User Metadata Events are required to receive updates from other users such as their name or profile picture being changed. Channel Metadata Events are used to notify others that a channel's name has changed.  Membership Metadata Events are used to notify others that a user has joined or left a channel.  Get All Channel Metadata is used when first initializing an application, to join all public channels.  Get All User Metadata is used to search for other users and cache other app users.

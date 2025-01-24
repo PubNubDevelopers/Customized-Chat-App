@@ -180,8 +180,8 @@ export default function ChatScreen ({
         appConfiguration?.support_push,
         configuration?.support_push,
         'Push Setting Changed',
-        'The native mobile version of this application WILL support push messaging (GMS on Android, APNS on iOS',
-        'The native mobile version of this application will NOT support push messaging (GMS on Android, APNS on iOS'
+        'The native mobile version of this application WILL support push messaging (FCM on Android, APNS on iOS',
+        'The native mobile version of this application will NOT support push messaging (FCM on Android, APNS on iOS'
       )
       notifyUserConfigurationChanged(
         appConfiguration?.message_history,
