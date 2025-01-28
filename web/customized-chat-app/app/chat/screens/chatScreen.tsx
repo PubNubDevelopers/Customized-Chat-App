@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client'
 
 import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect, useContext, useCallback, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Channel,
   Chat,
@@ -13,7 +12,6 @@ import {
   Message as pnMessage
 } from '@pubnub/chat'
 import Image from 'next/image'
-import { roboto } from '@/app/fonts'
 import Header from '../ui-components/header'
 import ChatSelectionMenu from '../ui-components/chatSelectionMenu'
 import MessageList from '../ui-components/messageList'
@@ -28,17 +26,14 @@ import ModalChangeName from '../ui-components/modalChangeName'
 import ModalManageMembers from '../ui-components/modalManageMembers'
 import ModalReportMessage from '../ui-components/modalReportMessage'
 import ModalForwardMessage from '../ui-components/modalForwardMessage'
-import searchImg from '@/public/icons/chat-assets/search.svg'
 import data from '@emoji-mart/data'
 import Picker from '@emoji-mart/react'
 import {
   ChatNameModals,
   MessageActionsTypes,
-  ChatHeaderActionIcon,
   ToastType,
   ChatEventTypes,
   UnreadMessagesOnChannel,
-  PresenceIcon,
   Restriction,
   ThemeColors,
   Backgrounds
@@ -110,7 +105,6 @@ export default function ChatScreen ({
 
   const [quotedMessage, setQuotedMessage] = useState<pnMessage | null>(null)
   const [quotedMessageSender, setQuotedMessageSender] = useState('')
-  const [typingUsers, setTypingUsers] = useState<string | null>(null)
 
   //  State of the channels I'm a member of (left hand pane)
   const [publicChannels, setPublicChannels] = useState<Channel[]>()
@@ -150,7 +144,7 @@ export default function ChatScreen ({
     chat?.getUnreadMessagesCounts({}).then(
       result => {
         const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-        result.forEach((element, index) => {
+        result.forEach((element) => {
           const newUnreadMessage: UnreadMessagesOnChannel = {
             channel: element.channel,
             count: element.count
@@ -159,6 +153,7 @@ export default function ChatScreen ({
         })
         setUnreadMessages(unreadMessagesOnChannel)
       },
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       error => {
         console.warn(
           'Unable to enable unread messages because you do not have "Message Persistence" enabled on your keyset'
@@ -320,6 +315,7 @@ export default function ChatScreen ({
                 )
               ) {
                 //  No current membership, join channel
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const newMembership = await publicChannel.join(message => {
                   //  I have a message listener elsewhere for consistency with private and direct chats
                 })
@@ -471,7 +467,7 @@ export default function ChatScreen ({
       chat?.getUnreadMessagesCounts({}).then(
         result => {
           const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-          result.forEach((element, index) => {
+          result.forEach((element) => {
             const newUnreadMessage: UnreadMessagesOnChannel = {
               channel: element.channel,
               count: element.count
@@ -480,6 +476,7 @@ export default function ChatScreen ({
           })
           setUnreadMessages(unreadMessagesOnChannel)
         },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         error => {
           console.warn(
             'Unable to enable unread messages because you do not have "Message Persistence" enabled on your keyset'
@@ -490,7 +487,7 @@ export default function ChatScreen ({
 
     const publicHandlers: (() => void)[] = []
     if (publicChannels) {
-      publicChannels.forEach((channel, index) => {
+      publicChannels.forEach((channel) => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -506,7 +503,7 @@ export default function ChatScreen ({
     }
     const directHandlers: (() => void)[] = []
     if (directChats) {
-      directChats.forEach((channel, index) => {
+      directChats.forEach((channel) => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -522,7 +519,7 @@ export default function ChatScreen ({
     }
     const privateHandlers: (() => void)[] = []
     if (privateGroups) {
-      privateGroups.forEach((channel, index) => {
+      privateGroups.forEach((channel) => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -579,7 +576,7 @@ export default function ChatScreen ({
       //  Channel is either group or direct
       activeChannel.getMembers({}).then(membersResponse => {
         setActiveChannelUsers(
-          membersResponse.members.map((membership, index) => {
+          membersResponse.members.map((membership) => {
             return membership.user
           })
         )
@@ -807,29 +804,10 @@ export default function ChatScreen ({
     const removeModerationListener = chat.listenForEvents({
       channel: chat.currentUser.id,
       type: 'moderation',
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       callback: async evt => {
         if (appConfiguration?.handle_banned == true) {
-          let moderationMessage = ''
-          let notificationSeverity: ToastType = ToastType.INFO
-          if (evt.payload.restriction == 'muted') {
-            moderationMessage = `You have been MUTED by the administrator`
-            notificationSeverity = ToastType.ERROR
-          } else if (evt.payload.restriction == 'banned') {
-            moderationMessage = `You have been BANNED by the administrator for the following reason: ${evt.payload.reason}`
-            notificationSeverity = ToastType.ERROR
-          } else if (evt.payload.restriction == 'lifted') {
-            moderationMessage = `Your previous restrictions have been LIFTED by the administrator`
-            notificationSeverity = ToastType.CHECK
-          }
-          //  Rather than show a pop-up each time, the UI now updates to disable the ability
-          //  to send messages (or view messages if banned)
           updateActiveChannelRestrictions()
-          //showUserMessage(
-          //  'Moderation Event:',
-          //  moderationMessage,
-          //  'https://www.pubnub.com/how-to/monitor-and-moderate-conversations-with-bizops-workspace/',
-          //  notificationSeverity
-          //)
         }
       }
     })
@@ -904,7 +882,7 @@ export default function ChatScreen ({
             indexGroup
           ].getMembers({ sort: { updated: 'desc' }, limit: 100 })
           if (response.members) {
-            const channelUsers = response.members.map((membership, index) => {
+            const channelUsers = response.members.map((membership) => {
               return membership.user
             })
             tempGroupUsers[tempIndex] = channelUsers
@@ -947,7 +925,7 @@ export default function ChatScreen ({
 
           if (response.members) {
             //  response contains the most recent 100 members
-            const channelUsers = response.members.map((membership, index) => {
+            const channelUsers = response.members.map((membership) => {
               return membership.user
             })
             tempDirectUsers[tempIndex] = channelUsers
@@ -1046,6 +1024,7 @@ export default function ChatScreen ({
         break
       case MessageActionsTypes.DELETE:
         if (embeddedDemoConfig) return
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const updatedMessage = await data?.delete(
           { soft: true },
           { preserveFiles: true }
@@ -1369,6 +1348,7 @@ export default function ChatScreen ({
               setReportMessageModalVisible(false)
               return
             }
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const reportResult = await reportedMessage?.report(reportReason)
             showUserMessage(
               'Message Reported:',

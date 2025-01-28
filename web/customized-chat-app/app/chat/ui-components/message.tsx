@@ -1,17 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import Avatar from './avatar'
 import Image from 'next/image'
 import { roboto } from '@/app/fonts'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import MessageActions from './messageActions'
 import PinnedMessagePill from './pinnedMessagePill'
 import QuotedMessage from './quotedMessage'
 import MessageReaction from './messageReaction'
 import Sent from './icons/sent'
 import Read from './icons/read'
-import { MessageActionsTypes, PresenceIcon, ToastType } from '../../types'
+import { MessageActionsTypes, ToastType } from '../../types'
 import ToolTip from './toolTip'
-import { Channel, TimetokenUtils, MixedTextTypedElement } from '@pubnub/chat'
+import { TimetokenUtils, MixedTextTypedElement } from '@pubnub/chat'
 
 export default function Message ({
   received,
@@ -22,13 +21,16 @@ export default function Message ({
   showReadIndicator = true,
   quotedMessageSender = '',
   sender,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   messageActionHandler = (a, b) => {},
   pinned = false,
   unpinMessageHandler = () => {},
   message,
   currentUserId,
   isOnline = -1,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showUserMessage = (a, b, c, d) => {},
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showUserProfile = senderId => {},
   mutedOrBanned = false,
   activeChannelBackground,
@@ -43,11 +45,11 @@ export default function Message ({
 
   let messageHovered = false
 
-  const handleMessageMouseEnter = e => {
+  const handleMessageMouseEnter = () => {
     messageHovered = true
     setActionsShown(true)
   }
-  const handleMessageMouseLeave = e => {
+  const handleMessageMouseLeave = () => {
     messageHovered = false
     if (!forceShowActions) {
       setActionsShown(false)
@@ -63,10 +65,6 @@ export default function Message ({
     if (!messageHovered && !forceShowActions) {
       setActionsShown(false)
     }
-  }
-
-  function copyMessageText (messageText) {
-    navigator.clipboard.writeText(messageText)
   }
 
   function openLink (url) {
