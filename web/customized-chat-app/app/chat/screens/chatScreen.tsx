@@ -352,7 +352,7 @@ export default function ChatScreen ({
         : 'light',
       primary: appConfiguration?.color_primary
         ? appConfiguration?.color_primary
-        : '#161C2D',
+        : '#334155',
       primaryDark: appConfiguration?.color_primary_dark
         ? appConfiguration?.color_primary_dark
         : '#082f49',
