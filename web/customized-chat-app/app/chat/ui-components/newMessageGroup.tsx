@@ -134,7 +134,7 @@ export default function NewMessageGroup ({
         }`
       }}
     >
-      <div className='flex flex-col border h-screen min-w-full'>
+      <div className='flex flex-col border min-w-full'>
         <div className='flex flex-row gap-4 py-2'>
           <div
             className={`${roboto.className} flex flex-row items-center px-3 font-medium text-base`}
