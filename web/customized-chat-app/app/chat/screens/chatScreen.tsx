@@ -262,6 +262,7 @@ export default function ChatScreen ({
     //  Configuration is available, initialize PubNub
     async function init () {
       try {
+        if (!userId) return
         const localChat = await Chat.init({
           publishKey: appConfiguration.publishKey,
           subscribeKey: appConfiguration.subscribeKey,

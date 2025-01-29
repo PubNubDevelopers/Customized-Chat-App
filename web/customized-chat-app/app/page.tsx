@@ -81,6 +81,8 @@ export default function Home () {
   useEffect(() => {
     async function keysetInit () {
       try {
+        if (!publishKey) return
+        if (!subscribeKey) return
         const localChat = await Chat.init({
           publishKey: publishKey,
           subscribeKey: subscribeKey,

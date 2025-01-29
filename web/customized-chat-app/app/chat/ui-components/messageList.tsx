@@ -589,7 +589,7 @@ export default function MessageList ({
                   (message.quotedMessage.userId === currentUser.id
                     ? currentUser.name
                     : allUsers?.find(
-                        user => user.id === message.quotedMessage.userId
+                        user => user.id === message.quotedMessage?.userId
                       )?.name)
                 }
                 showReadIndicator={activeChannel.type !== 'public'}
