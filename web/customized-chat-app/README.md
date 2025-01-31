@@ -1,12 +1,12 @@
 # PubNub Customizable Chat Application
 
-Application which is configurable at both runtime and build-time to show how PubNub can deliver any kind of real-time chat solution.  This application is designed to be used in conjunction with the [customization dashboard](https://customized-chat-app-dashboard.netlify.app/).
+Application which is configurable at both runtime and build-time to show how PubNub can deliver any kind of real-time chat solution.  This application is designed to be used in conjunction with the [customization dashboard](https://pubnub-chat-builder.netlify.app/).
 
 ## Installation / Getting Started
 
 This application is written with NextJS, so be sure to have a copy of [Node.js 18.17](https://nodejs.org/) or later installed.
 
-**This application requires a configuration file, available from the [customization dashboard](https://customized-chat-app-dashboard.netlify.app/)**, this contains your PubNub publish and subscribe keys as well defining the capabilities of the app.  As a prerequisite to running this application, it is assumed you have created a PubNub Pub/Sub keyset which is correctly configured, i.e. the capabilities of the keyset match required capabilities of the application.  For example, if your customizable chat application supports message attachments, you must have the `Files` setting enabled on your keyset.  The full set of keyset requirements was provided by the configuration dashboard when the configuration was created.  
+**This application requires a configuration file, available from the [customization dashboard](https://pubnub-chat-builder.netlify.app/)**, this contains your PubNub publish and subscribe keys as well defining the capabilities of the app.  As a prerequisite to running this application, it is assumed you have created a PubNub Pub/Sub keyset which is correctly configured, i.e. the capabilities of the keyset match required capabilities of the application.  For example, if your customizable chat application supports message attachments, you must have the `Files` setting enabled on your keyset.  The full set of keyset requirements was provided by the configuration dashboard when the configuration was created.  
 
 It is important to note the App Context settings:  **Check** the following boxes: `User Metadata Events`, `Channel Metadata Events`, `Membership Events`.  **Uncheck** the following boxes: `Disallow Get All Channel Metadata`, `Disallow Get All User Metadata`
 
@@ -16,7 +16,7 @@ It is important to note the App Context settings:  **Check** the following boxes
 1. Navigate to the web variant of the application `cd web\customized-chat-app`
 1. Open the application in your favourite code editor, for example to open in VSCode `code .`
 1. Locate the `configuration.ts` file, located at `<web application location>\app\configuration.ts`
-1. Replace the contents of `configuration.ts` with the configuration provided by the [customization dashboard](https://customized-chat-app-dashboard.netlify.app/).  This will look something like the following:
+1. Replace the contents of `configuration.ts` with the configuration provided by the [customization dashboard](https://pubnub-chat-builder.netlify.app/).  This will look something like the following:
 
 ```javascript
 export const buildConfig = {

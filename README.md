@@ -2,7 +2,7 @@
 
 Customized chat applications powered by the PubNub Chat SDK
 
-This application is designed to be used in conjunction with the [Chat Builder Dashboard](https://customized-chat-app-dashboard.netlify.app/)
+This application is designed to be used in conjunction with the [Chat Builder Dashboard](https://pubnub-chat-builder.netlify.app/)
 
 ## Implementation Status
 
@@ -58,7 +58,7 @@ This application is designed to be used in conjunction with the [Chat Builder Da
 
 ![Dashboard](./media/screenshots/screenshot01.png)
 
-1. Load the dashboard (https://customized-chat-app-dashboard.netlify.app/)
+1. Load the dashboard (https://pubnub-chat-builder.netlify.app/)
 1. Configure your application as needed, or use one of the predefined templates
 1. Create and configure a PubNub Keyset from the [PubNub Admin Portal](https://admin.pubnub.com/)
 1. Provide the keyset to the dashboard and follow the instructions to run or build your application.
@@ -77,11 +77,11 @@ This application is designed to be used in conjunction with the [Chat Builder Da
 
 1. The dashboard will list your keyset requirements.  It is important to note the App Context settings:  **Check** the following boxes: `User Metadata Events`, `Channel Metadata Events`, `Membership Events`.  **Uncheck** the following boxes: `Disallow Get All Channel Metadata`, `Disallow Get All User Metadata`
 
-1. Copy the Publish and Subscribe keys and provide them to the [dashboard](https://customized-chat-app-dashboard.netlify.app/) .
+1. Copy the Publish and Subscribe keys and provide them to the [dashboard](https://pubnub-chat-builder.netlify.app/) .
 
 ## Building and Running
 
-Follow the instructions on the [dashboard](https://customized-chat-app-dashboard.netlify.app/) to build or run the customized application for your platform(s) of choice.
+Follow the instructions on the [dashboard](https://pubnub-chat-builder.netlify.app/) to build or run the customized application for your platform(s) of choice.
 
 ## Contributing
 
