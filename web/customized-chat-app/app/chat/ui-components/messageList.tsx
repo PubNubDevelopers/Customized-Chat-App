@@ -327,7 +327,7 @@ export default function MessageList ({
               <div
                 className={`p-2 py-3 ${
                   activeChannelPinnedMessage &&
-                  'cursor-pointer rounded-md  hover:ring-1 ring-black dark:ring-white'
+                  'cursor-pointer rounded-md'
                 } `}
                 onClick={() => {
                   if (!activeChannelPinnedMessage) return
@@ -371,7 +371,7 @@ export default function MessageList ({
           {(appConfiguration == null ||
             appConfiguration?.edit_channel_details == true) && (
             <div
-              className='mx-1 p-3 py-3 cursor-pointer rounded-md hover:ring-1 ring-black dark:ring-white'
+              className='mx-1 p-3 py-3 cursor-pointer rounded-md'
               onClick={() => {
                 setChatSettingsScreenVisible(true)
               }}
