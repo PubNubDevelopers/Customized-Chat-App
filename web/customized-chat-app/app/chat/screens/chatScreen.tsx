@@ -1203,7 +1203,7 @@ export default function ChatScreen ({
       </div>
       <main
         className={`hidden sm:block overscroll-none overflow-y-hidden ${
-          embeddedDemoConfig != null && 'border-b-1'
+          embeddedDemoConfig != null && 'rounded-xl'
         }`}
       >
         <div

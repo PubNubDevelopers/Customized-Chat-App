@@ -241,7 +241,7 @@ export default function MessageList ({
     >
       <div
         id='chats-header'
-        className='flex flex-row items-center h-16 min-h-16 border select-none'
+        className='flex flex-row items-center h-16 min-h-16 border-y border-l select-none'
         style={{
           background: `${
             colorScheme?.app_appearance === 'dark'
