@@ -19,19 +19,21 @@ export default function ModalReportMessage ({
       } fixed mx-auto inset-0 flex justify-center items-center z-40 select-none`}
     >
       {/* Example Modal */}
-      <div className='flex flex-col lg:w-1/2 md:w-2/3 sm:w-2/3 shadow-xl rounded-xl border border-neutral-300'
-      style={{
-        background: `${
-          colorScheme?.app_appearance === 'dark'
-            ? colorScheme?.primaryDark
-            : colorScheme?.primary
-        }`,
-        color: `${
-          colorScheme?.app_appearance === 'dark'
-            ? colorScheme?.secondaryDark
-            : colorScheme?.secondary
-        }`
-      }}>
+      <div
+        className='flex flex-col lg:w-1/2 md:w-2/3 sm:w-2/3 shadow-xl rounded-xl border border-neutral-300'
+        style={{
+          background: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.primaryDark
+              : colorScheme?.primary
+          }`,
+          color: `${
+            colorScheme?.app_appearance === 'dark'
+              ? colorScheme?.secondaryDark
+              : colorScheme?.secondary
+          }`
+        }}
+      >
         <div className='flex flex-row justify-end'>
           <div
             className=' cursor-pointer'
@@ -95,7 +97,6 @@ export default function ModalReportMessage ({
                     : colorScheme?.secondary
                 }`
               }}
-
             >
               Cancel
             </div>

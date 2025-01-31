@@ -300,8 +300,8 @@ export default function Message ({
               <div
                 className={`${roboto.className} text-sm font-normal flex cursor-pointer select-none`}
                 style={{
-                  color: activeChannelBackground?.color ?? "#525252"
-                }}  
+                  color: activeChannelBackground?.color ?? '#525252'
+                }}
                 onClick={() => {
                   showUserProfile(message.userId)
                 }}
@@ -314,7 +314,7 @@ export default function Message ({
             <div
               className={`${roboto.className} text-sm font-normal flex`}
               style={{
-                color: activeChannelBackground?.color ?? "#525252"
+                color: activeChannelBackground?.color ?? '#525252'
               }}
             >
               {determineUserReadableDate(message.timetoken)}
@@ -413,7 +413,6 @@ export default function Message ({
                             : colorScheme?.secondary
                         }`
                       }}
-                
                     >
                       Restore Message
                     </div>

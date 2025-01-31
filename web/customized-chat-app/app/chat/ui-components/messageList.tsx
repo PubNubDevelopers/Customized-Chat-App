@@ -46,7 +46,6 @@ export default function MessageList ({
   const [messages, setMessages] = useState<pnMessage[]>([])
   const [currentMembership, setCurrentMembership] = useState<Membership>()
   const [readReceipts, setReadReceipts] = useState()
-  //const [pinnedMessageTimetoken, setPinnedMessageTimetoken] = useState('') //  Keep track of if someone else has updated the pinned message
   const messageListRef = useRef<HTMLDivElement>(null)
   const [loadingMessage, setLoadingMessage] = useState('')
 
@@ -64,7 +63,6 @@ export default function MessageList ({
     if (activeChannel == null) return
     if (groupMembership == null) return
     if (!groupMembership.channel) return
-    //if (messages && messages.length > 0) return
     //  UseEffect to handle initial configuration of the Message List including reading the historical messages
     setLoadingMessage(
       `${
@@ -75,7 +73,7 @@ export default function MessageList ({
     )
     async function initMessageList () {
       if (activeChannel.id !== groupMembership.channel.id) {
-        //console.log('channel IDs did not match, returning')
+        // channel IDs did not match
         return
       }
       setMessages([])
@@ -83,7 +81,6 @@ export default function MessageList ({
       if (appConfiguration?.message_history) {
         activeChannel.getHistory({ count: 20 }).then(
           async historicalMessagesObj => {
-            //console.log(historicalMessagesObj)
             //  Run through the historical messages and set the most recently received one (that we were not the sender of) as read
             if (historicalMessagesObj.messages) {
               if (historicalMessagesObj.messages.length == 0) {
@@ -172,13 +169,12 @@ export default function MessageList ({
 
   useEffect(() => {
     if (!messageListRef.current) return
-    //console.log(messageListRef.current.scrollHeight - messageListRef.current.scrollTop)
     if (
       messageListRef.current.scrollTop != 0 &&
       messageListRef.current.scrollHeight - messageListRef.current.scrollTop >
         900
     ) {
-      return //  We aren't scrolled to the bottom
+      return //  We aren't scrolled to the bottom (this logic is not great - unreliable for some screens, depending on the length of the message list!)
     }
     setTimeout(() => {
       if (messageListRef.current) {
@@ -229,7 +225,9 @@ export default function MessageList ({
   return (
     <div
       className={`flex flex-col ${
-        embeddedDemoConfig != null ? 'max-h-[750px] h-[750px]' : 'min-h-screen h-screen'
+        embeddedDemoConfig != null
+          ? 'max-h-[750px] h-[750px]'
+          : 'min-h-screen h-screen'
       }`}
       style={{
         backgroundImage:
@@ -326,8 +324,7 @@ export default function MessageList ({
               {/* Pin with number of pinned messages */}
               <div
                 className={`p-2 py-3 ${
-                  activeChannelPinnedMessage &&
-                  'cursor-pointer rounded-md'
+                  activeChannelPinnedMessage && 'cursor-pointer rounded-md'
                 } `}
                 onClick={() => {
                   if (!activeChannelPinnedMessage) return

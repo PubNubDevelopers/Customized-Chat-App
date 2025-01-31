@@ -10,7 +10,12 @@ import {
   ChatHeaderActionIcon,
   PresenceIcon,
   ToastType,
-  useBreakpoints, giveUserAvatarUrl, giveGroupAvatarUrl, givePublicAvatarUrl, giveUserName, findIndex
+  useBreakpoints,
+  giveUserAvatarUrl,
+  giveGroupAvatarUrl,
+  givePublicAvatarUrl,
+  giveUserName,
+  findIndex
 } from '../../types'
 
 export default function ChatSelectionMenu ({
@@ -99,7 +104,6 @@ export default function ChatSelectionMenu ({
         await membershipsArray[index].setLastReadMessage(
           lastMessage.messages[0]
         )
-        console.log('setting unread message counts')
         updateUnreadMessagesCounts()
       }
     }
@@ -142,13 +146,15 @@ export default function ChatSelectionMenu ({
             setShowThread(false)
           }}
         >
-        <CloseRooms
+          <CloseRooms
             className=''
             width={36}
             height={36}
-            fill={colorScheme?.app_appearance === 'dark'
-              ? colorScheme?.secondaryDark
-              : colorScheme?.secondary}
+            fill={
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }
           />
         </div>
       </div>
@@ -230,7 +236,8 @@ export default function ChatSelectionMenu ({
                         ? giveUserAvatarUrl(
                             directChatsUsers[
                               findIndex(directChats, unreadMessage.channel.id)
-                            ], currentUserId
+                            ],
+                            currentUserId
                           )
                         : '/avatars/placeholder.png'
                     }
@@ -248,7 +255,8 @@ export default function ChatSelectionMenu ({
                         ? giveUserName(
                             directChatsUsers[
                               findIndex(directChats, unreadMessage.channel.id)
-                            ], currentUserId
+                            ],
+                            currentUserId
                           )
                         : unreadMessage.channel.name
                     }
@@ -331,15 +339,17 @@ export default function ChatSelectionMenu ({
         {showUnreadMessageCount == true &&
           unreadMessages &&
           unreadMessages.length > 0 && (
-            <div className='w-full border mt-4' style={{
-              borderColor: `${
-                colorScheme?.app_appearance === 'dark'
-                  ? colorScheme?.accentDark
-                  : colorScheme?.accent
-              }`
-            }}></div>
+            <div
+              className='w-full border mt-4'
+              style={{
+                borderColor: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.accentDark
+                    : colorScheme?.accent
+                }`
+              }}
+            ></div>
           )}
-          
 
         {showPublicChannels && (
           <ChatMenuHeader
@@ -385,13 +395,16 @@ export default function ChatSelectionMenu ({
         )}
 
         {showPublicChannels && (
-          <div className='w-full border mt-4' style={{
-            borderColor: `${
-              colorScheme?.app_appearance === 'dark'
-                ? colorScheme?.accentDark
-                : colorScheme?.accent
-            }`
-          }}></div>
+          <div
+            className='w-full border mt-4'
+            style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}
+          ></div>
         )}
 
         {showGroupChat && (
@@ -400,7 +413,9 @@ export default function ChatSelectionMenu ({
             expanded={groupsExpanded}
             expandCollapse={() => setGroupsExpanded(!groupsExpanded)}
             actionIcon={ChatHeaderActionIcon.ADD}
-            action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
+            action={
+              embeddedDemoConfig != null ? () => {} : setCreatingNewMessage
+            }
             colorScheme={colorScheme}
           />
         )}
@@ -431,13 +446,16 @@ export default function ChatSelectionMenu ({
         )}
 
         {showGroupChat && (
-          <div className='w-full border mt-4' style={{
-            borderColor: `${
-              colorScheme?.app_appearance === 'dark'
-                ? colorScheme?.accentDark
-                : colorScheme?.accent
-            }`
-          }}></div>
+          <div
+            className='w-full border mt-4'
+            style={{
+              borderColor: `${
+                colorScheme?.app_appearance === 'dark'
+                  ? colorScheme?.accentDark
+                  : colorScheme?.accent
+              }`
+            }}
+          ></div>
         )}
         {showGroupChat && (
           <ChatMenuHeader
@@ -447,7 +465,9 @@ export default function ChatSelectionMenu ({
               setDirectMessagesExpanded(!directMessagesExpanded)
             }
             actionIcon={ChatHeaderActionIcon.ADD}
-            action={embeddedDemoConfig != null ? (() => {}) : setCreatingNewMessage}
+            action={
+              embeddedDemoConfig != null ? () => {} : setCreatingNewMessage
+            }
             colorScheme={colorScheme}
           />
         )}
@@ -464,7 +484,10 @@ export default function ChatSelectionMenu ({
                   .indexOf(searchChannels.toLowerCase()) > -1 && (
                   <ChatMenuItem
                     key={index}
-                    avatarUrl={giveUserAvatarUrl(directChatsUsers[index], currentUserId)}
+                    avatarUrl={giveUserAvatarUrl(
+                      directChatsUsers[index],
+                      currentUserId
+                    )}
                     text={giveUserName(directChatsUsers[index], currentUserId)}
                     present={
                       directChatsUsers[index]?.find(

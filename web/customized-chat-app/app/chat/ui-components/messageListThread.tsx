@@ -81,10 +81,13 @@ export default function MessageListThread ({
           embeddedDemoConfig == null ? 'mt-[64px]' : ''
         }`}
         style={{
-          backgroundImage: activeChannelBackground?.backgroundImage ?? "url('/backgrounds/default.png')",
-          backgroundPosition: activeChannelBackground?.backgroundPosition ?? "initial"
+          backgroundImage:
+            activeChannelBackground?.backgroundImage ??
+            "url('/backgrounds/default.png')",
+          backgroundPosition:
+            activeChannelBackground?.backgroundPosition ?? 'initial'
         }}
-        >
+      >
         <div
           id='threads-header'
           className='flex flex-row items-center w-full h-16 border min-h-16 border-l border-navy-200'

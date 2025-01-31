@@ -6,7 +6,7 @@ export default function QuotedMessage ({
   quotedMessage,
   quotedMessageSender,
   setQuotedMessage,
-  displayedWithMesageInput  //  Whether this component is rendered above the input control, or as part of a message
+  displayedWithMesageInput //  Whether this component is rendered above the input control, or as part of a message
 }) {
   return (
     <div
@@ -26,7 +26,11 @@ export default function QuotedMessage ({
         </div>
         <div className='font-normal text-sm text-neutral-900 line-clamp-2'>
           {/* Usually you would use message.text but I'm using content here for the embedded demo test data.  Additionally, although you have access to the quoted message text here, you might want to retrieve the full message through channel.getMessage(timetoken) to render user / channel suggestions properly */}
-          {quotedMessage?.text ? quotedMessage.text : quotedMessage?.content?.text ? quotedMessage?.content?.text : ""}
+          {quotedMessage?.text
+            ? quotedMessage.text
+            : quotedMessage?.content?.text
+            ? quotedMessage?.content?.text
+            : ''}
         </div>
       </div>
       {displayedWithMesageInput && setQuotedMessage && (

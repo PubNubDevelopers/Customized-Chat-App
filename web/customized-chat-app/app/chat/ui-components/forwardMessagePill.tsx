@@ -13,10 +13,7 @@ export default function ForwardMessagePill ({
     >
       <div className=''>{text}</div>
       {!isMe && (
-        <div
-          className='cursor-pointer'
-          onClick={() => removePillAction(id)}
-        >
+        <div className='cursor-pointer' onClick={() => removePillAction(id)}>
           <Image
             src='/icons/chat-assets/close.svg'
             alt='Remove'

@@ -14,13 +14,7 @@ export default function MessageReaction ({
         onClick={() => reactionClicked(emoji, messageTimetoken)}
       >
         <div className='flex text-lg'>{emoji}</div>
-        {count > 1 && (
-          <div
-            className='flex text-xs'
-          >
-            {count}
-          </div>
-        )}
+        {count > 1 && <div className='flex text-xs'>{count}</div>}
       </div>
     )
   )

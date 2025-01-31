@@ -118,7 +118,6 @@ export default function ChatScreen ({
   const [directChatsMemberships, setDirectChatsMemberships] =
     useState<Membership[]>()
 
-  //const [publicChannelsUsers, setPublicChannelsUsers] = useState<User[][]>([])
   const [privateGroupsUsers, setPrivateGroupsUsers] = useState<User[][]>([])
   const [directChatsUsers, setDirectChatsUsers] = useState<User[][]>([])
   const [allUsers, setAllUsers] = useState<User[]>()
@@ -144,7 +143,7 @@ export default function ChatScreen ({
     chat?.getUnreadMessagesCounts({}).then(
       result => {
         const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-        result.forEach((element) => {
+        result.forEach(element => {
           const newUnreadMessage: UnreadMessagesOnChannel = {
             channel: element.channel,
             count: element.count
@@ -201,8 +200,6 @@ export default function ChatScreen ({
       )
     }
 
-    //console.log('calling set app configuration')
-    //setAppConfiguration(configuration)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration])
 
@@ -306,7 +303,6 @@ export default function ChatScreen ({
             currentPublicMemberships.total < localPublicChannels.total
           ) {
             //  There are public channels that we are not a member of, join them all
-            //const localPublicChannelMemberships = []
             const localPublicChannelMemberships =
               currentPublicMemberships.memberships
             for (const publicChannel of localPublicChannels.channels) {
@@ -348,6 +344,8 @@ export default function ChatScreen ({
     }
 
     const startUpColorScheme: ThemeColors = {
+      //  Note: only primary, secondary and accent are used in the current implementation
+      //  app_appearance, primaryDark, secondaryDark and accentDark are associated with a previous implementation
       app_appearance: appConfiguration?.app_appearance
         ? appConfiguration.app_appearance
         : 'light',
@@ -371,7 +369,6 @@ export default function ChatScreen ({
         : '#b91c1c'
     }
     setColorScheme(startUpColorScheme)
-    //console.log(startUpColorScheme)
 
     if (embeddedDemoConfig != null) {
       //  Any special initialization when we are running within the embedded demo?
@@ -468,7 +465,7 @@ export default function ChatScreen ({
       chat?.getUnreadMessagesCounts({}).then(
         result => {
           const unreadMessagesOnChannel: UnreadMessagesOnChannel[] = []
-          result.forEach((element) => {
+          result.forEach(element => {
             const newUnreadMessage: UnreadMessagesOnChannel = {
               channel: element.channel,
               count: element.count
@@ -488,7 +485,7 @@ export default function ChatScreen ({
 
     const publicHandlers: (() => void)[] = []
     if (publicChannels) {
-      publicChannels.forEach((channel) => {
+      publicChannels.forEach(channel => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -504,7 +501,7 @@ export default function ChatScreen ({
     }
     const directHandlers: (() => void)[] = []
     if (directChats) {
-      directChats.forEach((channel) => {
+      directChats.forEach(channel => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -520,7 +517,7 @@ export default function ChatScreen ({
     }
     const privateHandlers: (() => void)[] = []
     if (privateGroups) {
-      privateGroups.forEach((channel) => {
+      privateGroups.forEach(channel => {
         const disconnectHandler = channel.connect(message => {
           if (
             !(
@@ -557,7 +554,7 @@ export default function ChatScreen ({
     appConfiguration?.message_unread_count
   ])
 
-  /**  Maintain the users and group memberships for the currently active channel */
+  //  Maintain the users and group memberships for the currently active channel
   useEffect(() => {
     if (!chat) return
     if (!activeChannel) return
@@ -577,7 +574,7 @@ export default function ChatScreen ({
       //  Channel is either group or direct
       activeChannel.getMembers({}).then(membersResponse => {
         setActiveChannelUsers(
-          membersResponse.members.map((membership) => {
+          membersResponse.members.map(membership => {
             return membership.user
           })
         )
@@ -636,7 +633,6 @@ export default function ChatScreen ({
   }, [chat, activeChannel])
 
   /* Update the current channel's background (if specified on server) */
-
   useEffect(() => {
     if (!chat) return
     if (!activeChannel) return
@@ -647,7 +643,6 @@ export default function ChatScreen ({
         channelThemeFromServer == null ||
         typeof channelThemeFromServer == 'undefined'
       ) {
-        console.log('no server theme')
         setActiveChannelBackground(Backgrounds[DEFAULT_CHAT_BACKGROUND])
         return
       }
@@ -657,7 +652,6 @@ export default function ChatScreen ({
         backgroundId < 0 ||
         backgroundId >= Backgrounds.length
       ) {
-        console.log('nan')
         setActiveChannelBackground(Backgrounds[DEFAULT_CHAT_BACKGROUND])
         return
       }
@@ -737,10 +731,9 @@ export default function ChatScreen ({
     }
   }, [chat, privateGroups, activeChannel])
 
-  //  Note: We do not need to stream updates on direct chats since we do not use the channel name, only the user info (name, avatar)
+  //  Note: We do not need to stream updates on direct chats since we do not allow modification of the channel name, only the user info (name, avatar)
 
   /* Handle updates to any of the other users in the system */
-
   useEffect(() => {
     if (!allUsers) return
     //  It would be better to re-register update listeners whenever a user changes, but all this function does is maintain the state of allUsers locally
@@ -883,7 +876,7 @@ export default function ChatScreen ({
             indexGroup
           ].getMembers({ sort: { updated: 'desc' }, limit: 100 })
           if (response.members) {
-            const channelUsers = response.members.map((membership) => {
+            const channelUsers = response.members.map(membership => {
               return membership.user
             })
             tempGroupUsers[tempIndex] = channelUsers
@@ -926,7 +919,7 @@ export default function ChatScreen ({
 
           if (response.members) {
             //  response contains the most recent 100 members
-            const channelUsers = response.members.map((membership) => {
+            const channelUsers = response.members.map(membership => {
               return membership.user
             })
             tempDirectUsers[tempIndex] = channelUsers
@@ -1100,11 +1093,6 @@ export default function ChatScreen ({
       const channelType = activeChannel.type
 
       await activeChannel.leave()
-      //showUserMessage(
-      //  'You Left:',
-      //  'You have left this group, please select a different channel or create a new group / DM',
-      //  'https://www.pubnub.com/docs/chat/chat-sdk/build/features/channels/updates#update-channel-details'
-      //)
       if (publicChannels && publicChannels.length > 0) {
         setActiveChannel(publicChannels[0])
       } else {
@@ -1199,7 +1187,8 @@ export default function ChatScreen ({
 
   return (
     <div className=''>
-      <div className='sm:hidden flex flex-col mt-10 h-screen justify-center w-full text-center gap-16 text-4xl'>This app is not designed for mobile
+      <div className='sm:hidden flex flex-col mt-10 h-screen justify-center w-full text-center gap-16 text-4xl'>
+        This app is not designed for mobile
       </div>
       <main
         className={`hidden sm:block overscroll-none overflow-y-hidden ${

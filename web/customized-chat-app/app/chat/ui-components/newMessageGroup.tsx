@@ -79,7 +79,6 @@ export default function NewMessageGroup ({
   }
 
   async function createGroup () {
-    console.log('CREATE GROUP')
     setCreationInProgress(true)
     //  Call createGroup or direct conversation, depending on which one it is.
     //  Send joined events to all participants to let them know they are in a new group
@@ -114,7 +113,6 @@ export default function NewMessageGroup ({
       await invokeRefresh(desiredChannelId, createdChannel['type'])
       setActiveChannel(createdChannel)
     }
-    console.log('set to false')
     setCreatingNewMessage(false)
   }
 
@@ -201,14 +199,16 @@ export default function NewMessageGroup ({
         {searchTerm.length > 0 && searchResults.length > 0 && (
           <div className='px-6 w-full'>
             <div className='relative px-6 w-full'>
-              <div className='flex flex-col absolute w-2/5 rounded-lg border shadow-lg left-[0px] top-[0px] z-10'
-                            style={{
-                              background: `${
-                                colorScheme?.app_appearance === 'dark'
-                                  ? colorScheme?.primaryDark
-                                  : colorScheme?.primary
-                              }`,
-                            }}>
+              <div
+                className='flex flex-col absolute w-2/5 rounded-lg border shadow-lg left-[0px] top-[0px] z-10'
+                style={{
+                  background: `${
+                    colorScheme?.app_appearance === 'dark'
+                      ? colorScheme?.primaryDark
+                      : colorScheme?.primary
+                  }`
+                }}
+              >
                 {/* Search Results */}
 
                 {searchResults?.map((user, index) => (
@@ -250,8 +250,7 @@ export default function NewMessageGroup ({
           <div
             className={`${
               creationInProgress && 'hidden'
-            } flex justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg`
-            }
+            } flex justify-between items-center font-medium text-sm px-6 mx-2.5 h-10 cursor-pointer rounded-lg`}
             style={{
               background: `${
                 colorScheme?.app_appearance === 'dark'

@@ -10,8 +10,7 @@ export default function ForwardMessageSearchResult ({
 }) {
   return (
     <div
-      className={`${roboto.className} flex flex-row text-base mx-4 my-2 gap-2 w-full items-center cursor-pointer`
-      }
+      className={`${roboto.className} flex flex-row text-base mx-4 my-2 gap-2 w-full items-center cursor-pointer`}
       onClick={() => clickAction()}
       style={{
         color: `${

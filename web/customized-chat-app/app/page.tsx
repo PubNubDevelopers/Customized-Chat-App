@@ -15,7 +15,6 @@ export default function Home () {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buildConfiguration: any = buildConfig
   const router = useRouter()
-  //const [configTypingIndicator, setConfigTypingIndicator] = useState(false)
   const [publishKey, setPublishKey] = useState(null)
   const [subscribeKey, setSubscribeKey] = useState(null)
   const [publicChannelsAvailable, setPublicChannelsAvailable] = useState(false) //  Only create public channel data on the keyset if enabled
@@ -27,15 +26,11 @@ export default function Home () {
   useEffect(() => {
     setLoadMessage('No Publish / Subscribe Keys')
     //  1. Check for Runtime configuration
-    console.log('checking for runtime config')
     const encodedConfiguration = searchParams.get('configuration')
     if (encodedConfiguration) {
       console.log('Found runtime configuration')
-      //setEncodedConfiguration(encodedConfiguration)
-      //const decodedConfiguration = atob(encodedConfiguration)
       try {
         const jsonConfig = JSON.parse(atob(encodedConfiguration))
-        //setConfigTypingIndicator(jsonConfig['typing_indicator'])
         setPublishKey(jsonConfig['publishKey'])
         setSubscribeKey(jsonConfig['subscribeKey'])
         setPublicChannelsAvailable(jsonConfig['public_channels'])
@@ -65,9 +60,7 @@ export default function Home () {
       //  all the logic to switch between light and dark in case we want to add this again
       //  in the future.
       const isDarkMode = buildConfiguration?.app_appearance == 'dark'
-      document
-      .getElementById('appRoot')
-      ?.classList.toggle('dark', isDarkMode)
+      document.getElementById('appRoot')?.classList.toggle('dark', isDarkMode)
     }
   }, [
     searchParams,
@@ -164,8 +157,6 @@ export default function Home () {
     }
     if (!publishKey) return
     if (!subscribeKey) return
-    console.log('publish key: ' + publishKey)
-    console.log('subscribe key: ' + subscribeKey)
     setLoadMessage('Initializing Keyset')
     shuffleArray(userArray)
     keysetInit()
@@ -185,16 +176,6 @@ export default function Home () {
 
   return (
     <main className='flex flex-col min-h-screen size-full gap-8 items-center'>
-      {/*
-      <div suppressHydrationWarning={true} className=''>
-        Value of Typing Indicator (Runtime){' '}
-        {configTypingIndicator ? 'Enabled' : 'Disabled'}
-      </div>
-      <div className=''>
-        Value of Typing Indicator (Build){' '}
-        {buildConfiguration?.typing_indicator ? 'Enabled' : 'Disabled'}
-      </div>
-        */}
       <div className='flex flex-col gap-3 m-2 items-center'>
         {!initialized || loggingIn ? (
           <div className='animate-spin'>
@@ -229,7 +210,10 @@ export default function Home () {
               Built with the PubNub Chat SDK for JavaScript and TypeScript.
             </div>
 
-            <div className='text-xs'>Select a user to log in as.  The next page will render with your requested color scheme</div>
+            <div className='text-xs'>
+              Select a user to log in as. The next page will render with your
+              requested color scheme
+            </div>
 
             <div className='grid md:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-2'>
               {userArray.slice(0, 21).map((user, index) => {

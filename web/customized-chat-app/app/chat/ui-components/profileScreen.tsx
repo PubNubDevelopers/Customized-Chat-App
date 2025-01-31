@@ -11,7 +11,6 @@ import { SunIcon } from './icons/sunIcon'
 import CloseRooms from './icons/closeRooms'
 import Logout from './icons/logout'
 
-
 export default function ProfileScreen ({
   profileScreenVisible,
   setProfileScreenVisible,
@@ -44,33 +43,32 @@ export default function ProfileScreen ({
     }
   }
 
-  function getLastSeenOnline(user) {
-    let returnVal = "Never"
-    if (user && user.custom && user.custom.lastActiveTimestamp)
-    {
-      const secondsSinceSeen = Math.floor(((new Date()).getTime() - user.custom.lastActiveTimestamp) / 1000)
+  function getLastSeenOnline (user) {
+    let returnVal = 'Never'
+    if (user && user.custom && user.custom.lastActiveTimestamp) {
+      const secondsSinceSeen = Math.floor(
+        (new Date().getTime() - user.custom.lastActiveTimestamp) / 1000
+      )
       const hrs = Math.floor(secondsSinceSeen / 3600)
-      const mins = Math.floor((secondsSinceSeen - (3600 * hrs)) / 60)
+      const mins = Math.floor((secondsSinceSeen - 3600 * hrs) / 60)
       const secs = secondsSinceSeen % 60
-      returnVal = ""
-      if (hrs > 0)
-        returnVal += hrs + "h "
-      returnVal += mins + "m "
-      returnVal += secs + "s ago"
+      returnVal = ''
+      if (hrs > 0) returnVal += hrs + 'h '
+      returnVal += mins + 'm '
+      returnVal += secs + 's ago'
     }
     return returnVal
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  function handleSetDarkMode(isDarkMode)
-  {
+  function handleSetDarkMode (isDarkMode) {
     setDarkMode(isDarkMode)
     setAppDarkMode(isDarkMode)
   }
 
   useEffect(() => {
     setDarkMode(colorScheme?.app_appearance === 'dark')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -99,14 +97,17 @@ export default function ProfileScreen ({
         <div
           className='flex cursor-pointer'
           onClick={() => setProfileScreenVisible(false)}
-      >
-          <CloseRooms className='p-3'
-          width={36}
-          height={36}
-          fill={colorScheme?.app_appearance === 'dark'
-            ? colorScheme?.secondaryDark
-            : colorScheme?.secondary}/>
-          
+        >
+          <CloseRooms
+            className='p-3'
+            width={36}
+            height={36}
+            fill={
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }
+          />
         </div>
         Profile
       </div>
@@ -141,7 +142,8 @@ export default function ProfileScreen ({
         }}>{darkMode ? 'Dark Mode' : 'Light Mode'}</div>
             </Switch>
         </div>
-        */}
+        */
+        }
         <div
           className={`${roboto.className} text-sm font-medium flex flex-row p-3 justify-between items-center`}
         >
@@ -199,14 +201,14 @@ export default function ProfileScreen ({
 
         <div className={`${isMe ? 'hidden' : 'flex flex-col py-2 px-4'}`}>
           <div className='text-sm'>Last seen online</div>
-          <div className='text-lg font-semibold' suppressHydrationWarning>{getLastSeenOnline(user)}</div>
+          <div className='text-lg font-semibold' suppressHydrationWarning>
+            {getLastSeenOnline(user)}
+          </div>
         </div>
 
         <div className='flex flex-col py-2 px-4'>
           <div className='text-sm'>Location</div>
-          <div className='text-lg font-semibold'>
-            {user?.custom?.location}
-          </div>
+          <div className='text-lg font-semibold'>{user?.custom?.location}</div>
         </div>
 
         <div className='flex flex-col py-2 px-4'>
@@ -216,12 +218,9 @@ export default function ProfileScreen ({
           </div>
         </div>
 
-
         <div className='flex flex-col py-2 px-4'>
           <div className='text-sm'>Job Title</div>
-          <div className='text-lg font-semibold'>
-            {user?.custom?.jobTitle}
-          </div>
+          <div className='text-lg font-semibold'>{user?.custom?.jobTitle}</div>
         </div>
 
         <div className='flex flex-col py-2 px-4'>
@@ -233,9 +232,7 @@ export default function ProfileScreen ({
 
         <div className='flex flex-col py-2 px-4'>
           <div className='text-sm'>External ID</div>
-          <div className='text-lg font-semibold'>
-            {user?.externalId}
-          </div>
+          <div className='text-lg font-semibold'>{user?.externalId}</div>
         </div>
 
         <div className='flex flex-col py-2 px-4'>
@@ -247,13 +244,16 @@ export default function ProfileScreen ({
 
         {isMe && (
           <div className='pt-3'>
-            <div className='w-full border mt-4' style={{
-              borderColor: `${
-                colorScheme?.app_appearance === 'dark'
-                  ? colorScheme?.accentDark
-                  : colorScheme?.accent
-              }`
-            }}></div>
+            <div
+              className='w-full border mt-4'
+              style={{
+                borderColor: `${
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.accentDark
+                    : colorScheme?.accent
+                }`
+              }}
+            ></div>
 
             <div
               className={`${roboto.className} flex flex-row justify-center items-center my-6 font-medium text-sm px-4 mx-2.5 h-10 cursor-pointer rounded-lg `}
@@ -274,12 +274,16 @@ export default function ProfileScreen ({
                 logout()
               }}
             >
-              <Logout className='p-3'
+              <Logout
+                className='p-3'
                 width={40}
                 height={40}
-                fill={colorScheme?.app_appearance === 'dark'
-                  ? colorScheme?.secondaryDark
-                  : colorScheme?.secondary}/>
+                fill={
+                  colorScheme?.app_appearance === 'dark'
+                    ? colorScheme?.secondaryDark
+                    : colorScheme?.secondary
+                }
+              />
               {logoutButtonText}
             </div>
           </div>

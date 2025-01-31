@@ -11,7 +11,8 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: 'PubNub Customized Chat App',
-  description: 'Customized Chat Application using the PubNub Chat SDK written in Next.js'
+  description:
+    'Customized Chat Application using the PubNub Chat SDK written in Next.js'
 }
 
 export default function RootLayout ({
@@ -22,8 +23,7 @@ export default function RootLayout ({
   return (
     <html lang='en' id='appRoot' className=''>
       <Suspense>
-        <body
-          className={poppins.className}>
+        <body className={poppins.className}>
           <NextUIProvider>{children}</NextUIProvider>
         </body>
       </Suspense>

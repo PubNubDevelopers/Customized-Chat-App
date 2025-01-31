@@ -20,14 +20,16 @@ export default function ManagedMember ({
           avatarUrl={user.profileUrl}
           appConfiguration={appConfiguration}
         />
-        <div className='flex pl-3 text-sm font-normal'
-                      style={{
-                        color: `${
-                          colorScheme?.app_appearance === 'dark'
-                            ? colorScheme?.secondaryDark
-                            : colorScheme?.secondary
-                        }`
-                      }}>
+        <div
+          className='flex pl-3 text-sm font-normal'
+          style={{
+            color: `${
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }`
+          }}
+        >
           {name}
         </div>
       </div>

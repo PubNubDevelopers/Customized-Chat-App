@@ -48,7 +48,7 @@ export default function ChatSettingsScreen ({
         }`
       }}
     >
-    <div
+      <div
         className={`${roboto.className} ${
           (changeChatNameScreenVisible || manageMembersModalVisible) &&
           'opacity-40'
@@ -62,9 +62,11 @@ export default function ChatSettingsScreen ({
             className=''
             width={36}
             height={36}
-            fill={colorScheme?.app_appearance === 'dark'
-              ? colorScheme?.secondaryDark
-              : colorScheme?.secondary}
+            fill={
+              colorScheme?.app_appearance === 'dark'
+                ? colorScheme?.secondaryDark
+                : colorScheme?.secondary
+            }
           />
         </div>
         Chat settings
@@ -201,11 +203,14 @@ export default function ChatSettingsScreen ({
             <div className='text-lg'>Choose Background</div>
             <div className='text-xs'>Will update for all participants</div>
             {Backgrounds?.map((background, index) => (
-              <div key={index} className='cursor-pointer place-items-end'
-              onClick={() => {
-                setBackgroundAction(background, index)
-                setChatSettingsScreenVisible(false)
-              }}>
+              <div
+                key={index}
+                className='cursor-pointer place-items-end'
+                onClick={() => {
+                  setBackgroundAction(background, index)
+                  setChatSettingsScreenVisible(false)
+                }}
+              >
                 <Image
                   src={background.url}
                   alt='Background'
@@ -217,7 +222,7 @@ export default function ChatSettingsScreen ({
                     height: '100px'
                   }}
                 />
-                  <div className='text-xs my-1 self-end'>{background.name}</div>
+                <div className='text-xs my-1 self-end'>{background.name}</div>
               </div>
             ))}
           </div>

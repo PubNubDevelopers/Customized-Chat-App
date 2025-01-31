@@ -3,7 +3,7 @@ import { SuggestedMention } from '@pubnub/chat'
 
 export default function MentionSuggestions ({
   suggestedMentions,
-  pickSuggestedMention,
+  pickSuggestedMention
 }) {
   return (
     <div className='flex w-full px-7 flex-row bg-white'>

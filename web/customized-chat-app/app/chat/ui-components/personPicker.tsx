@@ -13,9 +13,7 @@ export default function PersonPicker ({
   return (
     <div
       className={`cursor-pointer flex flex-row items-center gap-3 select-none ${className} ${
-        isThin
-          ? 'h-12 px-3 flex-row-reverse'
-          : 'hover:ring p-2 w-56 border-2'
+        isThin ? 'h-12 px-3 flex-row-reverse' : 'hover:ring p-2 w-56 border-2'
       } rounded-xl`}
       onClick={() => {
         personSelected(id)
@@ -33,7 +31,8 @@ export default function PersonPicker ({
           className='w-full text-md'
           style={{
             color: `${
-              colorScheme && (colorScheme['app_appearance'] === 'dark'
+              colorScheme &&
+              (colorScheme['app_appearance'] === 'dark'
                 ? colorScheme['secondaryDark']
                 : colorScheme['secondary'])
             }`

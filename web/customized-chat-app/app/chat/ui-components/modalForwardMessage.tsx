@@ -57,7 +57,10 @@ export default function ModalForwardMessage ({
     setSearchResultsChannels([])
     if (publicChannels) {
       for (const publicChannel of publicChannels) {
-        if (publicChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 && message.channelId !== publicChannel.id) {
+        if (
+          publicChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 &&
+          message.channelId !== publicChannel.id
+        ) {
           setSearchResultsChannels(searchResultsChannels => [
             ...searchResultsChannels,
             publicChannel
@@ -68,7 +71,8 @@ export default function ModalForwardMessage ({
     if (privateGroups) {
       for (const privateChannel of privateGroups) {
         if (
-          privateChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 && message.channelId !== privateChannel.id
+          privateChannel.name.toLowerCase().indexOf(term.toLowerCase()) > -1 &&
+          message.channelId !== privateChannel.id
         ) {
           setSearchResultsChannels(searchResultsChannels => [
             ...searchResultsChannels,
@@ -288,7 +292,8 @@ export default function ModalForwardMessage ({
               <Avatar
                 present={PresenceIcon.NOT_SHOWN}
                 avatarUrl={
-                  allUsers?.find((user) => user.id == message?.userId)?.profileUrl ?? '/avatars/placeholder.png'
+                  allUsers?.find(user => user.id == message?.userId)
+                    ?.profileUrl ?? '/avatars/placeholder.png'
                 }
                 width={25}
                 height={25}

@@ -13,10 +13,8 @@ export default function MessageInput ({
   quotedMessageSender,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setQuotedMessage = any => {},
-  //creatingNewMessage = false,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   showUserMessage = (a, b, c, d) => {},
-  //plusAction = () => {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setShowEmojiPicker = any => {},
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -47,11 +45,9 @@ export default function MessageInput ({
     if (currentlyEditingMessage) {
       if (currentlyEditingMessage.text == text) {
         //  The text has not changed
-        console.log('text unchanged')
         return
       }
       if (!embeddedDemoConfig) {
-        console.log('calling edit text')
         await currentlyEditingMessage?.editText(text)
       }
       setCurrentlyEditingMessage(null)
@@ -145,13 +141,11 @@ export default function MessageInput ({
 
   async function messageDraftChangeListener (state) {
     let mentions = await state.suggestedMentions
-    if (!appConfiguration?.mention_user)
-    {
-      mentions = mentions.filter((mention) => mention.type != 'mention')
+    if (!appConfiguration?.mention_user) {
+      mentions = mentions.filter(mention => mention.type != 'mention')
     }
-    if (!appConfiguration?.channel_references)
-    {
-      mentions = mentions.filter((mention) => mention.type != 'channelReference')
+    if (!appConfiguration?.channel_references) {
+      mentions = mentions.filter(mention => mention.type != 'channelReference')
     }
     if (mentions) {
       setSuggestedMentions(mentions)
@@ -240,7 +234,7 @@ export default function MessageInput ({
           Uploading Attachments...
         </div>
       )}
-      {(suggestedMentions && suggestedMentions.length > 0) && (
+      {suggestedMentions && suggestedMentions.length > 0 && (
         <MentionSuggestions
           suggestedMentions={suggestedMentions}
           pickSuggestedMention={mention => {
