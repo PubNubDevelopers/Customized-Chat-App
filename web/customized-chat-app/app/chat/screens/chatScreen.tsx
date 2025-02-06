@@ -1463,7 +1463,7 @@ export default function ChatScreen ({
           id='chat-main'
           className={`flex flex-row ${
             embeddedDemoConfig != null
-              ? 'max-h-[750px]'
+              ? 'h-[calc(100vh-250px)]'
               : 'min-h-screen h-screen'
           } overscroll-none ${shouldBlurScreen && 'blur-sm opacity-40'}`}
         >

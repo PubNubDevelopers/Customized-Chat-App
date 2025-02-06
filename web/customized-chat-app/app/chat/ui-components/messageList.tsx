@@ -189,7 +189,7 @@ export default function MessageList ({
         <div
           className={`flex flex-col  ${
             embeddedDemoConfig != null
-              ? 'max-h-[750px]'
+              ? 'h-[calc(100vh-250px)]'
               : 'min-h-screen h-screen'
           } justify-center items-center w-full`}
         >
@@ -226,7 +226,7 @@ export default function MessageList ({
     <div
       className={`flex flex-col ${
         embeddedDemoConfig != null
-          ? 'max-h-[750px] h-[750px]'
+          ? 'h-[calc(100vh-250px)]'
           : 'min-h-screen h-screen'
       }`}
       style={{
