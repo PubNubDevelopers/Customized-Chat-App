@@ -12,7 +12,7 @@ This application is designed to be used in conjunction with the [Chat Builder Da
 | ---- | ---- | ---- | ---- |
 | Description | Web app written in React (Next.js) | Native Android application written in Kotlin | Native iOS application written in Swift |
 | SDK | [PubNub JavaScript Chat SDK](https://www.pubnub.com/docs/chat/chat-sdk) | [PubNub Kotlin Chat SDK](https://www.pubnub.com/docs/chat/kotlin-chat-sdk) | [PubNub Swift Chat SDK](https://www.pubnub.com/docs/chat/swift-chat-sdk) |
-| Status | **Mostly Complete** | *In Progress* | *In Progress* |
+| Status | **Complete** | *In Progress* | *In Progress* |
 | Platform ReadMe  | [Web ReadMe](./web/customized-chat-app/README.md) | [Android ReadMe](./android/README.md) | [iOS ReadMe](./ios/README.md) |
 
 
