@@ -19,13 +19,15 @@ export default function PersonPicker ({
         personSelected(id)
       }}
     >
-      <Avatar
-        avatarUrl={avatarUrl}
-        present={PresenceIcon.NOT_SHOWN}
-        width={isThin ? 42 : 48}
-        height={isThin ? 42 : 48}
-        appConfiguration={null}
-      ></Avatar>
+      <div className='min-w-10 min-h-10'>
+        <Avatar
+          avatarUrl={avatarUrl}
+          present={PresenceIcon.NOT_SHOWN}
+          width={isThin ? 42 : 48}
+          height={isThin ? 42 : 48}
+          appConfiguration={null}
+        ></Avatar>
+      </div>
       <div className='flex flex-col'>
         <div
           className='w-full text-md'

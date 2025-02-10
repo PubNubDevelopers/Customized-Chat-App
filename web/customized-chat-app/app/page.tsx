@@ -18,6 +18,10 @@ export default function Home () {
   const [publishKey, setPublishKey] = useState(null)
   const [subscribeKey, setSubscribeKey] = useState(null)
   const [publicChannelsAvailable, setPublicChannelsAvailable] = useState(false) //  Only create public channel data on the keyset if enabled
+  const [user01Name, setUser01Name] = useState(null)
+  const [user01ProfileUrl, setUser01ProfileUrl] = useState(null)
+  const [user02Name, setUser02Name] = useState(null)
+  const [user02ProfileUrl, setUser02ProfileUrl] = useState(null)
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
@@ -34,6 +38,10 @@ export default function Home () {
         setPublishKey(jsonConfig['publishKey'])
         setSubscribeKey(jsonConfig['subscribeKey'])
         setPublicChannelsAvailable(jsonConfig['public_channels'])
+        setUser01Name(jsonConfig['user01_name'])
+        setUser02Name(jsonConfig['user02_name'])
+        setUser01ProfileUrl(jsonConfig['user01_profileUrl'])
+        setUser02ProfileUrl(jsonConfig['user02_profileUrl'])
         return
       } catch {
         //  Unable to parse provided configuration
@@ -54,6 +62,18 @@ export default function Home () {
     if (buildConfiguration?.public_channels != null) {
       setPublicChannelsAvailable(buildConfiguration.public_channels)
     }
+    if (buildConfiguration?.user01_name != null) {
+      setUser01Name(buildConfiguration.user01_name)
+    }
+    if (buildConfiguration?.user02_name != null) {
+      setUser02Name(buildConfiguration.user02_name)
+    }
+    if (buildConfiguration?.user01_profileUrl != null) {
+      setUser01ProfileUrl(buildConfiguration.user01_profileUrl)
+    }
+    if (buildConfiguration?.user02_profileUrl != null) {
+      setUser02ProfileUrl(buildConfiguration.user02_profileUrl)
+    }
     if (buildConfiguration?.app_appearance != null) {
       //  This application was originally written to support custom light and dark
       //  modes, but now only supports a single customizable colour scheme.  I retained
@@ -68,7 +88,11 @@ export default function Home () {
     buildConfiguration.publishKey,
     buildConfiguration.subscribeKey,
     buildConfiguration.public_channels,
-    buildConfiguration.app_appearance
+    buildConfiguration.app_appearance,
+    buildConfiguration.user01_name,
+    buildConfiguration.user02_name,
+    buildConfiguration.user01_profileUrl,
+    buildConfiguration.user02_profileUrl
   ])
 
   useEffect(() => {
@@ -81,6 +105,20 @@ export default function Home () {
           subscribeKey: subscribeKey,
           userId: 'admin-config'
         })
+
+        //  Update the local array if any of the users have been specified on the dashboard
+        if (user01Name) {
+          userArray[0].name = user01Name
+        }
+        if (user01ProfileUrl) {
+          userArray[0].avatar = user01ProfileUrl
+        }
+        if (user02Name) {
+          userArray[1].name = user02Name
+        }
+        if (user02ProfileUrl) {
+          userArray[1].avatar = user02ProfileUrl
+        }
 
         const testUser = await localChat.getUser('user-01')
 
@@ -117,6 +155,27 @@ export default function Home () {
             }
           }
           await Promise.all(promises)
+        } else {
+          //  Users already existed on the keyset, but update the name and avatar of any user specified in the config
+          //  as needing a new name / avatar
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const user01UpdateObj: any = {}
+          if (user01Name) {
+            user01UpdateObj.name = user01Name
+          }
+          if (user01ProfileUrl) {
+            user01UpdateObj.profileUrl = user01ProfileUrl
+          }
+          await localChat.updateUser('user-01', user01UpdateObj)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const user02UpdateObj: any = {}
+          if (user02Name) {
+            user02UpdateObj.name = user02Name
+          }
+          if (user02ProfileUrl) {
+            user02UpdateObj.profileUrl = user02ProfileUrl
+          }
+          await localChat.updateUser('user-02', user02UpdateObj)
         }
 
         const testPublicChannel = await localChat.getChannel(
@@ -160,7 +219,16 @@ export default function Home () {
     setLoadMessage('Initializing Keyset')
     shuffleArray(userArray)
     keysetInit()
-  }, [publishKey, subscribeKey, userArray, publicChannelsAvailable])
+  }, [
+    publishKey,
+    subscribeKey,
+    userArray,
+    publicChannelsAvailable,
+    user01Name,
+    user01ProfileUrl,
+    user02Name,
+    user02ProfileUrl
+  ])
 
   function login (userId) {
     setLoggingIn(true)
@@ -168,8 +236,10 @@ export default function Home () {
   }
 
   function shuffleArray (array) {
-    for (let i = array.length - 1; i >= 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1))
+    //  Retain the first two elements as these are adjustable
+    //  on the dashboard
+    for (let i = array.length - 1; i >= 2; i--) {
+      const j = 2 + Math.floor(Math.random() * (i + 1))
       ;[array[i], array[j]] = [array[j], array[i]]
     }
   }
