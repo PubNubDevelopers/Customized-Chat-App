@@ -160,21 +160,13 @@ export default function Home () {
           //  as needing a new name / avatar
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const user01UpdateObj: any = {}
-          if (user01Name) {
-            user01UpdateObj.name = user01Name
-          }
-          if (user01ProfileUrl) {
-            user01UpdateObj.profileUrl = user01ProfileUrl
-          }
+          user01UpdateObj.name = userArray[0].name
+          user01UpdateObj.profileUrl = userArray[0].avatar
           await localChat.updateUser('user-01', user01UpdateObj)
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const user02UpdateObj: any = {}
-          if (user02Name) {
-            user02UpdateObj.name = user02Name
-          }
-          if (user02ProfileUrl) {
-            user02UpdateObj.profileUrl = user02ProfileUrl
-          }
+          user02UpdateObj.name = userArray[1].name
+          user02UpdateObj.profileUrl = userArray[1].avatar
           await localChat.updateUser('user-02', user02UpdateObj)
         }
 
