@@ -133,7 +133,7 @@ export default function Header ({
         >
           <div className='flex flex-row gap-1 items-center text-neutral-50 text-lg font-medium'>
             <div style={{ color: `${colorScheme?.secondary}` }}>PREVIEW</div>{' '}
-            <div style={{ color: `${colorScheme?.accent}` }}>
+            <div style={{ color: `${colorScheme?.secondary}` }}>
               <AlertIcon />
             </div>
           </div>
