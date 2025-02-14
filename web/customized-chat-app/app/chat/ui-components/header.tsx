@@ -3,6 +3,8 @@ import { roboto } from '@/app/fonts'
 import PersonPicker from './personPicker'
 import NewMessageIcon from './icons/newMessageIcon'
 import { useEffect, useState } from 'react'
+//  Only used when embedded within the Chat Builder dashboard
+import { Tooltip } from '@nextui-org/react'
 
 export default function Header ({
   currentUser,
@@ -13,6 +15,25 @@ export default function Header ({
   embeddedDemoConfig,
   colorScheme
 }) {
+  const AlertIcon = props => {
+    return (
+      <svg
+        aria-hidden='true'
+        focusable='false'
+        height='20'
+        role='presentation'
+        viewBox='0 0 16 20'
+        width='16'
+        {...props}
+      >
+        <path
+          d='M7.33325 6.66732H8.66659V8.00066H7.33325V6.66732ZM7.33325 9.33399H8.66659V13.334H7.33325V9.33399ZM7.99992 3.33398C4.31992 3.33398 1.33325 6.32066 1.33325 10.0007C1.33325 13.6807 4.31992 16.6673 7.99992 16.6673C11.6799 16.6673 14.6666 13.6807 14.6666 10.0007C14.6666 6.32066 11.6799 3.33398 7.99992 3.33398ZM7.99992 15.334C5.05992 15.334 2.66659 12.9407 2.66659 10.0007C2.66659 7.06066 5.05992 4.66732 7.99992 4.66732C10.9399 4.66732 13.3333 7.06066 13.3333 10.0007C13.3333 12.9407 10.9399 15.334 7.99992 15.334Z'
+          fill='currentColor'
+        />
+      </svg>
+    )
+  }
+
   const [customerLogoUrl, setCustomerLogoUrl] = useState(
     '/pubnub-logos/pubnub.png'
   )
@@ -90,6 +111,34 @@ export default function Header ({
           {appConfiguration?.customer_name ?? ''}
         </div>
       </div>
+      {embeddedDemoConfig && (
+        <Tooltip
+          content={
+            <div className='flex flex-col'>
+              <div className=''>Preview has limited functionality.</div>
+              <div className=''>
+                Run the app (test your configuration) to fully experience
+                selected chat features
+              </div>
+            </div>
+          }
+          showArrow={false}
+          placement={'right'}
+          offset={-10}
+          classNames={{
+            content: [
+              'bg-brandAccentNavy1-16pc text-neutral-50 text-sm max-w-64'
+            ]
+          }}
+        >
+          <div className='flex flex-row gap-1 items-center text-neutral-50 text-lg font-medium'>
+            <div style={{ color: `${colorScheme?.secondary}` }}>PREVIEW</div>{' '}
+            <div style={{ color: `${colorScheme?.accent}` }}>
+              <AlertIcon />
+            </div>
+          </div>
+        </Tooltip>
+      )}
       <div className='flex items-center mr-2.5'>
         <div
           id='btn-message-new'
