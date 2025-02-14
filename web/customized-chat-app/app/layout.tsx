@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Suspense } from 'react'
 import { Poppins } from 'next/font/google'
 import './globals.css'
-import { NextUIProvider } from '@nextui-org/system'
+import { HeroUIProvider } from '@heroui/react'
 
 const poppins = Poppins({
   weight: ['400', '500', '600', '700'],
@@ -24,7 +24,7 @@ export default function RootLayout ({
     <html lang='en' id='appRoot' className=''>
       <Suspense>
         <body className={poppins.className}>
-          <NextUIProvider>{children}</NextUIProvider>
+          <HeroUIProvider>{children}</HeroUIProvider>
         </body>
       </Suspense>
     </html>

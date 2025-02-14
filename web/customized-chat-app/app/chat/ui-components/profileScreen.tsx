@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Switch } from '@nextui-org/switch'
+import { Switch } from '@heroui/react'
 import Avatar from './avatar'
 import { roboto } from '@/app/fonts'
 import { ToastType } from '../../types'

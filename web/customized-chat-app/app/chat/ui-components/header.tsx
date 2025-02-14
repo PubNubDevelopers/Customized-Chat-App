@@ -4,7 +4,7 @@ import PersonPicker from './personPicker'
 import NewMessageIcon from './icons/newMessageIcon'
 import { useEffect, useState } from 'react'
 //  Only used when embedded within the Chat Builder dashboard
-import { Tooltip } from '@nextui-org/react'
+import { Tooltip } from '@heroui/react'
 
 export default function Header ({
   currentUser,

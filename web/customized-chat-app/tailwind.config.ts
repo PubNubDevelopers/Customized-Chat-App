@@ -1,12 +1,12 @@
 import type { Config } from "tailwindcss";
-const { nextui } = require("@nextui-org/theme");
+const {heroui} = require("@heroui/react");
 
 export default {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
     extend: {
@@ -35,7 +35,7 @@ export default {
   },
   darkMode: "selector",
   plugins: [
-    nextui({
+    heroui({
       themes: {
         light: {
           colors: {},
