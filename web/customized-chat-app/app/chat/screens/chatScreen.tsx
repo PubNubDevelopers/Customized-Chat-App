@@ -329,7 +329,7 @@ export default function ChatScreen ({
         setLoaded(true)
       } catch {
         setLoadMessage(
-          "You need to enable 'App Context' on your keyset.  Please also choose a bucket region close to you, enable all events, allow retrieval of all Metadata events, and disable referential integrity.  After enabling, wait a few seconds for it to apply before refreshing this page."
+          "You need to enable 'App Context' on your keyset.  Please also choose a bucket region close to you, enable all events, and allow retrieval of all Metadata events.  After enabling, wait a few seconds for it to apply before refreshing this page."
         )
       }
     }
