@@ -25,6 +25,7 @@ export default function Home() {
   const [loadMessage, setLoadMessage] = useState('Demo is initializing...')
   const [initialized, setInitialized] = useState(false)
   const [loggingIn, setLoggingIn] = useState(false)
+  const [base64Config, setBase64Config] = useState('')
   const userArray = testUsers
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function Home() {
       const savedConfigurationId = searchParams.get('savedconfig')
       if (encodedConfiguration) {
         console.log('Found runtime configuration')
+        setBase64Config(encodedConfiguration)
         try {
           const jsonConfig = JSON.parse(atob(encodedConfiguration))
           applyJsonConfiguration(jsonConfig)
@@ -49,6 +51,9 @@ export default function Home() {
         if (savedConfig != null) {
           //  savedConfig is a JSON representation of the saved configuration
           applyJsonConfiguration(savedConfig)
+          //  Encode the savedConfig into base64, to pass to the chat screen using the existing logic
+          const encodedSavedConfig = btoa(JSON.stringify(savedConfig))
+          setBase64Config(encodedSavedConfig)
           return
         }
       }
@@ -231,7 +236,14 @@ export default function Home() {
 
   function login(userId) {
     setLoggingIn(true)
-    router.push(`/chat/?userId=${userId}&${searchParams}`)
+    if (base64Config == '')
+    {
+      router.push(`/chat/?userId=${userId}`)
+    }
+    else 
+    {
+      router.push(`/chat/?userId=${userId}&configuration=${base64Config}`)
+    }
   }
 
   function shuffleArray(array) {
