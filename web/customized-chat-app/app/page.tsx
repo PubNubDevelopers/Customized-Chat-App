@@ -10,7 +10,7 @@ import { testUsers, testPublicChannels } from './data/testData'
 import Image from 'next/image'
 import PersonPicker from './chat/ui-components/personPicker'
 
-export default function Home () {
+export default function Home() {
   const searchParams = useSearchParams()
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const buildConfiguration: any = buildConfig
@@ -28,60 +28,67 @@ export default function Home () {
   const userArray = testUsers
 
   useEffect(() => {
-    setLoadMessage('No Publish / Subscribe Keys')
-    //  1. Check for Runtime configuration
-    const encodedConfiguration = searchParams.get('configuration')
-    if (encodedConfiguration) {
-      console.log('Found runtime configuration')
-      try {
-        const jsonConfig = JSON.parse(atob(encodedConfiguration))
-        setPublishKey(jsonConfig['publishKey'])
-        setSubscribeKey(jsonConfig['subscribeKey'])
-        setPublicChannelsAvailable(jsonConfig['public_channels'])
-        setUser01Name(jsonConfig['user01_name'])
-        setUser02Name(jsonConfig['user02_name'])
-        setUser01ProfileUrl(jsonConfig['user01_profileUrl'])
-        setUser02ProfileUrl(jsonConfig['user02_profileUrl'])
-        return
-      } catch {
-        //  Unable to parse provided configuration
-        console.log('Warning: Unable to parse provided runtime configuration')
+    async function init() {
+      //  1. Check for Runtime configuration
+      const encodedConfiguration = searchParams.get('configuration')
+      const savedConfigurationId = searchParams.get('savedconfig')
+      if (encodedConfiguration) {
+        console.log('Found runtime configuration')
+        try {
+          const jsonConfig = JSON.parse(atob(encodedConfiguration))
+          applyJsonConfiguration(jsonConfig)
+          return
+        } catch {
+          //  Unable to parse provided configuration
+          console.log('Warning: Unable to parse provided runtime configuration')
+        }
+      }
+      else if (savedConfigurationId) {
+        console.log('Found saved configuration in runtime with id ' + savedConfigurationId)
+        const savedConfig = await openConfiguration(savedConfigurationId)
+        if (savedConfig != null) {
+          //  savedConfig is a JSON representation of the saved configuration
+          applyJsonConfiguration(savedConfig)
+          return
+        }
+      }
+      //  2. Check for Build time configuration
+      console.log(
+        'No runtime configuration found.  Checking for build time config'
+      )
+      if (buildConfiguration?.publishKey != null) {
+        console.log('Found build time config')
+        setPublishKey(buildConfiguration.publishKey)
+      }
+      if (buildConfiguration?.subscribeKey != null) {
+        setSubscribeKey(buildConfiguration.subscribeKey)
+      }
+      if (buildConfiguration?.public_channels != null) {
+        setPublicChannelsAvailable(buildConfiguration.public_channels)
+      }
+      if (buildConfiguration?.user01_name != null) {
+        setUser01Name(buildConfiguration.user01_name)
+      }
+      if (buildConfiguration?.user02_name != null) {
+        setUser02Name(buildConfiguration.user02_name)
+      }
+      if (buildConfiguration?.user01_profileUrl != null) {
+        setUser01ProfileUrl(buildConfiguration.user01_profileUrl)
+      }
+      if (buildConfiguration?.user02_profileUrl != null) {
+        setUser02ProfileUrl(buildConfiguration.user02_profileUrl)
+      }
+      if (buildConfiguration?.app_appearance != null) {
+        //  This application was originally written to support custom light and dark
+        //  modes, but now only supports a single customizable colour scheme.  I retained
+        //  all the logic to switch between light and dark in case we want to add this again
+        //  in the future.
+        const isDarkMode = buildConfiguration?.app_appearance == 'dark'
+        document.getElementById('appRoot')?.classList.toggle('dark', isDarkMode)
       }
     }
-    //  2. Check for Build time configuration
-    console.log(
-      'No runtime configuration found.  Checking for build time config'
-    )
-    if (buildConfiguration?.publishKey != null) {
-      console.log('Found build time config')
-      setPublishKey(buildConfiguration.publishKey)
-    }
-    if (buildConfiguration?.subscribeKey != null) {
-      setSubscribeKey(buildConfiguration.subscribeKey)
-    }
-    if (buildConfiguration?.public_channels != null) {
-      setPublicChannelsAvailable(buildConfiguration.public_channels)
-    }
-    if (buildConfiguration?.user01_name != null) {
-      setUser01Name(buildConfiguration.user01_name)
-    }
-    if (buildConfiguration?.user02_name != null) {
-      setUser02Name(buildConfiguration.user02_name)
-    }
-    if (buildConfiguration?.user01_profileUrl != null) {
-      setUser01ProfileUrl(buildConfiguration.user01_profileUrl)
-    }
-    if (buildConfiguration?.user02_profileUrl != null) {
-      setUser02ProfileUrl(buildConfiguration.user02_profileUrl)
-    }
-    if (buildConfiguration?.app_appearance != null) {
-      //  This application was originally written to support custom light and dark
-      //  modes, but now only supports a single customizable colour scheme.  I retained
-      //  all the logic to switch between light and dark in case we want to add this again
-      //  in the future.
-      const isDarkMode = buildConfiguration?.app_appearance == 'dark'
-      document.getElementById('appRoot')?.classList.toggle('dark', isDarkMode)
-    }
+    setLoadMessage('No Publish / Subscribe Keys')
+    init();
   }, [
     searchParams,
     router,
@@ -96,7 +103,7 @@ export default function Home () {
   ])
 
   useEffect(() => {
-    async function keysetInit () {
+    async function keysetInit() {
       try {
         if (!publishKey) return
         if (!subscribeKey) return
@@ -222,17 +229,56 @@ export default function Home () {
     user02ProfileUrl
   ])
 
-  function login (userId) {
+  function login(userId) {
     setLoggingIn(true)
     router.push(`/chat/?userId=${userId}&${searchParams}`)
   }
 
-  function shuffleArray (array) {
+  function shuffleArray(array) {
     //  Retain the first two elements as these are adjustable
     //  on the dashboard
     for (let i = array.length - 1; i >= 2; i--) {
       const j = 2 + Math.floor(Math.random() * (i + 1))
-      ;[array[i], array[j]] = [array[j], array[i]]
+        ;[array[i], array[j]] = [array[j], array[i]]
+    }
+  }
+
+  function applyJsonConfiguration(jsonConfig)
+  {
+    setPublishKey(jsonConfig['publishKey'])
+    setSubscribeKey(jsonConfig['subscribeKey'])
+    setPublicChannelsAvailable(jsonConfig['public_channels'])
+    setUser01Name(jsonConfig['user01_name'])
+    setUser02Name(jsonConfig['user02_name'])
+    setUser01ProfileUrl(jsonConfig['user01_profileUrl'])
+    setUser02ProfileUrl(jsonConfig['user02_profileUrl'])
+  }
+
+  async function openConfiguration(configId) {
+    const url = `https://ps.pndsn.com/v1/blocks/sub-key/sub-c-917c12d9-6c7a-435f-817e-f13c23fc50ca/config?id=${configId}`
+    try {
+      const response = await fetch(url, {
+        method: 'GET'
+      })
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`)
+      }
+      const jsonResponse = await response.json()
+      if (jsonResponse.config != null) {
+        return jsonResponse.config
+      } else {
+        console.warn(
+          'Unable to open configuration.  No config known with ID ' + configId
+        )
+        return null
+      }
+    } catch (error) {
+      let errorMsg = 'Error loading configuration'
+      if (error instanceof Error) {
+        errorMsg += `: ${error.message}`
+      }
+      console.log(errorMsg)
+      return null
     }
   }
 
