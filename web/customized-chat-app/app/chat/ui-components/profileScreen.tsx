@@ -235,6 +235,14 @@ export default function ProfileScreen ({
           <div className='text-lg font-semibold'>{user?.externalId}</div>
         </div>
 
+        {user?.custom?.spamming && user?.custom?.spamming > 0 && (
+          <div className='flex flex-col py-2 px-4'>
+            <div className='text-sm'>Spam Detection</div>
+            <div className='text-lg font-semibold'>
+              {'User identified as spamming'}
+            </div>
+          </div>
+        )}
         <div className='flex flex-col py-2 px-4'>
           <div className='text-sm'>Social Handle</div>
           <div className='text-lg font-semibold'>
