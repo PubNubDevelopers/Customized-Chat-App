@@ -65,7 +65,7 @@ This application is designed to be used in conjunction with the [Chat Builder Da
 
 ### Get Your PubNub Keys
 
-1. You’ll first need to sign up for a [PubNub account](https://admin.pubnub.com/signup/). Once you sign up, you can get your unique PubNub keys from the [PubNub Developer Portal](https://admin.pubnub.com/).
+1. You’ll first need to sign up for a [PubNub account](https://admin.pubnub.com/). Once you sign up, you can get your unique PubNub keys from the [PubNub Developer Portal](https://admin.pubnub.com/).
 
 1. Sign in to your [PubNub Dashboard](https://admin.pubnub.com/).
 
