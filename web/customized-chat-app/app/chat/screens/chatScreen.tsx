@@ -796,7 +796,7 @@ export default function ChatScreen ({
     })
 
     const removeModerationListener = chat.listenForEvents({
-      channel: chat.currentUser.id,
+      channel: `PUBNUB_INTERNAL_MODERATION.${chat.currentUser.id}`,
       type: 'moderation',
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       callback: async evt => {
