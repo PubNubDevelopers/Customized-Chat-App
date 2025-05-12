@@ -22,10 +22,13 @@ export default function RootLayout ({
 }>) {
   return (
     <html lang='en' id='appRoot' className=''>
+      <head>
+      <script src="https://www.pubnub.com/scripts/amplitude.js" defer></script>
+      </head>
       <Suspense>
-        <body className={poppins.className}>
-          <HeroUIProvider>{children}</HeroUIProvider>
-        </body>
+      <body className={poppins.className}>
+        <HeroUIProvider>{children}</HeroUIProvider>
+      </body>
       </Suspense>
     </html>
   )
