@@ -161,8 +161,9 @@ export function giveUserAvatarUrl(userArray, currentUserId) {
     : "/avatars/placeholder.png";
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function giveGroupAvatarUrl(currentUserProfileUrl) {
-  return currentUserProfileUrl ?? "/avatars/placeholder.png";
+  return "/group/generic-group.png";
 }
 
 export function givePublicAvatarUrl(channel) {
